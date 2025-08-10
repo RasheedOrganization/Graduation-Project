@@ -9,7 +9,7 @@ const randomUuid = v4();
 export default function CreateNewRoom() {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
-    const [roomid, setRoomid] = useState(randomUuid);
+    const [roomid] = useState(randomUuid);
   
     const handleUsernameChange = (e) => {
       setUsername(e.target.value);

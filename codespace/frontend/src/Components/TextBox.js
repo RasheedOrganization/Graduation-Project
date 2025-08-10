@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import '../App.css'
+import '../App.css';
 import CodeMirror from '@uiw/react-codemirror';
-import { StreamLanguage } from '@codemirror/language';
 import { cpp } from '@codemirror/lang-cpp';
 
 // Replace with the URL you want to send the request to
@@ -16,22 +14,21 @@ export default function TextBox({socketRef,currentProbId}) {
     const [textvalue, setTextvalue] = useState(defaultText);
     const [inputvalue, setInputvalue] = useState('');
     const [outputvalue, setOutputvalue] = useState('');
-    const [verdict, setVerdict] = useState('');
     const [color, setColor] = useState('black');
 
-    function SocketEmit(channel,msg){
+    const SocketEmit = useCallback((channel,msg) => {
         if(socketRef.current){
             socketRef.current.emit(channel,{code:msg});
         }
-    }
+    }, [socketRef]);
 
     useEffect(() => {
         if(socketRef.current){
             socketRef.current.on('receive-code-update', (payload) => {
                 setTextvalue(payload.code);
-            });   
+            });
         }
-    },[socketRef.current]);
+    },[socketRef]);
 
 
     useEffect(() => {
@@ -46,10 +43,10 @@ export default function TextBox({socketRef,currentProbId}) {
       }, [outputvalue]);
 
 
-    const Handlechange = React.useCallback((val, viewUpdate) => {
+    const Handlechange = useCallback((val, viewUpdate) => {
         setTextvalue(val);
         SocketEmit('update-code',val);
-    }, []);
+    }, [SocketEmit]);
 
     function Handlechangeinput(e) {
         setInputvalue(e.target.value);

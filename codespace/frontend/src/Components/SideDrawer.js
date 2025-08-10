@@ -49,10 +49,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const ContentContainer = styled('div')(({ open, theme }) => ({
   marginLeft: open ? drawerWidth : closedWidth,
-  transition: 'margin 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
+  transition: 'margin 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms, padding 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
   flexGrow: 1,
   padding: theme.spacing(10),
-  transition: 'padding 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
 }));
 
 const emojis = ['🧑', '👨', '🧔', '', '', '', '', '']; // Fill in with your desired emojis

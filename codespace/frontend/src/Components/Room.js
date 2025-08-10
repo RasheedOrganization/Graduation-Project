@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useState , useRef } from 'react';
 import MiniDrawer from './SideDrawer';
 import Split from 'react-split';
-import Main_LHS from './LHS/Main_LHS';
+import MainLHS from './LHS/MainLHS';
 import io from 'socket.io-client';  
 import SimplePeer from 'simple-peer';
 
@@ -33,18 +33,13 @@ const Video = (props) => {
   useEffect(() => {
       props.peer.on("stream", stream => {
           ref.current.srcObject = stream;
-      })
-  }, []);
+      });
+  }, [props.peer]);
 
   return (
       <StyledVideo playsInline autoPlay ref={ref} />
   );
 }
-
-const videoConstraints = {
-  height: window.innerHeight / 2,
-  width: window.innerWidth / 2
-};
 
 
 export default function Room() {
@@ -52,7 +47,7 @@ export default function Room() {
     console.log(`roomid is: ${roomid}`);
     console.log(`userid is: ${userid}`);
     const [peers,setPeers] = useState([]);
-    const [isMicOn, setIsMicOn] = useState(true);
+    const [isMicOn] = useState(true);
     const [currentProbId,setCurrentProb] = useState(null);
     const [members_in_room,setMembersInRoom] = useState([userid]);
     const userVideo = useRef();
@@ -75,10 +70,8 @@ export default function Room() {
     },[])
 
     function turnonmic(){
-        let audioStream = null;
         // socketRef.current = io("localhost:6909/", { transports: ['websocket'] });
         navigator.mediaDevices.getUserMedia({video: false, audio: true}).then(stream => {
-            audioStream = stream;
             if(!isMicOn){
                 // stream.getAudioTracks().forEach((track) => {
                 //     track.enabled = false; // Mute the audio track
@@ -197,7 +190,7 @@ export default function Room() {
                 }}
             >
                 <div className="LHS-container">
-                    <Main_LHS socketRef={socketRef} currentProbId={currentProbId} setCurrentProb={setCurrentProb} />
+                    <MainLHS socketRef={socketRef} currentProbId={currentProbId} setCurrentProb={setCurrentProb} />
                 </div>
                 <div className="RHS-container">
                     <TextBox socketRef={socketRef} currentProbId={currentProbId} />
