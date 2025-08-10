@@ -5,9 +5,10 @@ const { stderr } = require('process');
 
 require('dotenv').config();
 
+// Allow configuration of the Redis connection while providing sensible defaults
 const connectionOptions = {
-    host: '0.0.0.0',
-    port: 6379
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10)
 };
 
 const scrapingQueue = new Queue('scrapingProcess',{connection: connectionOptions});
@@ -32,7 +33,9 @@ async function scrapingWorker(job) {
             try {
                 const parsedOutput = JSON.parse(stdout);
                 //TODO: backend crashes here if link is invalid
-                redisClient.setEx(req_problem, 60000, JSON.stringify(parsedOutput));
+                if (redisClient.isOpen) {
+                    redisClient.setEx(req_problem, 60000, JSON.stringify(parsedOutput));
+                }
                 resolve(parsedOutput);
             } catch (err) {
                 console.error(err);

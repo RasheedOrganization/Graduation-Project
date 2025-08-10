@@ -6,9 +6,10 @@ const docker = new Docker();
 
 require('dotenv').config();
 
+// Allow configuration of the Redis connection while providing sensible defaults
 const connectionOptions = {
-    host: '0.0.0.0',
-    port: 6379
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10)
 };
 
 // this always runs inhouse, so we should be fine with hardcoding it
