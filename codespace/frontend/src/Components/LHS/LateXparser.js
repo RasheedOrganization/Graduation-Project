@@ -10,12 +10,12 @@ function App({text,setText,input,setInput,handleClose}) {
   useEffect(() => {
     setTmpText(renderTextWithKaTeX(inputval));
     setText(inputval);
-  }, [inputval]);
+  }, [inputval, setText]);
 
   useEffect(() => {
     setTmpText(renderTextWithKaTeX(input));
     setText(input);
-  }, [input]);
+  }, [input, setText]);
 
 
   function renderTextWithKaTeX(text) {

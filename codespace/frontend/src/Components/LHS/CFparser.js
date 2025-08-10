@@ -3,7 +3,6 @@ import axios from 'axios';
 
 const CFparser = ({setStatement,setProblemName,setSampleInput,setSampleOutput,setInput}) => {
   const [param, setparam] = useState('');
-  const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -87,8 +86,7 @@ const CFparser = ({setStatement,setProblemName,setSampleInput,setSampleOutput,se
       try {
         const encodedURL = encodeURIComponent(param);
         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/parse_problem/${encodedURL}`);
-        setData(response.data);
-        go(response.data); 
+        go(response.data);
       } catch (err) {   
         setError(err.message);
       } finally {
