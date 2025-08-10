@@ -13,8 +13,8 @@ export default function Navbar() {
           <Link to="/signup">Signup</Link>
         </>
       )}
+      {token && <Link to="/solve-problem">Problem List</Link>}
       {token && role === 'admin' && <Link to="/create-problem">Create Problem</Link>}
-      {token && role === 'user' && <Link to="/solve-problem">Solve Problem</Link>}
     </nav>
   );
 }
