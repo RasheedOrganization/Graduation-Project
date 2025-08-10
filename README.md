@@ -34,6 +34,7 @@ This script requires the AWS CLI to be installed and configured.
 
 - `POST /auth/register` – register a new user. Sends `username`, `email`, `password` and optionally `role` (`admin` or `user`). Creating an admin requires an existing admin's JWT in the `Authorization` header.
 - `POST /auth/login` – log in with `email` and `password`. Returns a JWT and the user's role.
+- `POST /api/new` – create a new problem. Requires an admin's JWT in `Authorization: Bearer <token>`. Body fields: `id`, `problem_name`, `statement`, `sinput`, `soutput`, `main_tests`, `expected_output`. Returns a success message or validation errors.
 
 All protected routes expect the JWT in the `Authorization: Bearer <token>` header. Only users with role `admin` may create or edit problems.
 

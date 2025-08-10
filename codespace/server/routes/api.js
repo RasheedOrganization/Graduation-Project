@@ -36,8 +36,6 @@ function newProblem(data, userId){
     statement,
     sinput,
     soutput,
-    main_tests,
-    expected_output,
   } = data;
 
   const problem_package = new problem_model({
@@ -49,21 +47,7 @@ function newProblem(data, userId){
     createdBy: userId,
   });
 
-  // const tests_package = new tests_model({
-  //   id,
-  //   main_tests,
-  //   expected_output,
-  // });
-
-  problem_package.save()
-  .then(() => {
-    console.log('problem_package saved successfully');
-  })
-  .catch(error => {
-    console.error('Error saving problem_package:', error.message);
-  });
-
-  
+  return problem_package.save();
 }
 
 function waitforJobCompletion(queue,job){
@@ -111,18 +95,26 @@ router.get('/', (req, res) => {
 });
 
 router.post('/new', authenticate, authorizeRoles('admin'), async (req,res) => {
+  const requiredFields = ['id','problem_name','statement','sinput','soutput','main_tests','expected_output'];
+  const missing = requiredFields.filter(field => !req.body[field]);
+  if (missing.length) {
+    return res.status(400).json({ message: `Missing fields: ${missing.join(', ')}` });
+  }
+
   try{
     if (redisClient.isOpen) {
       await redisClient.flushAll();
     }
-    newProblem(req.body, req.user.id);
+    await newProblem(req.body, req.user.id);
     const { id, main_tests, expected_output } = req.body;
     // store test data locally
     saveFile(`${id}`, 'input.txt', main_tests);
     saveFile(`${id}`, 'output.txt', expected_output);
+    res.status(201).json({ message: 'Problem created successfully' });
   }
   catch(error){
     console.error(error);
+    res.status(500).json({ message: 'Failed to create problem' });
   }
 
 })
