@@ -8,14 +8,6 @@ const { redisClient } = require('../model/redisModel');
 const {scrapingQueue} = require('../jobs/webScrapingWorker')
 const { saveFile, getTestData } = require('../controllers/fileStorage');
 const expire_time = 3600;
-redisClient.connect();
-redisClient.set('key', 'value', (err, reply) => {
-  if (err) {
-      console.error('Error setting value in Redis:', err);
-  } else {
-      console.log('Value set in Redis:', reply);
-  }
-});
 
 const ProblemSchema = new mongoose.Schema({
   id: String,
@@ -115,9 +107,11 @@ router.get('/', (req, res) => {
   res.send('Hi');
 });
 
-router.post('/new', (req,res) => {
+router.post('/new', async (req,res) => {
   try{
-    redisClient.flushAll();
+    if (redisClient.isOpen) {
+      await redisClient.flushAll();
+    }
     newProblem(req.body);
     const { id, main_tests, expected_output } = req.body;
     // store test data locally
@@ -132,13 +126,18 @@ router.post('/new', (req,res) => {
 
 router.get('/problem-list',async (req,res) => {
   try{
-    var data = await redisClient.get("problem-list");
-    if(data===null){
+    let data;
+    if (redisClient.isOpen) {
+      data = await redisClient.get("problem-list");
+    }
+    if(!data){
       console.log("We don't have that cached sire");
       data = await getProblemList();
       console.log(data);
       // cache the problems now
-      redisClient.set("problem-list",JSON.stringify(data));
+      if (redisClient.isOpen) {
+        await redisClient.set("problem-list",JSON.stringify(data));
+      }
       res.send(data);
     }
     else{
@@ -158,7 +157,10 @@ router.get('/parse_problem/:param',async (req,res) => {
   // console.log(redisClient);
   
   const req_problem = decodeURIComponent(req.params.param);
-  var data = await redisClient.get(req_problem);
+  var data = null;
+  if (redisClient.isOpen) {
+    data = await redisClient.get(req_problem);
+  }
   console.log(data);
   if(data!==null){
     res.json(JSON.parse(data));
@@ -187,15 +189,20 @@ router.post('/get-test-package', async (req,res) => {
   // needs to return a nice json!
   // so we get data from bucket and make it a json!
   try{
-    var data = await redisClient.get(id);
+    var data = null;
+    if (redisClient.isOpen) {
+      data = await redisClient.get(id);
+    }
     if(data===null){
       console.log("We don't have that cached sire");
       // I hope memory does not blow up with caching big tests bruh!
 
       data = await getTestData(id);
-      
+
       // cache the problems now
-      redisClient.setEx(id,expire_time,JSON.stringify(data));
+      if (redisClient.isOpen) {
+        await redisClient.setEx(id,expire_time,JSON.stringify(data));
+      }
       res.json(data);
     }
     else{
