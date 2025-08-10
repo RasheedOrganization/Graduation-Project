@@ -6,7 +6,7 @@ const url = process.env.MONGODB_URI;
 const {QueueEvents} = require('bullmq');
 const { redisClient } = require('../model/redisModel');
 const {scrapingQueue} = require('../jobs/webScrapingWorker')
-const {uploadFile,getTestData} = require('../controllers/s3Controller');
+const { saveFile, getTestData } = require('../controllers/fileStorage');
 const expire_time = 3600;
 redisClient.connect();
 redisClient.set('key', 'value', (err, reply) => {
@@ -69,12 +69,6 @@ function newProblem(data){
   });
 
   
-  // push test data to s3 bucket
-
-  // hardcoding file names untill I implement multitests!!
-  uploadFile(`${data.id}/input`,'input.txt',data.main_tests);
-  uploadFile(`${data.id}/output`,'output.txt',data.expected_output);
-
 }
 
 function waitforJobCompletion(queue,job){
@@ -125,11 +119,15 @@ router.post('/new', (req,res) => {
   try{
     redisClient.flushAll();
     newProblem(req.body);
+    const { id, main_tests, expected_output } = req.body;
+    // store test data locally
+    saveFile(`${id}`, 'input.txt', main_tests);
+    saveFile(`${id}`, 'output.txt', expected_output);
   }
   catch(error){
     console.error(error);
   }
-  
+
 })
 
 router.get('/problem-list',async (req,res) => {
