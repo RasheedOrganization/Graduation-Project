@@ -34,6 +34,8 @@ function ChildModal({socketRef, text,setText,input,setInput}) {
   const [mainTestsInput, setMainTestsInput] = React.useState('');
   const [expectedOutput, setExpectedOutput] = React.useState('');
   const id = uuidv4();
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
 
   const handleOpen = () => {
     setOpen(true);
@@ -52,7 +54,7 @@ function ChildModal({socketRef, text,setText,input,setInput}) {
         soutput: sampleOutput,
         main_tests: mainTestsInput,
         expected_output: expectedOutput,
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
 
       console.log(response.data.message);
     } catch (error) {
@@ -62,7 +64,7 @@ function ChildModal({socketRef, text,setText,input,setInput}) {
 
   return (
     <React.Fragment>
-      <Button onClick={handleOpen}>Create</Button>
+      {role === 'admin' && <Button onClick={handleOpen}>Create</Button>}
       <Modal
         open={open}
         onClose={handleClose}

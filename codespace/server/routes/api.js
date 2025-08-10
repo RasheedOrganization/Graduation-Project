@@ -7,6 +7,7 @@ const {QueueEvents} = require('bullmq');
 const { redisClient } = require('../model/redisModel');
 const {scrapingQueue} = require('../jobs/webScrapingWorker')
 const { saveFile, getTestData } = require('../controllers/fileStorage');
+const { authenticate, authorizeRoles } = require('../middleware/auth');
 const expire_time = 3600;
 
 const ProblemSchema = new mongoose.Schema({
@@ -15,6 +16,7 @@ const ProblemSchema = new mongoose.Schema({
   statement:  String,
   sinput: String,
   soutput: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 const testsSchema = new mongoose.Schema({
@@ -27,7 +29,7 @@ const problem_model = mongoose.model('Problem Packages',ProblemSchema);
 // const tests_model = mongoose.model('Test Packages',testsSchema);
 mongoose.connect(url);
 
-function newProblem(data){
+function newProblem(data, userId){
   const {
     id,
     problem_name,
@@ -44,6 +46,7 @@ function newProblem(data){
     statement,
     sinput,
     soutput,
+    createdBy: userId,
   });
 
   // const tests_package = new tests_model({
@@ -107,12 +110,12 @@ router.get('/', (req, res) => {
   res.send('Hi');
 });
 
-router.post('/new', async (req,res) => {
+router.post('/new', authenticate, authorizeRoles('admin'), async (req,res) => {
   try{
     if (redisClient.isOpen) {
       await redisClient.flushAll();
     }
-    newProblem(req.body);
+    newProblem(req.body, req.user.id);
     const { id, main_tests, expected_output } = req.body;
     // store test data locally
     saveFile(`${id}`, 'input.txt', main_tests);
