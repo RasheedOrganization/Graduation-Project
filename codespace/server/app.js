@@ -167,6 +167,7 @@ app.use((req, res, next) => {
     });
   });
 
-server.listen(6909, () => {
-    console.log(`server listening`);
+const PORT = process.env.PORT || 6909;
+server.listen(PORT, () => {
+    console.log(`server listening on ${PORT}`);
 })
