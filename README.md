@@ -42,3 +42,19 @@ All protected routes expect the JWT in the `Authorization: Bearer <token>` heade
 
 - `Login` and `Signup` pages interact with the new authentication endpoints.
 - `Navbar` shows different options based on the logged-in user's role. Admins see links to create problems while normal users see links to solve problems.
+
+## Docker setup
+
+The entire project can be run using Docker Compose. Ensure Docker and
+Docker Compose are installed, then run:
+
+```
+docker-compose up --build
+```
+
+This builds and starts the server, client, judge, and MongoDB services. The
+React client is available at [http://localhost:3000](http://localhost:3000)
+and the Node.js server at [http://localhost:5000](http://localhost:5000).
+Source directories are mounted into the containers for hot reloading during
+development, and environment variables such as the Mongo connection string
+and JWT secret are configured via `docker-compose.yml`.
