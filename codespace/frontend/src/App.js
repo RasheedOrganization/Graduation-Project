@@ -1,12 +1,12 @@
-import './App.css';
-import WelcomePage from './Components/WelcomePage';
-import LoginPage from './Components/LoginPage';
-import SignupPage from './Components/SignupPage';
-import JoinRoom from './Components/JoinRoom';
+import './styles/App.css';
+import WelcomePage from './pages/WelcomePage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import JoinRoom from './components/JoinRoom';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
-import CreateNewRoom from './Components/CreateNewRoom';
-import Room from './Components/Room';
-import GetUsername from './Components/GetUsername';
+import CreateNewRoom from './components/CreateNewRoom';
+import Room from './components/Room';
+import GetUsername from './components/GetUsername';
 
 function App(){
   console.log(process.env);

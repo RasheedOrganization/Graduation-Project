@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../Samples.css'
+import '../../styles/Samples.css'
 const Samples = ({sampleInput,sampleOutput}) => {
 
 return (
