@@ -27,3 +27,21 @@ node server/scripts/migrateFromS3.js <s3-bucket-name>
 ```
 
 This script requires the AWS CLI to be installed and configured.
+
+## Frontend entry flow
+
+The React frontend now provides a landing page and authentication funnel:
+
+- `http://localhost:3000/` – Welcome page with a hero banner and a button to log in or sign up.
+- `/login` – Login form that posts to `/api/auth/login` and stores the returned JWT. Successful logins redirect to `/join`.
+- `/signup` – Signup form for new users posting to `/api/auth/register`. After registration the user is redirected to `/login`.
+
+To run the frontend locally:
+
+```
+cd codespace/frontend
+npm install
+npm start
+```
+
+Then open [http://localhost:3000/](http://localhost:3000/) in your browser.
