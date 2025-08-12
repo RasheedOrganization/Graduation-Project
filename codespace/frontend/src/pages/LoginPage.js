@@ -12,7 +12,7 @@ function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
+      const res = await fetch(`http://localhost:6909/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password }),

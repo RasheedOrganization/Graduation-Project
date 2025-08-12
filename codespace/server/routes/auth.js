@@ -28,6 +28,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { identifier, password } = req.body;
+  
   try {
     const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
     if (!user) {
@@ -37,11 +38,13 @@ router.post('/login', async (req, res) => {
     if (!match) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
+    console.log(user);
     const token = jwt.sign(
       { id: user._id, username: user.username },
-      process.env.JWT_SECRET,
+      "6c0f87cc526802c1d5b1fd13ca74d873",
       { expiresIn: '1h' }
     );
+    
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
