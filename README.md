@@ -13,6 +13,7 @@ Create a `.env` file inside the `server/` folder with:
 ```
 MONGODB_URI=<your mongodb uri>
 TEST_DATA_DIR=./test-data
+JWT_SECRET=<your jwt secret>
 ```
 
 `TEST_DATA_DIR` controls where test files are saved and loaded from.
