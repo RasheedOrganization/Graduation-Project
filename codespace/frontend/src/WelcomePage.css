@@ -1,0 +1,34 @@
+.welcome-background {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.welcome-hero {
+  text-align: center;
+  color: #333;
+  padding: 2rem;
+}
+
+.welcome-title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-button {
+  margin-top: 2rem;
+  padding: 0.75rem 2rem;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.welcome-button:hover {
+  background-color: #115293;
+}
