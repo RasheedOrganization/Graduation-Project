@@ -1,7 +1,7 @@
 import './App.css';
-import WelcomePage from './components/WelcomePage';
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage';
+import WelcomePage from './Components/WelcomePage';
+import LoginPage from './Components/LoginPage';
+import SignupPage from './Components/SignupPage';
 import JoinRoom from './Components/JoinRoom';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import CreateNewRoom from './Components/CreateNewRoom';
