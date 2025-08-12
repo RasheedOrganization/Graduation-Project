@@ -1,5 +1,5 @@
 import TextBox from './TextBox';
-import '../App.css'
+import '../styles/App.css'
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { useState , useRef } from 'react';
