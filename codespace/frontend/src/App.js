@@ -7,6 +7,10 @@ import Room from './components/Room';
 import GetUsername from './components/GetUsername';
 import ContestPage from './pages/ContestPage';
 import RoomsPage from './pages/RoomsPage';
+import ProblemsPage from './pages/ProblemsPage';
+import ResourcesPage from './pages/ResourcesPage';
+import SectionsPage from './pages/SectionsPage';
+import ContactPage from './pages/ContactPage';
 
 function App(){
   console.log(process.env);
@@ -16,8 +20,12 @@ function App(){
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/problems" element={<ProblemsPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/sections" element={<SectionsPage />} />
         <Route path="/contest" element={<ContestPage />} />
         <Route path="/rooms" element={<RoomsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/rooms/:roomid/:userid" element={<Room />} />
         <Route path="/rooms/:roomid" element={<GetUsername />} />
       </Routes>
