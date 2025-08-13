@@ -18,12 +18,12 @@ export default function CreateNewRoom() {
     const handleSubmit = (e) => {
       e.preventDefault();
       socket.emit('join-room',{username:username,roomid:roomid});
-      navigate(`/room/${roomid}`);
+      navigate(`/rooms/${roomid}`);
     };
 
-    return (
-      <div>
-        <h2>Create Room</h2>
+      return (
+        <div className="auth-card">
+          <h2>Create Room</h2>
         <form onSubmit={handleSubmit}>
           <div>
             <label htmlFor="username">Username</label>
@@ -34,7 +34,7 @@ export default function CreateNewRoom() {
               onChange={handleUsernameChange}
             />
           </div>
-          <button type="submit">Login</button>
+          <button type="submit">Create</button>
         </form>
       </div>
     );
