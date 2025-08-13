@@ -1,0 +1,17 @@
+@import './AuthPage.css';
+
+.rooms-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.rooms-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  padding: 2rem;
+}

@@ -23,7 +23,7 @@ function LoginPage() {
         return;
       }
       localStorage.setItem('token', data.token);
-      navigate('/join');
+      navigate('/');
     } catch (err) {
       setError('Login failed');
     }

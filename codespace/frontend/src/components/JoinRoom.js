@@ -21,12 +21,12 @@ export default function JoinRoom() {
     const handleSubmit = (e) => {
       e.preventDefault();
       socket.emit('join-room',{username:username,roomid:roomid});
-      navigate(`/room/${roomid}`);
+      navigate(`/rooms/${roomid}`);
     };
   
-    return (
-      <div>
-        <h2>Join Room</h2>
+      return (
+        <div className="auth-card">
+          <h2>Join Room</h2>
         <form onSubmit={handleSubmit}>
           <div>
             <label htmlFor="username">Username</label>
@@ -47,7 +47,7 @@ export default function JoinRoom() {
             />
           </div>
           <br />
-        <button type="submit">Login</button>
+        <button type="submit">Join</button>
         </form>
         {/* <button>Hi</button> */}
       </div>

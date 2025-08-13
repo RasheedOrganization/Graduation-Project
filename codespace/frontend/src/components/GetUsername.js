@@ -18,7 +18,7 @@ export default function GetUsername() {
 
     function handleSubmit(e){
         e.preventDefault();
-        navigate(`/room/${roomid}/${username}`);
+        navigate(`/rooms/${roomid}/${username}`);
     }
 
     return (
