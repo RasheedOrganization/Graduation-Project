@@ -8,7 +8,8 @@ export default function CreateNewRoom({ onBack }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const roomid = v4();
+  const [roomId, setRoomId] = useState(v4());
+  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,13 +18,13 @@ export default function CreateNewRoom({ onBack }) {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:6909/api/rooms/create`, {
+      const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomid, isPrivate, password: isPrivate ? password : undefined }),
+        body: JSON.stringify({ roomid: roomId, isPrivate, password: isPrivate ? password : undefined }),
       });
       if (res.ok) {
-        navigate(`/rooms/${roomid}`);
+        navigate(`/rooms/${roomId}`);
       } else {
         const data = await res.json();
         setError(data.message || 'Error creating room');
@@ -37,6 +38,16 @@ export default function CreateNewRoom({ onBack }) {
     <div className="auth-card">
       <h2>Create Room</h2>
       <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="roomid">Room ID</label>
+          <input
+            type="text"
+            id="roomid"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+            required
+          />
+        </div>
         <div>
           <label>Room Type</label>
           <select

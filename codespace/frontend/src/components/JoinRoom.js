@@ -7,13 +7,14 @@ export default function JoinRoom({ onCreateClick }) {
   const [password, setPassword] = useState('');
   const [needsPassword, setNeedsPassword] = useState(false);
   const [error, setError] = useState('');
+  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const body = { roomid };
     if (needsPassword) body.password = password;
     try {
-      const res = await fetch(`http://localhost:6909/api/rooms/join`, {
+      const res = await fetch(`${API_BASE_URL}/api/rooms/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

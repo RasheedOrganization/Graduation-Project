@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/NavBar.css';
 import logo from '../assets/images/logo.svg';
+import userIcon from '../assets/images/user.svg';
 
 function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -39,12 +40,18 @@ function NavBar() {
         {loggedIn && (
           <li className="profile-container">
             <button className="profile-button" onClick={() => setOpen(!open)}>
-              <span role="img" aria-label="profile">👦</span>
+              <img src={userIcon} alt="User avatar" className="profile-avatar" />
             </button>
             {open && (
               <ul className="profile-dropdown">
-                <li><Link to="/profile" onClick={() => setOpen(false)}>Profile</Link></li>
-                <li><button onClick={handleLogout}>Log out</button></li>
+                <li>
+                  <Link to="/profile" onClick={() => setOpen(false)}>
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout}>Log out</button>
+                </li>
               </ul>
             )}
           </li>
