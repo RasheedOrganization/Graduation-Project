@@ -7,6 +7,7 @@ import axios from 'axios';
 import {v4 as uuidv4} from 'uuid';
 import ProblemList from './ProblemList';
 import CFparser from './CFparser';
+import BACKEND_URL from '../../config';
 
 const style = {
   position: 'absolute',
@@ -23,7 +24,7 @@ const style = {
   overflow: 'auto',
 };
 
-const api = `${process.env.REACT_APP_BACKEND_URL}/api/new`
+const api = `${BACKEND_URL}/api/new`
 
 function ChildModal({socketRef, text,setText,input,setInput}) {
   const [open, setOpen] = React.useState(false);

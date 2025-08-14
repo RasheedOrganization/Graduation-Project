@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
+import BACKEND_URL from '../config';
 
 export default function CreateNewRoom({ onBack }) {
   const navigate = useNavigate();
@@ -9,7 +10,6 @@ export default function CreateNewRoom({ onBack }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [roomId, setRoomId] = useState(v4());
-  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +18,7 @@ export default function CreateNewRoom({ onBack }) {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
+      const res = await fetch(`${BACKEND_URL}/api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomid: roomId, isPrivate, password: isPrivate ? password : undefined }),

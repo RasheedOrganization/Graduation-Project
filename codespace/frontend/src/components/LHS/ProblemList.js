@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import BACKEND_URL from '../../config';
 
-const api = `${process.env.REACT_APP_BACKEND_URL}/api/problem-list`;
+const api = `${BACKEND_URL}/api/problem-list`;
 
 function ProblemList({socketRef , setCurrentProb , setProblemName, setSampleInput, setSampleOutput, setInput}) {
     const [data, setData] = useState([]);
