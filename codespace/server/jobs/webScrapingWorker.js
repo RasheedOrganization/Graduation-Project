@@ -48,7 +48,8 @@ async function scrapingWorker(job) {
 
 const worker = new Worker('scrapingProcess',scrapingWorker, {
     connection: connectionOptions,
-    concurrency: parseInt(process.env.CONCURRENT_SCRAPING_WORKERS)
+    // Default to a single worker if the environment variable is undefined or invalid
+    concurrency: parseInt(process.env.CONCURRENT_SCRAPING_WORKERS, 10) || 1
 });
     
 
