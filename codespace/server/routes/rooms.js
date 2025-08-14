@@ -9,12 +9,14 @@ const url = process.env.MONGODB_URI;
 mongoose.connect(url);
 
 router.post('/create', async (req, res) => {
-  const { roomid, isPrivate, password } = req.body;
+  const { isPrivate, password } = req.body;
   try {
-    const existing = await Room.findOne({ roomid });
-    if (existing) {
-      return res.status(400).json({ message: 'Room already exists' });
-    }
+    let roomid;
+    // Generate a unique 4 digit room id
+    do {
+      roomid = Math.floor(1000 + Math.random() * 9000).toString();
+    } while (await Room.findOne({ roomid }));
+
     const room = new Room({ roomid, isPrivate, password: isPrivate ? password : undefined });
     await room.save();
     res.json({ roomid });

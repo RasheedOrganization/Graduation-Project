@@ -24,7 +24,8 @@ export default function JoinRoom({ onCreateClick }) {
         setNeedsPassword(true);
         setError('');
       } else if (res.ok) {
-        navigate(`/rooms/${roomid}`);
+        localStorage.setItem('roomid', roomid);
+        navigate('/room');
       } else {
         setError(data.message || 'Error joining room');
       }
@@ -44,6 +45,7 @@ export default function JoinRoom({ onCreateClick }) {
             id="roomid"
             value={roomid}
             onChange={(e) => setRoomid(e.target.value)}
+            required
           />
         </div>
         {needsPassword && (
@@ -54,6 +56,7 @@ export default function JoinRoom({ onCreateClick }) {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
         )}

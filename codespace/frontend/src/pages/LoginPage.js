@@ -24,6 +24,13 @@ function LoginPage() {
         return;
       }
       localStorage.setItem('token', data.token);
+      try {
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        localStorage.setItem('username', payload.username);
+        localStorage.setItem('userid', payload.id);
+      } catch (e) {
+        console.error('Failed to decode token');
+      }
       navigate('/');
     } catch (err) {
       setError('Login failed');

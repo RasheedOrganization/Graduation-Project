@@ -1,7 +1,6 @@
 import TextBox from './TextBox';
 import '../styles/App.css'
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router-dom';
 import { useState , useRef } from 'react';
 import MiniDrawer from './SideDrawer';
 import Split from 'react-split';
@@ -9,6 +8,7 @@ import MainLHS from './LHS/MainLHS';
 import io from 'socket.io-client';
 import SimplePeer from 'simple-peer';
 import BACKEND_URL from '../config';
+import '../styles/RoomPage.css';
 
 import styled from "styled-components";
 
@@ -44,7 +44,8 @@ const Video = (props) => {
 
 
 export default function Room() {
-    const {roomid,userid} = useParams();
+    const roomid = localStorage.getItem('roomid');
+    const userid = localStorage.getItem('userid');
     console.log(`roomid is: ${roomid}`);
     console.log(`userid is: ${userid}`);
     const [peers,setPeers] = useState([]);
@@ -175,6 +176,7 @@ export default function Room() {
       }
 
       return (
+        <div className="editor-background">
         <div className='main'>
             <Split
                 sizes={[20, 80]}
@@ -205,6 +207,7 @@ export default function Room() {
                     <Video key={index} peer={peer} />
                 ))}
             </Container>
+        </div>
         </div>
     );
 };

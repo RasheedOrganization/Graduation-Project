@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import BACKEND_URL from '../config';
 
@@ -9,7 +8,6 @@ export default function CreateNewRoom({ onBack }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [roomId, setRoomId] = useState(v4());
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,10 +19,12 @@ export default function CreateNewRoom({ onBack }) {
       const res = await fetch(`${BACKEND_URL}/api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomid: roomId, isPrivate, password: isPrivate ? password : undefined }),
+        body: JSON.stringify({ isPrivate, password: isPrivate ? password : undefined }),
       });
       if (res.ok) {
-        navigate(`/rooms/${roomId}`);
+        const data = await res.json();
+        localStorage.setItem('roomid', data.roomid);
+        navigate('/room');
       } else {
         const data = await res.json();
         setError(data.message || 'Error creating room');
@@ -38,16 +38,6 @@ export default function CreateNewRoom({ onBack }) {
     <div className="auth-card">
       <h2>Create Room</h2>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="roomid">Room ID</label>
-          <input
-            type="text"
-            id="roomid"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            required
-          />
-        </div>
         <div>
           <label>Room Type</label>
           <select
@@ -67,6 +57,7 @@ export default function CreateNewRoom({ onBack }) {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <div>
@@ -76,6 +67,7 @@ export default function CreateNewRoom({ onBack }) {
                 id="confirm"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
           </>
