@@ -17,7 +17,7 @@ export default function CreateNewRoom({ onBack }) {
       return;
     }
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/rooms/create`, {
+      const res = await fetch(`http://localhost:6909/api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomid, isPrivate, password: isPrivate ? password : undefined }),
