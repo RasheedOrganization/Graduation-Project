@@ -4,8 +4,9 @@ import 'katex/dist/katex.min.css';
 import NestedModal from './NestedModal';
 import axios from 'axios';
 import Samples from './Samples';
+import BACKEND_URL from '../../config';
 
-const api = `${process.env.REACT_APP_BACKEND_URL}/api/problem-list`;
+const api = `${BACKEND_URL}/api/problem-list`;
 
 export default function MainLHS({socketRef,currentProbId,setCurrentProb}) {
   // when we change the problem, just broadcast the problem id, and everything will change

@@ -6,8 +6,9 @@ import { useState , useRef } from 'react';
 import MiniDrawer from './SideDrawer';
 import Split from 'react-split';
 import MainLHS from './LHS/MainLHS';
-import io from 'socket.io-client';  
+import io from 'socket.io-client';
 import SimplePeer from 'simple-peer';
+import BACKEND_URL from '../config';
 
 import styled from "styled-components";
 
@@ -84,7 +85,7 @@ export default function Room() {
     }
             }
           // socketRef.current.emit('join room',{roomid: roomid , userid: userid});
-          socketRef.current = io(process.env.REACT_APP_BACKEND_URL, { transports: ['websocket'] });
+          socketRef.current = io(BACKEND_URL, { transports: ['websocket'] });
       socketRef.current.emit('join room',{roomid: roomid , userid: userid});
           socketRef.current.on('receive message',(payload) => {
             console.log(`I am ${userid}`);

@@ -3,10 +3,11 @@ import axios from 'axios';
 import '../styles/App.css';
 import CodeMirror from '@uiw/react-codemirror';
 import { cpp } from '@codemirror/lang-cpp';
+import BACKEND_URL from '../config';
 
 // Replace with the URL you want to send the request to
-const apiUrl = `${process.env.REACT_APP_BACKEND_URL}/test`; // cpp compilation docker container 
-const submitUrl = `${process.env.REACT_APP_BACKEND_URL}/submit`; 
+const apiUrl = `${BACKEND_URL}/test`; // cpp compilation docker container
+const submitUrl = `${BACKEND_URL}/submit`;
 const defaultText = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n int t;\n cin >> t;\n while(t--){\n\n }\n}";
 
 export default function TextBox({socketRef,currentProbId}) {

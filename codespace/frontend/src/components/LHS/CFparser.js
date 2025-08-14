@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import BACKEND_URL from '../../config';
 
 const CFparser = ({setStatement,setProblemName,setSampleInput,setSampleOutput,setInput}) => {
   const [param, setparam] = useState('');
@@ -85,7 +86,7 @@ const CFparser = ({setStatement,setProblemName,setSampleInput,setSampleOutput,se
       setError(null);
       try {
         const encodedURL = encodeURIComponent(param);
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/parse_problem/${encodedURL}`);
+        const response = await axios.get(`${BACKEND_URL}/api/parse_problem/${encodedURL}`);
         go(response.data);
       } catch (err) {   
         setError(err.message);
