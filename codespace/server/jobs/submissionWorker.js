@@ -157,7 +157,8 @@ function waitforJobCompletion(queue,job){
 
 const worker = new Worker('submissionProcess',submissionWorker,{
   connection: connectionOptions,
-  concurrency: parseInt(process.env.CONCURRENT_SUBMISSION_WORKERS)
+  // Default to a single worker if the environment variable is undefined or invalid
+  concurrency: parseInt(process.env.CONCURRENT_SUBMISSION_WORKERS, 10) || 1
 });
 
 module.exports = {submissionQueue, submissionWorker: worker, waitforJobCompletion};
