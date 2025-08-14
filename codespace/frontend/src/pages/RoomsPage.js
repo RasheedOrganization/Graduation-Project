@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import NavBar from '../components/NavBar';
 import JoinRoom from '../components/JoinRoom';
 import CreateNewRoom from '../components/CreateNewRoom';
 import '../styles/RoomsPage.css';
 
 function RoomsPage() {
+  const [creating, setCreating] = useState(false);
   return (
     <div className="rooms-container">
       <NavBar />
       <div className="rooms-content">
-        <JoinRoom />
-        <CreateNewRoom />
+        {creating ? (
+          <CreateNewRoom onBack={() => setCreating(false)} />
+        ) : (
+          <JoinRoom onCreateClick={() => setCreating(true)} />
+        )}
       </div>
     </div>
   );
