@@ -11,7 +11,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
   padding: 2rem;
+}
+
+.auth-card form div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.auth-card label {
+  margin-bottom: 0.25rem;
 }

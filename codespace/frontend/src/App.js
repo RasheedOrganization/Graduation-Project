@@ -4,7 +4,6 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import Room from './components/Room';
-import GetUsername from './components/GetUsername';
 import ContestPage from './pages/ContestPage';
 import RoomsPage from './pages/RoomsPage';
 import ProblemsPage from './pages/ProblemsPage';
@@ -28,8 +27,7 @@ function App(){
         <Route path="/rooms" element={<RoomsPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/rooms/:roomid/:userid" element={<Room />} />
-        <Route path="/rooms/:roomid" element={<GetUsername />} />
+        <Route path="/room" element={<Room />} />
       </Routes>
     </BrowserRouter>
   );
