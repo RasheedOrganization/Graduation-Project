@@ -2,7 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose');
 require('dotenv').config();
 const router = express.Router();
-const url = process.env.MONGODB_URI;
+// Use provided MongoDB connection string or fall back to a local instance
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/stuff';
 const {QueueEvents} = require('bullmq');
 const { redisClient } = require('../model/redisModel');
 const {scrapingQueue} = require('../jobs/webScrapingWorker')
@@ -25,7 +26,9 @@ const testsSchema = new mongoose.Schema({
 
 const problem_model = mongoose.model('Problem Packages',ProblemSchema);
 // const tests_model = mongoose.model('Test Packages',testsSchema);
-mongoose.connect(url);
+mongoose.connect(url).catch(err => {
+  console.error('Failed to connect to MongoDB:', err.message);
+});
 
 function newProblem(data){
   const {
