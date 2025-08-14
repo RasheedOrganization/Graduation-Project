@@ -11,6 +11,7 @@ import ProblemsPage from './pages/ProblemsPage';
 import ResourcesPage from './pages/ResourcesPage';
 import SectionsPage from './pages/SectionsPage';
 import ContactPage from './pages/ContactPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App(){
   console.log(process.env);
@@ -26,6 +27,7 @@ function App(){
         <Route path="/contest" element={<ContestPage />} />
         <Route path="/rooms" element={<RoomsPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/rooms/:roomid/:userid" element={<Room />} />
         <Route path="/rooms/:roomid" element={<GetUsername />} />
       </Routes>
