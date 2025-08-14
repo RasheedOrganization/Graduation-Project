@@ -12,8 +12,8 @@ const connectionOptions = {
     port: parseInt(process.env.REDIS_PORT || '6379', 10)
 };
 
-// this always runs inhouse, so we should be fine with hardcoding it
-const targetRouteUrl = 'http://localhost:6909/api/get-test-package';
+// allow configuration of backend URL
+const targetRouteUrl = `${process.env.BACKEND_URL || 'http://localhost:6909'}/api/get-test-package`;
 const submissionQueue = new Queue('submissionProcess',{connection: connectionOptions});
 
 async function getTestPackageData(problem_id) {
