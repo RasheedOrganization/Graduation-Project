@@ -5,25 +5,34 @@ import BACKEND_URL from '../config';
 export default function JoinRoom({ onCreateClick }) {
   const navigate = useNavigate();
   const [roomid, setRoomid] = useState('');
-  const [password, setPassword] = useState('');
-  const [needsPassword, setNeedsPassword] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const body = { roomid };
-    if (needsPassword) body.password = password;
     try {
-      const res = await fetch(`${BACKEND_URL}/api/rooms/join`, {
+      // First attempt: check if room requires a password
+      let res = await fetch(`${BACKEND_URL}/api/rooms/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ roomid }),
       });
-      const data = await res.json();
+      let data = await res.json();
+
+      // If the room is private prompt the user for its password
       if (data.requiresPassword) {
-        setNeedsPassword(true);
-        setError('');
-      } else if (res.ok) {
+        const password = window.prompt('This room is private. Enter password:');
+        if (!password) {
+          return;
+        }
+        res = await fetch(`${BACKEND_URL}/api/rooms/join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomid, password }),
+        });
+        data = await res.json();
+      }
+
+      if (res.ok) {
         localStorage.setItem('roomid', roomid);
         navigate('/room');
       } else {
@@ -48,26 +57,14 @@ export default function JoinRoom({ onCreateClick }) {
             required
           />
         </div>
-        {needsPassword && (
-          <div>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-        )}
         {error && <p>{error}</p>}
         <br />
         <button type="submit">Join</button>
       </form>
-        <p className="switch-link">
-          Don't want to join?{' '}
-          <button type="button" onClick={onCreateClick}>Create a room</button>
-        </p>
-      </div>
-    );
-  }
+      <p className="switch-link">
+        Don't want to join?{' '}
+        <button type="button" onClick={onCreateClick}>Create a room</button>
+      </p>
+    </div>
+  );
+}
