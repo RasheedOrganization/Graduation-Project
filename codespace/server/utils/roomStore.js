@@ -5,7 +5,7 @@ function addUserToRoom(roomid, userid, username) {
     rooms[roomid] = [];
   }
   if (!rooms[roomid].some((u) => u.userid === userid)) {
-    rooms[roomid].push({ userid, username });
+    rooms[roomid].push({ userid, username, micOn: false });
   }
 }
 
@@ -25,9 +25,18 @@ function getAllRooms() {
   return rooms;
 }
 
+function updateMicStatus(roomid, userid, micOn) {
+  if (!rooms[roomid]) return;
+  const user = rooms[roomid].find((u) => u.userid === userid);
+  if (user) {
+    user.micOn = micOn;
+  }
+}
+
 module.exports = {
   addUserToRoom,
   removeUserFromRoom,
   getUsersInRoom,
   getAllRooms,
+  updateMicStatus,
 };
