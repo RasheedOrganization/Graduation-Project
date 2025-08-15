@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+  server:
+    build: ./codespace/server
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/graduation_project
+      - TEST_DATA_DIR=./test-data
+      - JWT_SECRET=changeme
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "6909:6909"
+    depends_on:
+      - mongo
+      - redis
+  frontend:
+    build: ./codespace/frontend
+    restart: unless-stopped
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+volumes:
+  mongo-data:

@@ -46,3 +46,20 @@ npm start
 ```
 
 Then open [http://localhost:3000/](http://localhost:3000/) in your browser.
+
+## Running with Docker
+
+Use Docker Compose to run the backend, frontend, MongoDB, and Redis without installing dependencies manually.
+
+```bash
+docker-compose up --build
+```
+
+This starts the services on:
+
+- Frontend: http://localhost:3000
+- API server: http://localhost:6909
+- MongoDB: localhost:27017
+- Redis: localhost:6379
+
+The server uses the `.env` values defined in `docker-compose.yml`. Edit the file if you need different settings.
