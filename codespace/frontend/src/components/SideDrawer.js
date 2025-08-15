@@ -78,21 +78,10 @@ const MemberCard = ({ id , member}) => {
   );
 };
 
-export default function MiniDrawer({ toggleMic, socketRef, roomid }) {
+export default function MiniDrawer({ toggleMic, roomid, members = [] }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
-  const [members, setMembers] = React.useState([]);
-
-  React.useEffect(() => {
-    if (!socketRef?.current) return;
-    const handleUsers = (payload) => setMembers(payload.users);
-    socketRef.current.emit('get-users-in-room');
-    socketRef.current.on('users-in-room', handleUsers);
-    return () => {
-      socketRef.current.off('users-in-room', handleUsers);
-    };
-  }, [socketRef?.current]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -146,7 +135,7 @@ export default function MiniDrawer({ toggleMic, socketRef, roomid }) {
               fullWidth
               startIcon={<ContentCopyIcon />}
               onClick={handleCopyRoomId}
-              sx={{mt: 'auto', mb: 1, mx: 1, whiteSpace: 'nowrap'}}
+              sx={{mt: 'auto', mb: 1, mx: 1, whiteSpace: 'normal', textAlign: 'center'}}
             >
               {copied ? 'Copied!' : 'Copy Room ID'}
             </Button>
