@@ -59,6 +59,11 @@ export default function Room() {
     const peersRef = useRef([]);
     // TODO: get the username
     // TODO: we join room here
+
+    const handleCopyRoomId = () => {
+      navigator.clipboard.writeText(roomid);
+      alert('Room ID copied to clipboard');
+    };
     
     const toggleMic = () => {
       console.log("hey man!");
@@ -179,6 +184,10 @@ export default function Room() {
       return (
         <div className="editor-background">
         <div className='main'>
+            <div className="roomid-copy">
+              <span>Room ID: {roomid}</span>
+              <button onClick={handleCopyRoomId}>Copy</button>
+            </div>
             <Split
                 sizes={[20, 80]}
                 minSize={200}

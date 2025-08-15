@@ -42,3 +42,17 @@
   font-weight: 500;
   overflow-wrap: anywhere;
 }
+
+.roomid-copy {
+  margin: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.roomid-copy button {
+  margin-left: 0.5rem;
+}
