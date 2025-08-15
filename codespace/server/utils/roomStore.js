@@ -4,7 +4,9 @@ function addUserToRoom(roomid, userid, username) {
   if (!rooms[roomid]) {
     rooms[roomid] = [];
   }
-  rooms[roomid].push({ userid, username });
+  if (!rooms[roomid].some((u) => u.userid === userid)) {
+    rooms[roomid].push({ userid, username });
+  }
 }
 
 function removeUserFromRoom(roomid, userid) {
