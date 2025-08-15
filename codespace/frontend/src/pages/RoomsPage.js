@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import NavBar from '../components/NavBar';
 import JoinRoom from '../components/JoinRoom';
 import CreateNewRoom from '../components/CreateNewRoom';
+import PublicRoomsList from '../components/PublicRoomsList';
 import '../styles/RoomsPage.css';
 
 function RoomsPage() {
@@ -13,7 +14,10 @@ function RoomsPage() {
         {creating ? (
           <CreateNewRoom onBack={() => setCreating(false)} />
         ) : (
-          <JoinRoom onCreateClick={() => setCreating(true)} />
+          <>
+            <PublicRoomsList />
+            <JoinRoom onCreateClick={() => setCreating(true)} />
+          </>
         )}
       </div>
     </div>

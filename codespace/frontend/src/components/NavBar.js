@@ -25,8 +25,8 @@ function NavBar() {
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/" className="brand-link">
-          <img src={logo} alt="USACO Guide logo" className="brand-logo" />
-          <span className="brand-name">USACO Guide</span>
+          <img src={logo} alt="Code Hub logo" className="brand-logo" />
+          <span className="brand-name">Code Hub</span>
         </Link>
       </div>
       <ul className="navbar-links">

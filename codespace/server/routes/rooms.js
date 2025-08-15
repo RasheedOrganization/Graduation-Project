@@ -46,4 +46,13 @@ router.post('/join', async (req, res) => {
   }
 });
 
+router.get('/public', async (req, res) => {
+  try {
+    const rooms = await Room.find({ isPrivate: false }).select('roomid -_id');
+    res.json(rooms);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
