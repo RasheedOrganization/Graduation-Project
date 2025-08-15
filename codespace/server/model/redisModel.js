@@ -2,19 +2,19 @@ const redis = require('redis');
 
 /**
  * Create a Redis client using the connection string provided in
- * `process.env.REDIS_URL`. If the environment variable is not set,
- * the default local Redis instance (localhost:6379) will be used.
+ * `process.env.REDIS_URL`. When the variable is not supplied (for
+ * example in local development) the client falls back to the Docker
+ * service name `redis` so that the server can still communicate with
+ * the Redis container.
  *
  * The client attempts to connect immediately. Any connection errors
  * are caught so that the rest of the application can continue to run
  * even if Redis is unavailable.
  */
-const redisUrl = process.env.REDIS_URL;
+const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
 
-// Allow configuration via REDIS_URL while falling back to default localhost
-const redisClient = redisUrl
-  ? redis.createClient({ url: redisUrl })
-  : redis.createClient();
+// Always create the client with an explicit URL so the default isn't localhost
+const redisClient = redis.createClient({ url: redisUrl });
 
 redisClient.on('ready', () => {
   console.log('Connected to Redis');
