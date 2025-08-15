@@ -5,6 +5,8 @@ import IconButton from '@mui/material/IconButton';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import MicIcon from '@mui/icons-material/Mic';
 import Button from '@mui/material/Button';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Typography from '@mui/material/Typography';
@@ -66,19 +68,24 @@ const MembersContainer = styled('div')({
 
 const emojis = ['🧑', '👨', '🧔', '', '', '', '', '']; // Fill in with your desired emojis
 
-const MemberCard = ({ id , member}) => {
+const MemberCard = ({ id, member }) => {
   const index = id % emojis.length;
   const emoji = emojis[index];
 
   return (
     <div className="member-card">
       <span className="emoji">{emoji}</span>
-      <span className="id">{member}</span>
+      <span className="id">{member.username}</span>
+      {member.micOn ? (
+        <MicIcon fontSize="small" style={{ marginLeft: 'auto' }} />
+      ) : (
+        <MicOffIcon fontSize="small" style={{ marginLeft: 'auto' }} />
+      )}
     </div>
   );
 };
 
-export default function MiniDrawer({ toggleMic, roomid, members = [] }) {
+export default function MiniDrawer({ toggleMic, roomid, members = [], isMicOn }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
@@ -110,7 +117,7 @@ export default function MiniDrawer({ toggleMic, roomid, members = [] }) {
           </IconButton>
 
           <IconButton variant="contained" color="primary" onClick={toggleMic}>
-            <HeadsetMicIcon />
+            {isMicOn ? <HeadsetMicIcon /> : <MicOffIcon />}
           </IconButton>
 
           <div style={{flexGrow: 1}}>

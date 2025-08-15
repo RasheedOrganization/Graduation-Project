@@ -1,4 +1,5 @@
 .editor-background {
+  position: relative;
   min-height: 100vh;
   height: 100vh;
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
@@ -41,5 +42,12 @@
   font-size: 0.9rem;
   font-weight: 500;
   overflow-wrap: anywhere;
+}
+
+.leave-room-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
 }
 

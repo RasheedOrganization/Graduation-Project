@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
     res.send('omg hewwo fren!!');
 });
 
-const { addUserToRoom, removeUserFromRoom, getUsersInRoom } = require('./utils/roomStore');
+const { addUserToRoom, removeUserFromRoom, getUsersInRoom, updateMicStatus } = require('./utils/roomStore');
 const username_to_socket = {};
 const pairSet = new Map();
 
@@ -76,7 +76,7 @@ io.on('connection', (socket) => {
         console.log(`${payload.userid} joined ${payload.roomid}`)
         const usersInRoom = getUsersInRoom(payload.roomid);
         io.to(socket.roomid).emit('all users',{users: usersInRoom.map(u => u.userid)});
-        io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => u.username) });
+        io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
     })
     
     socket.on('update-code', (payload) => {
@@ -127,10 +127,15 @@ io.on('connection', (socket) => {
         }
     })
 
+    socket.on('mic-status', (payload) => {
+        updateMicStatus(socket.roomid, payload.userid, payload.micOn);
+        io.to(socket.roomid).emit('mic-status', payload);
+    });
+
     socket.on('get-users-in-room', (payload) => {
-        const usersInRoom = getUsersInRoom(socket.roomid).map(u => u.username);
+        const usersInRoom = getUsersInRoom(socket.roomid);
         console.log('someone is asking around');
-        socket.emit('users-in-room', { users: usersInRoom });
+        socket.emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
     });
 
 
@@ -138,10 +143,10 @@ io.on('connection', (socket) => {
         // this is trash bruh
         if (socket.roomid) {
           removeUserFromRoom(socket.roomid, socket.userid);
-          const usersInRoom = getUsersInRoom(socket.roomid).map(u => u.username);
-          io.to(socket.roomid).emit('users-in-room', { users: usersInRoom });
+          const usersInRoom = getUsersInRoom(socket.roomid);
+          io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
 
-          console.log('users currently in room are: ' + usersInRoom);
+          console.log('users currently in room are: ' + usersInRoom.map(u => u.username));
 
           console.log(`${socket.userid} left ${socket.roomid}`);
         }

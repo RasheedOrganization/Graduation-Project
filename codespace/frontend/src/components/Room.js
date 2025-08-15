@@ -1,6 +1,7 @@
 import TextBox from './TextBox';
 import '../styles/App.css'
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MiniDrawer from './SideDrawer';
 import Split from 'react-split';
 import MainLHS from './LHS/MainLHS';
@@ -57,6 +58,7 @@ export default function Room() {
     const socketRef = useRef();
     const peersRef = useRef([]);
     const streamRef = useRef();
+    const navigate = useNavigate();
     // TODO: get the username
     // TODO: we join room here
 
@@ -71,6 +73,9 @@ export default function Room() {
         peersRef.current = [];
         setPeers([]);
         setIsMicOn(false);
+        if (socketRef.current) {
+          socketRef.current.emit('mic-status', { userid, micOn: false });
+        }
       } else {
         navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(stream => {
           streamRef.current = stream;
@@ -78,8 +83,18 @@ export default function Room() {
             userVideo.current.srcObject = stream;
           }
           setIsMicOn(true);
+          if (socketRef.current) {
+            socketRef.current.emit('mic-status', { userid, micOn: true });
+          }
         });
       }
+    };
+
+    const leaveRoom = () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+      navigate('/rooms');
     };
 
     useEffect(() => {
@@ -135,6 +150,10 @@ export default function Room() {
         setMembers(payload.users);
       });
 
+      socketRef.current.on('mic-status', (payload) => {
+        setMembers((prev) => prev.map(m => m.userid === payload.userid ? { ...m, micOn: payload.micOn } : m));
+      });
+
       socketRef.current.emit('join room', { roomid: roomid, userid: userid, username: username });
       socketRef.current.emit('get-users-in-room');
 
@@ -177,6 +196,7 @@ export default function Room() {
 
       return (
         <div className="editor-background">
+        <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
         <div className='main'>
               <Split
                   sizes={[20, 80]}
@@ -199,7 +219,7 @@ export default function Room() {
                     <TextBox socketRef={socketRef} currentProbId={currentProbId} />
                 </div>
             </Split>
-              <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} />
+              <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} isMicOn={isMicOn} />
             {/* <AudioRecorder socket={socket} username={username} roomid={roomid}/> */}
             <Container>
                 <StyledVideo muted ref={userVideo} autoPlay playsInline />
