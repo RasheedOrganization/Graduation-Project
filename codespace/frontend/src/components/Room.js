@@ -51,6 +51,7 @@ export default function Room() {
     console.log(`roomid is: ${roomid}`);
     console.log(`userid is: ${userid}`);
     const [peers,setPeers] = useState([]);
+    const [members, setMembers] = useState([]);
     const [isMicOn] = useState(true);
     const [currentProbId,setCurrentProb] = useState(null);
     const userVideo = useRef();
@@ -87,12 +88,11 @@ export default function Room() {
     }
             }
           socketRef.current = io(BACKEND_URL, { transports: ['websocket'] });
-      socketRef.current.emit('join room',{roomid: roomid , userid: userid, username: username});
           socketRef.current.on('receive message',(payload) => {
             console.log(`I am ${userid}`);
             console.log(payload.msg);
           })
-    
+
           socketRef.current.on('all users',(payload) => {
             const peers = [];
             const tmp = payload.users;
@@ -109,7 +109,7 @@ export default function Room() {
             })
             setPeers(peers);
           })
-    
+
           socketRef.current.on('offer received', (payload) => {
             console.log('offer received');
             console.log(`callerid received with offer is: ${payload.callerID}`);
@@ -118,10 +118,10 @@ export default function Room() {
               peerID: payload.callerID,
               peer,
             })
-    
+
             setPeers(users => [...users, peer]);
           })
-    
+
           socketRef.current.on('reply received', (payload) => {
             // whatever this step is
             console.log('flag received, end!');
@@ -130,9 +130,16 @@ export default function Room() {
             if(!item){
               console.log("item shit not found");
             }
-    
+
             item.peer.signal(payload.signal);
           })
+
+          socketRef.current.on('users-in-room', (payload) => {
+            setMembers(payload.users);
+          })
+
+          socketRef.current.emit('join room',{roomid: roomid , userid: userid, username: username});
+          socketRef.current.emit('get-users-in-room');
 
         })
       }
@@ -193,7 +200,7 @@ export default function Room() {
                     <TextBox socketRef={socketRef} currentProbId={currentProbId} />
                 </div>
             </Split>
-              <MiniDrawer toggleMic={toggleMic} socketRef={socketRef} roomid={roomid} />
+              <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} />
             {/* <AudioRecorder socket={socket} username={username} roomid={roomid}/> */}
             <Container>
                 <StyledVideo muted ref={userVideo} autoPlay playsInline />
