@@ -74,8 +74,9 @@ io.on('connection', (socket) => {
         addUserToRoom(payload.roomid, payload.userid, payload.username);
 
         console.log(`${payload.userid} joined ${payload.roomid}`)
-        const usersInRoom = getUsersInRoom(payload.roomid).map(u => u.userid);
-        io.to(socket.roomid).emit('all users',{users: usersInRoom});
+        const usersInRoom = getUsersInRoom(payload.roomid);
+        io.to(socket.roomid).emit('all users',{users: usersInRoom.map(u => u.userid)});
+        io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => u.username) });
     })
     
     socket.on('update-code', (payload) => {
