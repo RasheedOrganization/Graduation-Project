@@ -52,7 +52,7 @@ router.get('/public', async (req, res) => {
     const rooms = await Room.find({ isPrivate: false }).select('roomid -_id');
     const roomsWithUsers = rooms.map((r) => ({
       roomid: r.roomid,
-      users: getUsersInRoom(r.roomid),
+      users: getUsersInRoom(r.roomid).map(u => u.username),
     }));
     res.json(roomsWithUsers);
   } catch (err) {
