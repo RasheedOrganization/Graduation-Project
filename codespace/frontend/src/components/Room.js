@@ -78,8 +78,6 @@ export default function Room() {
             userVideo.current.srcObject = stream;
           }
           setIsMicOn(true);
-          // Rejoin to trigger offers from existing users
-          socketRef.current.emit('join room', { roomid, userid, username });
         });
       }
     };
