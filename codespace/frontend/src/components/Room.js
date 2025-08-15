@@ -46,12 +46,13 @@ const Video = (props) => {
 export default function Room() {
     const roomid = localStorage.getItem('roomid');
     const userid = localStorage.getItem('userid');
+    const username = localStorage.getItem('username');
     console.log(`roomid is: ${roomid}`);
     console.log(`userid is: ${userid}`);
     const [peers,setPeers] = useState([]);
     const [isMicOn] = useState(true);
     const [currentProbId,setCurrentProb] = useState(null);
-    const [members_in_room,setMembersInRoom] = useState([userid]);
+    const [members_in_room,setMembersInRoom] = useState([username]);
     const userVideo = useRef();
     const socketRef = useRef();
     const peersRef = useRef([]);
@@ -85,9 +86,8 @@ export default function Room() {
       console.log('breaks applied');
     }
             }
-          // socketRef.current.emit('join room',{roomid: roomid , userid: userid});
           socketRef.current = io(BACKEND_URL, { transports: ['websocket'] });
-      socketRef.current.emit('join room',{roomid: roomid , userid: userid});
+      socketRef.current.emit('join room',{roomid: roomid , userid: userid, username: username});
           socketRef.current.on('receive message',(payload) => {
             console.log(`I am ${userid}`);
             console.log(payload.msg);

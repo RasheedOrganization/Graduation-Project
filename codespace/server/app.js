@@ -66,15 +66,15 @@ io.on('connection', (socket) => {
     socket.on('join room',(payload) => {
         socket.roomid = payload.roomid;
         socket.userid = payload.userid;
-        
+        socket.username = payload.username;
+
         socket.join(payload.roomid);
         username_to_socket[payload.userid] = socket;
 
-        addUserToRoom(payload.roomid, payload.userid);
-      
+        addUserToRoom(payload.roomid, payload.userid, payload.username);
+
         console.log(`${payload.userid} joined ${payload.roomid}`)
-        // console.log(`the user socket id is: ${socket.id}`);
-        const usersInRoom = getUsersInRoom(payload.roomid);
+        const usersInRoom = getUsersInRoom(payload.roomid).map(u => u.userid);
         io.to(socket.roomid).emit('all users',{users: usersInRoom});
     })
     
@@ -127,7 +127,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('get-users-in-room', (payload) => {
-        const usersInRoom = getUsersInRoom(socket.roomid);
+        const usersInRoom = getUsersInRoom(socket.roomid).map(u => u.username);
         console.log('someone is asking around');
         socket.emit('users-in-room', { users: usersInRoom });
     });
@@ -137,7 +137,7 @@ io.on('connection', (socket) => {
         // this is trash bruh
         if (socket.roomid) {
           removeUserFromRoom(socket.roomid, socket.userid);
-          const usersInRoom = getUsersInRoom(socket.roomid);
+          const usersInRoom = getUsersInRoom(socket.roomid).map(u => u.username);
           io.to(socket.roomid).emit('users-in-room', { users: usersInRoom });
 
           console.log('users currently in room are: ' + usersInRoom);

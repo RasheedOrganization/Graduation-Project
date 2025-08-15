@@ -1,15 +1,15 @@
 const rooms = {};
 
-function addUserToRoom(roomid, userid) {
+function addUserToRoom(roomid, userid, username) {
   if (!rooms[roomid]) {
     rooms[roomid] = [];
   }
-  rooms[roomid].push(userid);
+  rooms[roomid].push({ userid, username });
 }
 
 function removeUserFromRoom(roomid, userid) {
   if (!rooms[roomid]) return;
-  rooms[roomid] = rooms[roomid].filter((u) => u !== userid);
+  rooms[roomid] = rooms[roomid].filter((u) => u.userid !== userid);
   if (rooms[roomid].length === 0) {
     delete rooms[roomid];
   }
