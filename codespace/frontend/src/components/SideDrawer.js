@@ -5,8 +5,10 @@ import IconButton from '@mui/material/IconButton';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
+import Button from '@mui/material/Button';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-const drawerWidth = 240;
+const drawerWidth = '20%';
 const closedWidth = 30;
 
 const openedMixin = (theme) => ({
@@ -75,50 +77,67 @@ const MemberCard = ({ id , member}) => {
   );
 };
 
-export default function MiniDrawer({toggleMic,members_in_room}) {
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+export default function MiniDrawer({toggleMic,members_in_room, roomid}) {
+    const theme = useTheme();
+    const [open, setOpen] = React.useState(false);
+    const [copied, setCopied] = React.useState(false);
 
-  console.log(members_in_room);
+    console.log(members_in_room);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+    const handleDrawerOpen = () => {
+      setOpen(true);
+    };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+    const handleDrawerClose = () => {
+      setOpen(false);
+    };
 
-  return (
-    <div>
-      <Drawer variant="permanent" open={open}>
-        <IconButton
-          // color="inherit"
-          aria-label="open drawer"
-          onClick={open ? handleDrawerClose : handleDrawerOpen}
-          edge="start"
-        >
-          {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </IconButton>
+    const handleCopyRoomId = () => {
+      navigator.clipboard.writeText(roomid);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
 
-        <IconButton variant="contained" color="primary" onClick={toggleMic}>
-          <HeadsetMicIcon />
-        </IconButton>
-        
+    return (
+      <div>
+        <Drawer variant="permanent" open={open}>
+          <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+            <IconButton
+              aria-label="open drawer"
+              onClick={open ? handleDrawerClose : handleDrawerOpen}
+              edge="start"
+            >
+              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
 
-        <div>
-          {open ? <p>Members in room</p> : <p></p>}
-          <MembersContainer>
-            {members_in_room.map((member, index) => (
-              <MemberCard key={index} id={index} member={member} />
-            ))}
-          </MembersContainer>
-        </div>
-        {/* Your drawer content goes here */}
-      </Drawer>
-      <ContentContainer open={open} theme={theme}>
-        {/* Your main content goes here */}
-      </ContentContainer>
-    </div>
-  );
-}
+            <IconButton variant="contained" color="primary" onClick={toggleMic}>
+              <HeadsetMicIcon />
+            </IconButton>
+
+            <div style={{flexGrow: 1}}>
+              {open ? <p>Members in room</p> : <p></p>}
+              <MembersContainer>
+                {members_in_room.map((member, index) => (
+                  <MemberCard key={index} id={index} member={member} />
+                ))}
+              </MembersContainer>
+            </div>
+
+            {open && (
+              <Button
+                variant="outlined"
+                startIcon={<ContentCopyIcon />}
+                onClick={handleCopyRoomId}
+                sx={{mt: 'auto', mb: 1, mx: 1}}
+              >
+                {copied ? 'Copied!' : 'Copy Room ID'}
+              </Button>
+            )}
+          </div>
+        </Drawer>
+        <ContentContainer open={open} theme={theme}>
+          {/* Your main content goes here */}
+        </ContentContainer>
+      </div>
+    );
+  }
