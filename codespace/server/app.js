@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
     res.send('omg hewwo fren!!');
 });
 
-const rooms = {};
+const { addUserToRoom, removeUserFromRoom, getUsersInRoom } = require('./utils/roomStore');
 const username_to_socket = {};
 const pairSet = new Map();
 
@@ -59,13 +59,7 @@ function removeuserfrompair(){
     // pairSet.clear();
 }
 
-function getUsersInRoom(roomid) {
-    if (rooms[roomid]) {
-      return rooms[roomid];
-    } else {
-      return [];
-    }
-}
+
 
 io.on('connection', (socket) => {
     socket.emit('welcome',{msg: 'welcome to room'});
@@ -76,11 +70,7 @@ io.on('connection', (socket) => {
         socket.join(payload.roomid);
         username_to_socket[payload.userid] = socket;
 
-        if (!rooms[payload.roomid]) {
-            rooms[payload.roomid] = [];
-        }
-      
-        rooms[payload.roomid].push(payload.userid);
+        addUserToRoom(payload.roomid, payload.userid);
       
         console.log(`${payload.userid} joined ${payload.roomid}`)
         // console.log(`the user socket id is: ${socket.id}`);
@@ -145,18 +135,13 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         // this is trash bruh
-        if (socket.roomid && rooms[socket.roomid]) {
-          // Remove the user from the room when they disconnect.
-          const index = rooms[socket.roomid].indexOf(socket.userid);
-
-          if (index !== -1) {
-            rooms[socket.roomid].splice(index, 1);
-          }
+        if (socket.roomid) {
+          removeUserFromRoom(socket.roomid, socket.userid);
           const usersInRoom = getUsersInRoom(socket.roomid);
           io.to(socket.roomid).emit('users-in-room', { users: usersInRoom });
 
           console.log('users currently in room are: ' + usersInRoom);
-          
+
           console.log(`${socket.userid} left ${socket.roomid}`);
         }
         removeuserfrompair();

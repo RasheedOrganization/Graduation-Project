@@ -10,15 +10,15 @@ function RoomsPage() {
   return (
     <div className="rooms-container">
       <NavBar />
-      <div className="rooms-content">
-        {creating ? (
-          <CreateNewRoom onBack={() => setCreating(false)} />
-        ) : (
-          <>
-            <PublicRoomsList />
+      <div className="rooms-body">
+        <PublicRoomsList />
+        <div className="rooms-content">
+          {creating ? (
+            <CreateNewRoom onBack={() => setCreating(false)} />
+          ) : (
             <JoinRoom onCreateClick={() => setCreating(true)} />
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

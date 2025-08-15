@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Room = require('../model/roomModel');
+const { getUsersInRoom } = require('../utils/roomStore');
 require('dotenv').config();
 
 const router = express.Router();
@@ -49,7 +50,11 @@ router.post('/join', async (req, res) => {
 router.get('/public', async (req, res) => {
   try {
     const rooms = await Room.find({ isPrivate: false }).select('roomid -_id');
-    res.json(rooms);
+    const roomsWithUsers = rooms.map((r) => ({
+      roomid: r.roomid,
+      users: getUsersInRoom(r.roomid),
+    }));
+    res.json(roomsWithUsers);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
