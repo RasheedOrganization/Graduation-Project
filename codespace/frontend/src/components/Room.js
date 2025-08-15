@@ -17,10 +17,11 @@ import styled from "styled-components";
 const Container = styled.div`
     padding: 20px;
     display: flex;
-    height: 100vh;
     width: 90%;
     margin: auto;
     flex-wrap: wrap;
+    max-height: 40vh;
+    overflow-y: auto;
 `;
 
 const StyledVideo = styled.video`

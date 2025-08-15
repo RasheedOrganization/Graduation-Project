@@ -64,10 +64,10 @@ export default function JoinRoom({ onCreateClick }) {
         <br />
         <button type="submit">Join</button>
       </form>
-      <p>
-        Don't want to join?{' '}
-        <button type="button" onClick={onCreateClick}>Create a room</button>
-      </p>
-    </div>
-  );
-}
+        <p className="switch-link">
+          Don't want to join?{' '}
+          <button type="button" onClick={onCreateClick}>Create a room</button>
+        </p>
+      </div>
+    );
+  }
