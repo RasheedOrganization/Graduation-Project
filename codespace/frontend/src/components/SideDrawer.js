@@ -7,8 +7,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import Button from '@mui/material/Button';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Typography from '@mui/material/Typography';
 
-const drawerWidth = '20%';
+const drawerWidth = '15%';
 const closedWidth = 30;
 
 const openedMixin = (theme) => ({
@@ -77,67 +78,84 @@ const MemberCard = ({ id , member}) => {
   );
 };
 
-export default function MiniDrawer({toggleMic,members_in_room, roomid}) {
-    const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
-    const [copied, setCopied] = React.useState(false);
+export default function MiniDrawer({ toggleMic, socketRef, roomid }) {
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
+  const [members, setMembers] = React.useState([]);
 
-    console.log(members_in_room);
-
-    const handleDrawerOpen = () => {
-      setOpen(true);
+  React.useEffect(() => {
+    if (!socketRef?.current) return;
+    const handleUsers = (payload) => setMembers(payload.users);
+    socketRef.current.emit('get-users-in-room');
+    socketRef.current.on('users-in-room', handleUsers);
+    return () => {
+      socketRef.current.off('users-in-room', handleUsers);
     };
+  }, [socketRef?.current]);
 
-    const handleDrawerClose = () => {
-      setOpen(false);
-    };
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
-    const handleCopyRoomId = () => {
-      navigator.clipboard.writeText(roomid);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
 
-    return (
-      <div>
-        <Drawer variant="permanent" open={open}>
-          <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
-            <IconButton
-              aria-label="open drawer"
-              onClick={open ? handleDrawerClose : handleDrawerOpen}
-              edge="start"
-            >
-              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
+  const handleCopyRoomId = () => {
+    navigator.clipboard.writeText(roomid);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-            <IconButton variant="contained" color="primary" onClick={toggleMic}>
-              <HeadsetMicIcon />
-            </IconButton>
+  return (
+    <div>
+      <Drawer variant="permanent" open={open}>
+        <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+          <IconButton
+            aria-label="open drawer"
+            onClick={open ? handleDrawerClose : handleDrawerOpen}
+            edge="start"
+          >
+            {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
 
-            <div style={{flexGrow: 1}}>
-              {open ? <p>Members in room</p> : <p></p>}
-              <MembersContainer>
-                {members_in_room.map((member, index) => (
-                  <MemberCard key={index} id={index} member={member} />
-                ))}
-              </MembersContainer>
-            </div>
+          <IconButton variant="contained" color="primary" onClick={toggleMic}>
+            <HeadsetMicIcon />
+          </IconButton>
 
-            {open && (
-              <Button
-                variant="outlined"
-                startIcon={<ContentCopyIcon />}
-                onClick={handleCopyRoomId}
-                sx={{mt: 'auto', mb: 1, mx: 1}}
-              >
-                {copied ? 'Copied!' : 'Copy Room ID'}
-              </Button>
+          <div style={{flexGrow: 1}}>
+            {open ? (
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                Members in the room
+              </Typography>
+            ) : (
+              <p></p>
             )}
+            <MembersContainer>
+              {members.map((member, index) => (
+                <MemberCard key={index} id={index} member={member} />
+              ))}
+            </MembersContainer>
           </div>
-        </Drawer>
-        <ContentContainer open={open} theme={theme}>
-          {/* Your main content goes here */}
-        </ContentContainer>
-      </div>
-    );
-  }
+
+          {open && (
+            <Button
+              variant="outlined"
+              size="small"
+              fullWidth
+              startIcon={<ContentCopyIcon />}
+              onClick={handleCopyRoomId}
+              sx={{mt: 'auto', mb: 1, mx: 1, whiteSpace: 'nowrap'}}
+            >
+              {copied ? 'Copied!' : 'Copy Room ID'}
+            </Button>
+          )}
+        </div>
+      </Drawer>
+      <ContentContainer open={open} theme={theme}>
+        {/* Your main content goes here */}
+      </ContentContainer>
+    </div>
+  );
+}
