@@ -19,6 +19,8 @@ export default function PublicRoomsList() {
       }
     }
     fetchRooms();
+    const interval = setInterval(fetchRooms, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const joinRoom = async (roomid) => {
@@ -46,21 +48,21 @@ export default function PublicRoomsList() {
     }
   };
 
-  const copyId = (e, roomid) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(roomid);
-  };
-
   return (
-    <div className="public-rooms-list">
+    <div className="rooms-sidebar">
+      <h3>Public Rooms</h3>
       {rooms.map((room) => (
         <div
           key={room.roomid}
-          className="public-room-item"
+          className="room-block"
           onClick={() => handleJoin(room.roomid)}
         >
-          <span>Room {room.roomid}</span>
-          <button onClick={(e) => copyId(e, room.roomid)}>{room.roomid}</button>
+          <div className="room-title">Room {room.roomid}</div>
+          <ul className="user-list">
+            {room.users && room.users.map((user) => (
+              <li key={user}>{user}</li>
+            ))}
+          </ul>
         </div>
       ))}
     </div>
