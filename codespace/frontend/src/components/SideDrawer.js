@@ -6,8 +6,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 
-const drawerWidth = 180 ;
-const closedWidth = 23;
+const drawerWidth = 240;
+const closedWidth = 30;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -53,6 +53,13 @@ const ContentContainer = styled('div')(({ open, theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(10),
 }));
+
+const MembersContainer = styled('div')({
+  overflowY: 'auto',
+  maxHeight: 'calc(100vh - 120px)',
+  width: '100%',
+  paddingRight: '8px',
+});
 
 const emojis = ['🧑', '👨', '🧔', '', '', '', '', '']; // Fill in with your desired emojis
 
@@ -101,12 +108,11 @@ export default function MiniDrawer({toggleMic,members_in_room}) {
 
         <div>
           {open ? <p>Members in room</p> : <p></p>}
-          {/* <p>Members in room</p> */}
-          <div>
+          <MembersContainer>
             {members_in_room.map((member, index) => (
-          <MemberCard key={index} id={index} member={member} />
-        ))}
-          </div>
+              <MemberCard key={index} id={index} member={member} />
+            ))}
+          </MembersContainer>
         </div>
         {/* Your drawer content goes here */}
       </Drawer>

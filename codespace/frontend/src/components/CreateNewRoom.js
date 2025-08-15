@@ -75,9 +75,9 @@ export default function CreateNewRoom({ onBack }) {
         {error && <p>{error}</p>}
         <button type="submit">Create</button>
       </form>
-      <p>
-        <button type="button" onClick={onBack}>Back to join</button>
-      </p>
-    </div>
-  );
-}
+        <p className="switch-link">
+          <button type="button" onClick={onBack}>Back to join</button>
+        </p>
+      </div>
+    );
+  }

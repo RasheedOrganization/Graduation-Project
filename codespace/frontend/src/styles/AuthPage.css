@@ -35,17 +35,20 @@
 
 .auth-card button {
   margin-top: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.75rem 1.5rem;
   background-color: #1976d2;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
+  align-self: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .auth-card button:hover {
   background-color: #115293;
+  transform: scale(1.02);
 }
 
 .error {
@@ -57,4 +60,17 @@
 .switch-link {
   text-align: center;
   margin-top: 1rem;
+}
+
+.switch-link button {
+  background: none;
+  border: none;
+  color: #1976d2;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.switch-link button:hover {
+  text-decoration: underline;
 }
