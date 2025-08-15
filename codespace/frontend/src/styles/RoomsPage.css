@@ -9,10 +9,44 @@
 .rooms-content {
   flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
   padding: 2rem;
+}
+
+.public-rooms-list {
+  width: 100%;
+  max-width: 400px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 2rem;
+}
+
+.public-room-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.public-room-item button {
+  padding: 0.25rem 0.5rem;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.public-room-item button:hover {
+  background-color: #115293;
 }
 
 .auth-card form div {
