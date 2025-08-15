@@ -132,10 +132,9 @@ export default function MiniDrawer({ toggleMic, roomid, members = [] }) {
             <Button
               variant="outlined"
               size="small"
-              fullWidth
               startIcon={<ContentCopyIcon />}
               onClick={handleCopyRoomId}
-              sx={{mt: 'auto', mb: 1, mx: 1, whiteSpace: 'normal', textAlign: 'center'}}
+              sx={{mt: 'auto', mb: 1, mx: 1, whiteSpace: 'nowrap', textAlign: 'center'}}
             >
               {copied ? 'Copied!' : 'Copy Room ID'}
             </Button>
