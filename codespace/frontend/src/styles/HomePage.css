@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   color: #fff;
   background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a1c4fd);
   background-size: 400% 400%;
@@ -22,7 +22,7 @@
 .home-title {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #1a1a1a;
+  color: #fff;
   animation: fadeIn 2s ease-in-out;
 }
 
@@ -78,6 +78,6 @@
   text-align: center;
   padding: 1rem;
   background-color: #fff;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
