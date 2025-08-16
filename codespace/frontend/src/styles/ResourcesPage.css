@@ -35,6 +35,32 @@
   border: 1px solid #ccc;
 }
 
+.left-menu button {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #1f2937;
+  color: #f1f5f9;
+  cursor: pointer;
+}
+
+.add-resource-form input,
+.add-resource-form select,
+.add-resource-form button {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.add-resource-form button {
+  background: #3b82f6;
+  color: #fff;
+}
+
 .right-resources {
   width: 75%;
   display: grid;

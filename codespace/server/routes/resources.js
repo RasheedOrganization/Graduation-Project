@@ -16,6 +16,17 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post('/', async (req, res) => {
+  try {
+    const { name, link, topic, subtopic } = req.body;
+    const resource = new Resource({ name, link, topic, subtopic });
+    await resource.save();
+    res.status(201).json(resource);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create resource' });
+  }
+});
+
 router.patch('/:id', async (req, res) => {
   try {
     const { status, name, link, topic, subtopic } = req.body;

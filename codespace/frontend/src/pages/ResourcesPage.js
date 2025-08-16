@@ -24,6 +24,13 @@ function ResourcesPage() {
   const [selectedSubtopic, setSelectedSubtopic] = useState('');
   const [resources, setResources] = useState([]);
   const [openStatusId, setOpenStatusId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    link: '',
+    topic: '',
+    subtopic: '',
+  });
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -40,6 +47,27 @@ function ResourcesPage() {
   const handleTopicChange = (e) => {
     setSelectedTopic(e.target.value);
     setSelectedSubtopic('');
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === 'topic' ? { subtopic: '' } : {}),
+    }));
+  };
+
+  const addResource = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${BACKEND_URL}/api/resources`, formData);
+      setResources((prev) => [...prev, res.data]);
+      setFormData({ name: '', link: '', topic: '', subtopic: '' });
+      setShowForm(false);
+    } catch (err) {
+      console.error('Failed to add resource', err);
+    }
   };
 
   const updateStatus = async (id, status) => {
@@ -74,6 +102,51 @@ function ResourcesPage() {
         </div>
         <div className="resources-content">
           <div className="left-menu">
+            <button onClick={() => setShowForm(!showForm)}>New</button>
+            {showForm && (
+              <form className="add-resource-form" onSubmit={addResource}>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="link"
+                  placeholder="Link"
+                  value={formData.link}
+                  onChange={handleFormChange}
+                  required
+                />
+                <select
+                  name="topic"
+                  value={formData.topic}
+                  onChange={handleFormChange}
+                  required
+                >
+                  <option value="">Select Topic</option>
+                  {Object.keys(topics).map((topic) => (
+                    <option key={topic} value={topic}>{topic}</option>
+                  ))}
+                </select>
+                <select
+                  name="subtopic"
+                  value={formData.subtopic}
+                  onChange={handleFormChange}
+                  disabled={!formData.topic}
+                  required
+                >
+                  <option value="">Select Subtopic</option>
+                  {formData.topic && topics[formData.topic].map((sub) => (
+                    <option key={sub} value={sub}>{sub}</option>
+                  ))}
+                </select>
+                <button type="submit">Add</button>
+              </form>
+            )}
             <select value={selectedTopic} onChange={handleTopicChange}>
               <option value="">All Topics</option>
               {Object.keys(topics).map((topic) => (
