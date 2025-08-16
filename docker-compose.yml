@@ -17,7 +17,7 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - TEST_DATA_DIR=${TEST_DATA_DIR}
       - JWT_SECRET=${JWT_SECRET}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL}
     ports: [6909:6909]
     depends_on: [mongo, redis]
   frontend:
