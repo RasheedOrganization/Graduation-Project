@@ -102,15 +102,16 @@
   background: #374151;
 }
 
-.status-not-attempted { background: #6b7280; }
-.status-solving { background: #3b82f6; }
-.status-solved { background: #22c55e; }
-.status-reviewing { background: #eab308; }
-.status-skipped { background: #f97316; }
-.status-ignored { background: #ef4444; }
+.status-circle.status-not-attempted { background: #6b7280; }
+.status-circle.status-solving { background: #3b82f6; }
+.status-circle.status-solved { background: #22c55e; }
+.status-circle.status-reviewing { background: #eab308; }
+.status-circle.status-skipped { background: #f97316; }
+.status-circle.status-ignored { background: #ef4444; }
 
 .status-emoji {
   font-size: 1.2em;
+  background: none;
 }
 
 .status-emoji.status-not-attempted { color: #6b7280; }
