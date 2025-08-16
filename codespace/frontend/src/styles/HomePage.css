@@ -22,10 +22,7 @@
 .home-title {
   font-size: 3rem;
   margin-bottom: 1rem;
-  background: linear-gradient(90deg, #ffecd2, #fcb69f);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #1a1a1a;
   animation: fadeIn 2s ease-in-out;
 }
 
