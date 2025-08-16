@@ -8,7 +8,8 @@ const test = require("./routes/test")
 const submit = require("./routes/submit")
 const api1 = require("./routes/api")
 const auth = require("./routes/auth")
-const roomsRoute = require("./routes/rooms")
+const roomsRoute = require("./routes/rooms");
+const contestsRoute = require("./routes/contests")
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use(express.json({limit: '50mb' , extended: true}));
 app.use('/api/auth',auth)
 app.use('/api',api1)
 app.use('/api/rooms',roomsRoute)
+app.use('/api/contests',contestsRoute)
 app.use('/test',test)
 app.use('/submit',submit)
 
