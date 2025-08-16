@@ -9,3 +9,7 @@ package-lock.json
 # Ignore environment files
 .env
 **/.env
+
+# Ignore dump file from docker
+dump.rdb
+**/dump.rdb

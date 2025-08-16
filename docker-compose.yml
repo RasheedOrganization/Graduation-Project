@@ -1,17 +1,15 @@
+---
 version: '3.8'
 services:
   mongo:
     image: mongo:6
     restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    ports: [27017:27017]
+    volumes: [mongo-data:/data/db]
   redis:
     image: redis:7
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    ports: [6379:6379]
   server:
     build: ./codespace/server
     restart: unless-stopped
@@ -19,21 +17,16 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - TEST_DATA_DIR=${TEST_DATA_DIR}
       - JWT_SECRET=${JWT_SECRET}
-      - REDIS_URL=${REDIS_URL}
-    ports:
-      - "6909:6909"
-    depends_on:
-      - mongo
-      - redis
+      - REDIS_URL=redis://redis:6379
+    ports: [6909:6909]
+    depends_on: [mongo, redis]
   frontend:
     build: ./codespace/frontend
     restart: unless-stopped
     environment:
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
-    ports:
-      - "3000:3000"
-    depends_on:
-      - server
+    ports: [3000:3000]
+    depends_on: [server]
 volumes:
   mongo-data:
