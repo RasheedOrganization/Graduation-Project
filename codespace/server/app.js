@@ -7,7 +7,8 @@ const test = require("./routes/test")
 const submit = require("./routes/submit")
 const api1 = require("./routes/api")
 const auth = require("./routes/auth")
-const roomsRoute = require("./routes/rooms")
+const roomsRoute = require("./routes/rooms");
+const contestsRoute = require("./routes/contests")
 const authMiddleware = require("./middleware/authMiddleware")
 const usersRoute = require("./routes/users")
 const rateLimit = require('express-rate-limit');
@@ -35,6 +36,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/api/auth',auth)
 app.use('/api',api1)
+app.use('/api/contests',contestsRoute)
 app.use('/api/rooms', authMiddleware, roomsRoute)
 app.use('/api/users', usersRoute)
 app.use('/test',test)
