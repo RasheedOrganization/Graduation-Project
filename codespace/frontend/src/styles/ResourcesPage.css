@@ -52,11 +52,19 @@
   padding: 15px;
   border-radius: 8px;
   position: relative;
+  cursor: pointer;
 }
 
-.resource-card a {
+.resource-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resource-link {
   color: #60a5fa;
   word-break: break-all;
+  margin: 4px 0 0;
 }
 
 .status-circle {
@@ -97,4 +105,15 @@
 .status-reviewing { background: #eab308; }
 .status-skipped { background: #f97316; }
 .status-ignored { background: #ef4444; }
+
+.status-emoji {
+  font-size: 1.2em;
+}
+
+.status-emoji.status-not-attempted { color: #6b7280; }
+.status-emoji.status-solving { color: #3b82f6; }
+.status-emoji.status-solved { color: #22c55e; }
+.status-emoji.status-reviewing { color: #eab308; }
+.status-emoji.status-skipped { color: #f97316; }
+.status-emoji.status-ignored { color: #ef4444; }
 

@@ -91,20 +91,35 @@ function ResourcesPage() {
               const statusClass = `status-${res.status.toLowerCase().replace(/ /g, '-')}`;
               const isOpen = openStatusId === res.id;
               return (
-                <div key={res.id} className="resource-card">
-                  <h3>{res.name}</h3>
-                  <a href={res.link} target="_blank" rel="noopener noreferrer">{res.link}</a>
+                <div
+                  key={res.id}
+                  className="resource-card"
+                  onClick={() => window.open(res.link, '_blank', 'noopener,noreferrer')}
+                >
+                  <div className="resource-header">
+                    <span
+                      className={`status-emoji ${statusClass}`}
+                      role="img"
+                      aria-label={res.status}
+                    >●</span>
+                    <h3>{res.name}</h3>
+                  </div>
+                  <p className="resource-link">{res.link}</p>
                   <div
                     className={`status-circle ${statusClass}`}
                     title={res.status}
-                    onClick={() => setOpenStatusId(isOpen ? null : res.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenStatusId(isOpen ? null : res.id);
+                    }}
                   ></div>
                   {isOpen && (
-                    <ul className="status-dropdown">
+                    <ul className="status-dropdown" onClick={(e) => e.stopPropagation()}>
                       {statusOptions.map((status) => (
                         <li
                           key={status}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             updateStatus(res.id, status);
                             setOpenStatusId(null);
                           }}
