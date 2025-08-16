@@ -2,10 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Room = require('../model/roomModel');
 const { getUsersInRoom } = require('../utils/roomStore');
-require('dotenv').config();
 
 const router = express.Router();
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 
 mongoose.connect(url);
 

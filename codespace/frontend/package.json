@@ -13,7 +13,6 @@
     "@uiw/codemirror-extensions-langs": "^4.21.20",
     "@uiw/react-codemirror": "^4.21.20",
     "axios": "^1.5.1",
-    "dotenv": "^17.2.1",
     "katex": "^0.16.10",
     "process": "^0.11.10",
     "react": "^18.2.0",

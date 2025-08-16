@@ -11,7 +11,7 @@ const redis = require('redis');
  * are caught so that the rest of the application can continue to run
  * even if Redis is unavailable.
  */
-const redisUrl = 'redis://redis:6379';
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
 // Always create the client with an explicit URL so the default isn't localhost
 const redisClient = redis.createClient({ url: redisUrl });

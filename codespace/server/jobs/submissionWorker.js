@@ -1,15 +1,15 @@
+require("dotenv").config();
 const {Job, Queue, Worker, QueueEvents} = require('bullmq')
 const fs = require('fs');
 const path = require('path');
 const Docker = require('dockerode');
 const docker = new Docker();
 
-require('dotenv').config();
-
 // Allow configuration of the Redis connection while providing sensible defaults
+const { hostname: redisHost, port: redisPort } = new URL(process.env.REDIS_URL || 'redis://localhost:6379');
 const connectionOptions = {
-    host: 'redis',
-    port: parseInt('6379', 10)
+    host: redisHost,
+    port: parseInt(redisPort, 10)
 };
 
 // allow configuration of backend URL
