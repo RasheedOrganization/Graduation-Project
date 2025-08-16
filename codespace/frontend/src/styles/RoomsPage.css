@@ -14,10 +14,11 @@
 
 .rooms-sidebar {
   width: 260px;
-  background: #fdfdfd;
+  background: #f9fbff;
   border-right: 1px solid #e0e0e0;
   padding: 1.5rem;
   overflow-y: auto;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .rooms-sidebar h3 {
@@ -33,13 +34,13 @@
   margin-bottom: 0.75rem;
   background: #ffffff;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .room-block:hover {
   background: #eef5ff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .room-title {
@@ -66,8 +67,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  background: linear-gradient(135deg, #e3f2fd, #ffffff);
   padding: 2rem;
+  transition: background 0.5s ease;
 }
 
 .auth-card form div {
