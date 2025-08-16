@@ -8,12 +8,12 @@ const topics = {
 };
 
 const statusOptions = [
-  'Not Attempted',
-  'Solving',
-  'Solved',
-  'Reviewing',
-  'Skipped',
-  'Ignored',
+  { value: 'Not Attempted', emoji: '⏳' },
+  { value: 'Solving', emoji: '🧠' },
+  { value: 'Solved', emoji: '👨‍💻' },
+  { value: 'Reviewing', emoji: '🔍' },
+  { value: 'Skipped', emoji: '⏭️' },
+  { value: 'Ignored', emoji: '🚫' },
 ];
 
 const initialResources = [
@@ -97,11 +97,6 @@ function ResourcesPage() {
                   onClick={() => window.open(res.link, '_blank', 'noopener,noreferrer')}
                 >
                   <div className="resource-header">
-                    <span
-                      className={`status-emoji ${statusClass}`}
-                      role="img"
-                      aria-label={res.status}
-                    >●</span>
                     <h3>{res.name}</h3>
                   </div>
                   <p className="resource-link">{res.link}</p>
@@ -115,16 +110,25 @@ function ResourcesPage() {
                   ></div>
                   {isOpen && (
                     <ul className="status-dropdown" onClick={(e) => e.stopPropagation()}>
-                      {statusOptions.map((status) => (
+                      {statusOptions.map(({ value, emoji }) => (
                         <li
-                          key={status}
+                          key={value}
                           onClick={(e) => {
                             e.stopPropagation();
-                            updateStatus(res.id, status);
+                            updateStatus(res.id, value);
                             setOpenStatusId(null);
                           }}
                         >
-                          {status}
+                          <span
+                            className={`status-emoji status-${value
+                              .toLowerCase()
+                              .replace(/ /g, '-')}`}
+                            role="img"
+                            aria-label={value}
+                          >
+                            {emoji}
+                          </span>
+                          {value}
                         </li>
                       ))}
                     </ul>
