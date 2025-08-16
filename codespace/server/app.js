@@ -3,13 +3,13 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { Server } = require("socket.io");
 const cors = require('cors');
-var bodyParser = require('body-parser');
 const test = require("./routes/test")
 const submit = require("./routes/submit")
 const api1 = require("./routes/api")
 const auth = require("./routes/auth")
 const roomsRoute = require("./routes/rooms")
-const authMiddleware = require('./middleware/authMiddleware')
+const authMiddleware = require("./middleware/authMiddleware")
+const usersRoute = require("./routes/users")
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -30,12 +30,13 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server(server); // this shit creates a separate websocket server whenever a connection opens
 
-app.use(express.json({limit: '50mb'}));
-app.use(express.json({limit: '50mb' , extended: true}));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/api/auth',auth)
 app.use('/api',api1)
 app.use('/api/rooms', authMiddleware, roomsRoute)
+app.use('/api/users', usersRoute)
 app.use('/test',test)
 app.use('/submit',submit)
 

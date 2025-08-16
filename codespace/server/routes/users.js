@@ -1,11 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const router = express.Router();
-
-const { submissionQueue, waitforJobCompletion } = require('../jobs/submissionWorker');
 const Submission = require('../model/submissionModel');
 
+const router = express.Router();
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 mongoose.connect(url);
 
@@ -24,28 +22,17 @@ function authenticate(req, res, next) {
   }
 }
 
-router.post('/', authenticate, async (req, res) => {
-  const { code, problem_id } = req.body;
-  if (!code || !problem_id) {
-    return res.status(400).send('Code and problem ID are required.');
+router.get('/:id/submissions', authenticate, async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) {
+    return res.status(403).json({ message: 'Forbidden' });
   }
-
-  const job = await submissionQueue.add('submissionProcess', { code: code, problemId: problem_id });
-  const verdictData = await waitforJobCompletion(submissionQueue, job);
-
   try {
-    const submission = new Submission({
-      user: req.user.id,
-      problem: problem_id,
-      code,
-      verdict: verdictData,
-    });
-    await submission.save();
+    const submissions = await Submission.find({ user: id }).sort({ createdAt: -1 });
+    res.json(submissions);
   } catch (err) {
-    console.error('Failed to save submission:', err);
+    res.status(500).json({ message: 'Server error' });
   }
-
-  res.send(verdictData);
 });
 
 module.exports = router;
