@@ -16,11 +16,19 @@ export default function CreateNewRoom({ onBack }) {
       return;
     }
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${BACKEND_URL}/api/rooms/create`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ isPrivate, password: isPrivate ? password : undefined }),
       });
+      if (res.status === 401) {
+        navigate('/login');
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('roomid', data.roomid);

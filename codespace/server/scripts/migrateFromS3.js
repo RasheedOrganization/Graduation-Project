@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+require("dotenv").config();
 // Optional helper to migrate existing S3 objects to local test data storage.
 // Requires the AWS CLI to be installed and configured.
 
 const { execSync } = require('child_process');
 const path = require('path');
-require('dotenv').config();
 
 const bucket = process.argv[2];
 if (!bucket) {

@@ -6,17 +6,29 @@ Problem test cases are stored on the filesystem instead of AWS S3. Each
 problem has its own directory under `server/test-data/<problemId>/` containing
 `input.txt` and `output.txt`.
 
-## Environment variables
+## Configuration
 
-Create a `.env` file inside the `server/` folder with:
+Create environment files from the provided examples:
 
 ```
-MONGODB_URI=<your mongodb uri>
-TEST_DATA_DIR=./test-data
-JWT_SECRET=<your jwt secret>
+cp .env.example .env
+cp codespace/server/.env.example codespace/server/.env
+cp codespace/frontend/.env.example codespace/frontend/.env
 ```
 
-`TEST_DATA_DIR` controls where test files are saved and loaded from.
+The root `.env` is used by Docker Compose. The server and frontend read `.env`
+files in their own directories when running without Docker.
+
+| Variable | Purpose |
+| --- | --- |
+| `MONGODB_URI` | MongoDB connection string |
+| `TEST_DATA_DIR` | Location for problem test files |
+| `JWT_SECRET` | Secret used to sign authentication tokens |
+| `REDIS_URL` | Redis connection URL |
+| `REACT_APP_BACKEND_URL` | API endpoint for the frontend |
+
+Default values for both Docker and manual setups are shown in the `.env.example`
+files.
 
 ## Migrating existing S3 data
 
@@ -46,3 +58,42 @@ npm start
 ```
 
 Then open [http://localhost:3000/](http://localhost:3000/) in your browser.
+
+## Running with Docker
+
+Copy `.env.example` to `.env` and build/start the containers:
+
+```bash
+cp .env.example .env
+docker-compose up --build
+```
+
+The services will be available at:
+
+- Frontend: http://localhost:3000
+- API server: http://localhost:6909
+- MongoDB: localhost:27017
+- Redis: localhost:6379
+
+## Running manually
+
+Ensure MongoDB and Redis are running locally, create `.env` files for the server
+and frontend, then start both:
+
+```bash
+cp codespace/server/.env.example codespace/server/.env
+cp codespace/frontend/.env.example codespace/frontend/.env
+
+# in one terminal
+cd codespace/server
+npm install
+npm start
+
+# in another terminal
+cd codespace/frontend
+npm install
+npm start
+```
+
+Adjust any variables in the `.env` files if your local services run on different
+hosts or ports.

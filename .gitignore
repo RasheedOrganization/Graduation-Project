@@ -5,3 +5,7 @@ node_modules/
 # Ignore npm lock files
 package-lock.json
 **/package-lock.json
+
+# Ignore environment files
+.env
+**/.env

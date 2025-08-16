@@ -1,11 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Room = require('../model/roomModel');
-const { getUsersInRoom } = require('../utils/roomStore');
-require('dotenv').config();
+const { getUsersInRoom, getMessages } = require('../utils/roomStore');
 
 const router = express.Router();
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 
 mongoose.connect(url);
 
@@ -47,17 +46,31 @@ router.post('/join', async (req, res) => {
   }
 });
 
-router.get('/public', async (req, res) => {
-  try {
-    const rooms = await Room.find({ isPrivate: false }).select('roomid -_id');
-    const roomsWithUsers = rooms.map((r) => ({
-      roomid: r.roomid,
-      users: getUsersInRoom(r.roomid).map(u => u.username),
-    }));
-    res.json(roomsWithUsers);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+  router.get('/public', async (req, res) => {
+    try {
+      const rooms = await Room.find({ isPrivate: false }).select('roomid -_id');
+      const roomsWithUsers = await Promise.all(
+        rooms.map(async (r) => {
+          const users = await getUsersInRoom(r.roomid);
+          return {
+            roomid: r.roomid,
+            users: users.map(u => u.username),
+          };
+        })
+      );
+      res.json(roomsWithUsers);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.get('/:id/messages', async (req, res) => {
+    try {
+      const messages = await getMessages(req.params.id);
+      res.json(messages);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 
 module.exports = router;

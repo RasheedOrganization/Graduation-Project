@@ -3,10 +3,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel');
-require('dotenv').config();
 
 const router = express.Router();
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 
 mongoose.connect(url);
 
@@ -41,7 +40,7 @@ router.post('/login', async (req, res) => {
     console.log(user);
     const token = jwt.sign(
       { id: user._id, username: user.username },
-      "6c0f87cc526802c1d5b1fd13ca74d873",
+      process.env.JWT_SECRET || 'changeme',
       { expiresIn: '1h' }
     );
     

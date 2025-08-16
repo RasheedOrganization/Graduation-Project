@@ -11,11 +11,20 @@ export default function JoinRoom({ onCreateClick }) {
     e.preventDefault();
     try {
       // First attempt: check if room requires a password
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      };
       let res = await fetch(`${BACKEND_URL}/api/rooms/join`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ roomid }),
       });
+      if (res.status === 401) {
+        navigate('/login');
+        return;
+      }
       let data = await res.json();
 
       // If the room is private prompt the user for its password
@@ -26,12 +35,20 @@ export default function JoinRoom({ onCreateClick }) {
         }
         res = await fetch(`${BACKEND_URL}/api/rooms/join`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ roomid, password }),
         });
+        if (res.status === 401) {
+          navigate('/login');
+          return;
+        }
         data = await res.json();
       }
 
+      if (res.status === 401) {
+        navigate('/login');
+        return;
+      }
       if (res.ok) {
         localStorage.setItem('roomid', roomid);
         navigate('/room');

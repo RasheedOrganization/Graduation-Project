@@ -1,14 +1,14 @@
+require("dotenv").config();
 const {Job, Queue, Worker} = require('bullmq')
 const {redisClient} = require('../model/redisModel')
 const {exec} = require('child_process');
 const { stderr } = require('process');
 
-require('dotenv').config();
-
 // Allow configuration of the Redis connection while providing sensible defaults
+const { hostname: redisHost, port: redisPort } = new URL(process.env.REDIS_URL || 'redis://localhost:6379');
 const connectionOptions = {
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    port: parseInt(process.env.REDIS_PORT || '6379', 10)
+    host: redisHost,
+    port: parseInt(redisPort, 10)
 };
 
 const scrapingQueue = new Queue('scrapingProcess',{connection: connectionOptions});
