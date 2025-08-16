@@ -1,0 +1,77 @@
+.resources-page {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  max-width: 600px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.resources-content {
+  display: flex;
+}
+
+.left-menu {
+  width: 25%;
+  padding-right: 20px;
+}
+
+.left-menu select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.right-resources {
+  width: 75%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.resource-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #444;
+  background: #111827;
+  color: #f1f5f9;
+  padding: 15px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.resource-card a {
+  color: #60a5fa;
+  word-break: break-all;
+}
+
+.status-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.status-not-attempted { background: #6b7280; }
+.status-solving { background: #3b82f6; }
+.status-solved { background: #22c55e; }
+.status-reviewing { background: #eab308; }
+.status-skipped { background: #f97316; }
+.status-ignored { background: #ef4444; }
+
