@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import NavBar from '../components/NavBar';
 import '../styles/ResourcesPage.css';
+import BACKEND_URL from '../config';
 
 const topics = {
   'Graph Algorithms': ['BFS', 'DFS'],
@@ -16,36 +18,39 @@ const statusOptions = [
   { value: 'Ignored', emoji: '🚫' },
 ];
 
-const initialResources = [
-  { id: 1, name: 'BFS Tutorial', link: 'https://example.com/bfs', topic: 'Graph Algorithms', subtopic: 'BFS', status: 'Not Attempted' },
-  { id: 2, name: 'DFS Guide', link: 'https://example.com/dfs', topic: 'Graph Algorithms', subtopic: 'DFS', status: 'Solving' },
-  { id: 3, name: 'Knapsack Article', link: 'https://example.com/knapsack', topic: 'Dynamic Programming', subtopic: 'Knapsack', status: 'Solved' },
-  { id: 4, name: 'LIS Explained', link: 'https://example.com/lis', topic: 'Dynamic Programming', subtopic: 'LIS', status: 'Reviewing' },
-];
-
 function ResourcesPage() {
   const [search, setSearch] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
   const [selectedSubtopic, setSelectedSubtopic] = useState('');
-  const [resources, setResources] = useState(() => {
-    const stored = localStorage.getItem('resources');
-    return stored ? JSON.parse(stored) : initialResources;
-  });
+  const [resources, setResources] = useState([]);
   const [openStatusId, setOpenStatusId] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('resources', JSON.stringify(resources));
-  }, [resources]);
+    const fetchResources = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/resources`);
+        setResources(res.data);
+      } catch (err) {
+        console.error('Failed to fetch resources', err);
+      }
+    };
+    fetchResources();
+  }, []);
 
   const handleTopicChange = (e) => {
     setSelectedTopic(e.target.value);
     setSelectedSubtopic('');
   };
 
-  const updateStatus = (id, status) => {
-    setResources((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status } : r))
-    );
+  const updateStatus = async (id, status) => {
+    try {
+      await axios.patch(`${BACKEND_URL}/api/resources/${id}`, { status });
+      setResources((prev) =>
+        prev.map((r) => (r._id === id ? { ...r, status } : r))
+      );
+    } catch (err) {
+      console.error('Failed to update status', err);
+    }
   };
 
   const filteredResources = resources.filter((r) => {
@@ -89,10 +94,10 @@ function ResourcesPage() {
           <div className="right-resources">
             {filteredResources.map((res) => {
               const statusClass = `status-${res.status.toLowerCase().replace(/ /g, '-')}`;
-              const isOpen = openStatusId === res.id;
+              const isOpen = openStatusId === res._id;
               return (
                 <div
-                  key={res.id}
+                  key={res._id}
                   className="resource-card"
                   onClick={() => window.open(res.link, '_blank', 'noopener,noreferrer')}
                 >
@@ -105,7 +110,7 @@ function ResourcesPage() {
                     title={res.status}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setOpenStatusId(isOpen ? null : res.id);
+                      setOpenStatusId(isOpen ? null : res._id);
                     }}
                   ></div>
                   {isOpen && (
@@ -115,7 +120,7 @@ function ResourcesPage() {
                           key={value}
                           onClick={(e) => {
                             e.stopPropagation();
-                            updateStatus(res.id, value);
+                            updateStatus(res._id, value);
                             setOpenStatusId(null);
                           }}
                         >

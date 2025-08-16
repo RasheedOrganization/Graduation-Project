@@ -11,6 +11,7 @@ const roomsRoute = require("./routes/rooms");
 const contestsRoute = require("./routes/contests")
 const authMiddleware = require("./middleware/authMiddleware")
 const usersRoute = require("./routes/users")
+const resourcesRoute = require("./routes/resources")
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -39,6 +40,7 @@ app.use('/api',api1)
 app.use('/api/contests',contestsRoute)
 app.use('/api/rooms', authMiddleware, roomsRoute)
 app.use('/api/users', usersRoute)
+app.use('/api/resources', resourcesRoute)
 app.use('/test',test)
 app.use('/submit',submit)
 
