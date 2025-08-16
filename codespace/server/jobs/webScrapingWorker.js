@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Allow configuration of the Redis connection while providing sensible defaults
 const connectionOptions = {
-    host: process.env.REDIS_HOST || '127.0.0.1',
+    host: 'redis',
     port: parseInt(process.env.REDIS_PORT || '6379', 10)
 };
 
