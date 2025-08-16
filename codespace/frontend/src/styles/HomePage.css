@@ -12,19 +12,69 @@
   justify-content: center;
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
-  color: #333;
-  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  color: #fff;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a1c4fd);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   padding: 0 1rem;
 }
 
 .home-title {
   font-size: 3rem;
   margin-bottom: 1rem;
+  background: linear-gradient(90deg, #ffecd2, #fcb69f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fadeIn 2s ease-in-out;
 }
 
 .home-tagline {
   font-size: 1.25rem;
   margin: 0.25rem 0;
+  color: #fafafa;
+}
+
+.home-gallery {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  background-color: #fff;
+}
+
+.gallery-image {
+  width: 150px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.gallery-image:hover {
+  transform: scale(1.05);
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .home-footer {

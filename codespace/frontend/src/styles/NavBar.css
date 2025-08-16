@@ -3,16 +3,17 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 2rem;
-  background-color: #fff;
+  background: linear-gradient(90deg, #4e54c8, #8f94fb);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', sans-serif;
+  color: #fff;
 }
 
 .navbar-brand .brand-link {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: inherit;
+  color: #fff;
 }
 
 .brand-logo {
@@ -36,12 +37,29 @@
 
 .navbar-links a {
   text-decoration: none;
-  color: #333;
+  color: #fff;
   font-weight: 500;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
 .navbar-links a:hover {
-  color: #1976d2;
+  color: #ffefba;
+}
+
+.navbar-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: #ffefba;
+  transition: width 0.3s ease;
+}
+
+.navbar-links a:hover::after {
+  width: 100%;
 }
 
 .profile-container {
