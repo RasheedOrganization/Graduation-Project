@@ -85,6 +85,7 @@ export default function Room() {
           setIsMicOn(true);
           if (socketRef.current) {
             socketRef.current.emit('mic-status', { userid, micOn: true });
+            socketRef.current.emit('get-users-in-room');
           }
         });
       }
@@ -105,22 +106,10 @@ export default function Room() {
         console.log(payload.msg);
       });
 
-      socketRef.current.on('all users', (payload) => {
-        if (!streamRef.current) return;
-        const peers = [];
-        const tmp = payload.users;
-        tmp.forEach((user) => {
-          if (user !== userid) {
-            const peer = createPeer(user, userid, streamRef.current); // {target,my id,stream}
-            peersRef.current.push({
-              peerID: user,
-              peer,
-            });
-            peers.push(peer);
-          }
-        });
-        setPeers(peers);
-      });
+      // previous implementation relied on an 'all users' broadcast which
+      // could fire before a microphone stream was available, leaving new
+      // participants without peers. The logic has moved to the
+      // 'users-in-room' handler.
 
       socketRef.current.on('offer received', (payload) => {
         console.log('offer received');
@@ -148,6 +137,19 @@ export default function Room() {
 
       socketRef.current.on('users-in-room', (payload) => {
         setMembers(payload.users);
+        if (streamRef.current) {
+          const newPeers = [];
+          payload.users.forEach((user) => {
+            if (user.userid !== userid && !peersRef.current.some(p => p.peerID === user.userid)) {
+              const peer = createPeer(user.userid, userid, streamRef.current);
+              peersRef.current.push({ peerID: user.userid, peer });
+              newPeers.push(peer);
+            }
+          });
+          if (newPeers.length) {
+            setPeers(prev => [...prev, ...newPeers]);
+          }
+        }
       });
 
       socketRef.current.on('mic-status', (payload) => {

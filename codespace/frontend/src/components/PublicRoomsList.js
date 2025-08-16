@@ -9,7 +9,14 @@ export default function PublicRoomsList() {
   useEffect(() => {
     async function fetchRooms() {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/rooms/public`);
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${BACKEND_URL}/api/rooms/public`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.status === 401) {
+          navigate('/login');
+          return;
+        }
         if (res.ok) {
           const data = await res.json();
           setRooms(data);
@@ -21,15 +28,23 @@ export default function PublicRoomsList() {
     fetchRooms();
     const interval = setInterval(fetchRooms, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [navigate]);
 
   const joinRoom = async (roomid) => {
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${BACKEND_URL}/api/rooms/join`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ roomid }),
       });
+      if (res.status === 401) {
+        navigate('/login');
+        return;
+      }
       if (res.ok) {
         localStorage.setItem('roomid', roomid);
         navigate('/room');
