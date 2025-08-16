@@ -1,36 +1,43 @@
-const rooms = {};
+const RoomUser = require('../model/roomUserModel');
+const Message = require('../model/messageModel');
 
-function addUserToRoom(roomid, userid, username) {
-  if (!rooms[roomid]) {
-    rooms[roomid] = [];
-  }
-  if (!rooms[roomid].some((u) => u.userid === userid)) {
-    rooms[roomid].push({ userid, username, micOn: false });
-  }
+async function addUserToRoom(roomid, userid, username) {
+  await RoomUser.findOneAndUpdate(
+    { roomid, userid },
+    { username },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 }
 
-function removeUserFromRoom(roomid, userid) {
-  if (!rooms[roomid]) return;
-  rooms[roomid] = rooms[roomid].filter((u) => u.userid !== userid);
-  if (rooms[roomid].length === 0) {
-    delete rooms[roomid];
-  }
+async function removeUserFromRoom(roomid, userid) {
+  await RoomUser.deleteOne({ roomid, userid });
 }
 
-function getUsersInRoom(roomid) {
-  return rooms[roomid] || [];
+async function getUsersInRoom(roomid) {
+  return await RoomUser.find({ roomid });
 }
 
-function getAllRooms() {
+async function getAllRooms() {
+  const users = await RoomUser.find({});
+  const rooms = {};
+  users.forEach(u => {
+    if (!rooms[u.roomid]) rooms[u.roomid] = [];
+    rooms[u.roomid].push({ userid: u.userid, username: u.username, micOn: u.micOn });
+  });
   return rooms;
 }
 
-function updateMicStatus(roomid, userid, micOn) {
-  if (!rooms[roomid]) return;
-  const user = rooms[roomid].find((u) => u.userid === userid);
-  if (user) {
-    user.micOn = micOn;
-  }
+async function updateMicStatus(roomid, userid, micOn) {
+  await RoomUser.findOneAndUpdate({ roomid, userid }, { micOn });
+}
+
+async function addMessage(roomid, userid, username, msg) {
+  const message = new Message({ roomid, userid, username, message: msg });
+  await message.save();
+}
+
+async function getMessages(roomid) {
+  return await Message.find({ roomid }).sort({ createdAt: 1 });
 }
 
 module.exports = {
@@ -39,4 +46,6 @@ module.exports = {
   getUsersInRoom,
   getAllRooms,
   updateMicStatus,
+  addMessage,
+  getMessages,
 };

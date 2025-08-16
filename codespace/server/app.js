@@ -3,13 +3,14 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { Server } = require("socket.io");
 const cors = require('cors');
-var bodyParser = require('body-parser');
 const test = require("./routes/test")
 const submit = require("./routes/submit")
 const api1 = require("./routes/api")
 const auth = require("./routes/auth")
 const roomsRoute = require("./routes/rooms");
 const contestsRoute = require("./routes/contests")
+const authMiddleware = require("./middleware/authMiddleware")
+const usersRoute = require("./routes/users")
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -30,13 +31,14 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server(server); // this shit creates a separate websocket server whenever a connection opens
 
-app.use(express.json({limit: '50mb'}));
-app.use(express.json({limit: '50mb' , extended: true}));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/api/auth',auth)
 app.use('/api',api1)
-app.use('/api/rooms',roomsRoute)
 app.use('/api/contests',contestsRoute)
+app.use('/api/rooms', authMiddleware, roomsRoute)
+app.use('/api/users', usersRoute)
 app.use('/test',test)
 app.use('/submit',submit)
 
@@ -44,7 +46,13 @@ app.get('/', (req, res) => {
     res.send('omg hewwo fren!!');
 });
 
-const { addUserToRoom, removeUserFromRoom, getUsersInRoom, updateMicStatus } = require('./utils/roomStore');
+const {
+  addUserToRoom,
+  removeUserFromRoom,
+  getUsersInRoom,
+  updateMicStatus,
+  addMessage,
+} = require('./utils/roomStore');
 const username_to_socket = {};
 const pairSet = new Map();
 
@@ -66,7 +74,7 @@ function removeuserfrompair(){
 
 io.on('connection', (socket) => {
     socket.emit('welcome',{msg: 'welcome to room'});
-    socket.on('join room',(payload) => {
+    socket.on('join room', async (payload) => {
         socket.roomid = payload.roomid;
         socket.userid = payload.userid;
         socket.username = payload.username;
@@ -74,10 +82,10 @@ io.on('connection', (socket) => {
         socket.join(payload.roomid);
         username_to_socket[payload.userid] = socket;
 
-        addUserToRoom(payload.roomid, payload.userid, payload.username);
+        await addUserToRoom(payload.roomid, payload.userid, payload.username);
 
         console.log(`${payload.userid} joined ${payload.roomid}`)
-        const usersInRoom = getUsersInRoom(payload.roomid);
+        const usersInRoom = await getUsersInRoom(payload.roomid);
         io.to(socket.roomid).emit('all users',{users: usersInRoom.map(u => u.userid)});
         io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
     })
@@ -90,7 +98,8 @@ io.on('connection', (socket) => {
         io.to(socket.roomid).emit('receive-problem-statement',{statement: payload.statement});
     });
 
-    socket.on('send-message', (payload) => {
+    socket.on('send-message', async (payload) => {
+        await addMessage(socket.roomid, socket.userid, socket.username, payload.msg);
         io.to(socket.roomid).emit('receive message',{msg: payload.msg});
     })
 
@@ -130,23 +139,23 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('mic-status', (payload) => {
-        updateMicStatus(socket.roomid, payload.userid, payload.micOn);
+    socket.on('mic-status', async (payload) => {
+        await updateMicStatus(socket.roomid, payload.userid, payload.micOn);
         io.to(socket.roomid).emit('mic-status', payload);
     });
 
-    socket.on('get-users-in-room', (payload) => {
-        const usersInRoom = getUsersInRoom(socket.roomid);
+    socket.on('get-users-in-room', async (payload) => {
+        const usersInRoom = await getUsersInRoom(socket.roomid);
         console.log('someone is asking around');
         socket.emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
     });
 
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
         // this is trash bruh
         if (socket.roomid) {
-          removeUserFromRoom(socket.roomid, socket.userid);
-          const usersInRoom = getUsersInRoom(socket.roomid);
+          await removeUserFromRoom(socket.roomid, socket.userid);
+          const usersInRoom = await getUsersInRoom(socket.roomid);
           io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
 
           console.log('users currently in room are: ' + usersInRoom.map(u => u.username));
