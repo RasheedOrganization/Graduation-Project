@@ -1,9 +1,8 @@
 const express = require('express')
 const mongoose = require('mongoose');
-require('dotenv').config();
 const router = express.Router();
 // Use provided MongoDB connection string or fall back to a local instance
-const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/stuff';
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 const {QueueEvents} = require('bullmq');
 const { redisClient } = require('../model/redisModel');
 const {scrapingQueue} = require('../jobs/webScrapingWorker')
