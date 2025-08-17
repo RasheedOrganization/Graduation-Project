@@ -119,9 +119,11 @@ router.post('/new', async (req,res) => {
     // store test data locally
     saveFile(`${id}`, 'input.txt', main_tests);
     saveFile(`${id}`, 'output.txt', expected_output);
+    res.status(201).json({ message: 'Problem created' });
   }
   catch(error){
     console.error(error);
+    res.status(500).json({ error: 'Failed to create problem' });
   }
 
 })
@@ -215,6 +217,7 @@ router.post('/get-test-package', async (req,res) => {
   }
   catch(error){
     console.error(error);
+    res.status(500).json({ error: 'Error fetching test package' });
   }
 })
 
