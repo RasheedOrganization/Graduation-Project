@@ -3,6 +3,7 @@ import axios from 'axios';
 import '../styles/App.css';
 import CodeMirror from '@uiw/react-codemirror';
 import { cpp } from '@codemirror/lang-cpp';
+import { useNavigate } from 'react-router-dom';
 import BACKEND_URL from '../config';
 
 // Replace with the URL you want to send the request to
@@ -16,6 +17,7 @@ export default function TextBox({socketRef,currentProbId}) {
     const [inputvalue, setInputvalue] = useState('');
     const [outputvalue, setOutputvalue] = useState('');
     const [color, setColor] = useState('black');
+    const navigate = useNavigate();
 
     const SocketEmit = useCallback((channel,msg) => {
         if(socketRef.current){
@@ -77,10 +79,17 @@ export default function TextBox({socketRef,currentProbId}) {
                 code: textvalue,
                 problem_id: currentProbId
             };
-            const response = await axios.post(submitUrl, requestData);
+            const token = localStorage.getItem('token');
+            const response = await axios.post(submitUrl, requestData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setOutputvalue(response.data);
         }
         catch(error){
+            if (error.response && error.response.status === 401) {
+                navigate('/login');
+                return;
+            }
             setOutputvalue(error.message);
         }
     }
