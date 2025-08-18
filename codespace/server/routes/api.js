@@ -9,22 +9,7 @@ const {scrapingQueue} = require('../jobs/webScrapingWorker')
 const { saveFile, getTestData } = require('../controllers/fileStorage');
 const expire_time = 3600;
 
-const ProblemSchema = new mongoose.Schema({
-  id: String,
-  problem_name:  String,
-  statement:  String,
-  sinput: String,
-  soutput: String,
-});
-
-const testsSchema = new mongoose.Schema({
-  id: String,
-  main_tests: String,
-  expected_output: String,
-});
-
-const problem_model = mongoose.model('Problem Packages',ProblemSchema);
-// const tests_model = mongoose.model('Test Packages',testsSchema);
+const problem_model = require('../model/problemModel');
 mongoose.connect(url).catch(err => {
   console.error('Failed to connect to MongoDB:', err.message);
 });
@@ -155,6 +140,20 @@ router.get('/problem-list',async (req,res) => {
     res.status(500).send("sowwie,error fetching problems");
   }
 })
+
+router.get('/problems/:id', async (req, res) => {
+  try {
+    const problem = await problem_model.findOne({ id: req.params.id });
+    if (problem) {
+      res.json(problem);
+    } else {
+      res.status(404).json({ error: 'Problem not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching problem' });
+  }
+});
 
 router.get('/parse_problem/:param',async (req,res) => {
   console.log("who called me");
