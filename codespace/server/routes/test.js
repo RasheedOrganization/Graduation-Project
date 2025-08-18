@@ -1,72 +1,58 @@
 const express = require('express');
-const Docker = require('dockerode');
 const path = require('path');
 const fs = require('fs').promises;
-const router = express.Router();
-const docker = new Docker();
 const os = require('os');
+const { spawn } = require('child_process');
+
+const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const cppfilepath = path.join(__dirname, 'test1', 'a.cpp');
-  const inputfilepath = path.join(__dirname, 'test1', 'input.txt');
-  const outputfilepath = path.join(__dirname, 'test1', 'output.txt');
-  const test_path = path.join(__dirname,'test1');
   const { code, input } = req.body;
-
   if (!code) {
     return res.status(400).send('Code is required.');
   }
 
-  const containerOptions = {
-    Image: 'nubskr/compiler:1',
-    Cmd: ['./doshit.sh'],
-    HostConfig: {
-      Memory: 256 * 1024 * 1024, // 512MB
-      PidsLimit: 100, // Limit number of processes
-      Binds: [
-        `${test_path}/:/contest/`,
-      ],            
-      NetworkMode: 'none',
-      // TODO: add more limits
-    }
-  };
-
-  async function changeFile(filePath, data) {
-    try {
-      await fs.writeFile(filePath, data, 'utf8');
-      console.log(`File content at ${filePath} has been updated.`);
-    } catch (err) {
-      console.error('Error writing the file:', err);
-      throw err;
-    }
-  }
-
-  async function runContainer() {
-    try {
-      const container = await docker.createContainer(containerOptions);
-
-      await container.start();
-      console.log('Container started successfully.');
-
-      // You can add further interactions with the container here if necessary
-
-      await container.stop();
-      console.log('Container stopped.');
-
-      const outputData = await fs.readFile(outputfilepath, 'utf8');
-      res.send(outputData);
-    } catch (err) {
-      console.error('Error during Docker container operation:', err);
-      res.status(500).send('Internal Server Error');
-    }
-  }
+  const tmpBase = path.join(os.tmpdir(), 'sandbox-');
+  let workDir;
 
   try {
-    await changeFile(cppfilepath, code);
-    await changeFile(inputfilepath, input);
-    await runContainer();
+    workDir = await fs.mkdtemp(tmpBase);
+    const sourcePath = path.join(workDir, 'main.cpp');
+    const inputPath = path.join(workDir, 'input.txt');
+    const outputPath = path.join(workDir, 'output.txt');
+
+    await fs.writeFile(sourcePath, code, 'utf8');
+    await fs.writeFile(inputPath, input || '', 'utf8');
+
+    await new Promise((resolve, reject) => {
+      const docker = spawn('docker', [
+        'run', '--rm',
+        '--memory', '256m', '--network', 'none',
+        '-v', `${workDir}:/workspace`,
+        '-w', '/workspace',
+        'gcc:13',
+        'bash', '-lc',
+        'g++ main.cpp -o main && ./main < input.txt > output.txt'
+      ]);
+
+      let stderr = '';
+      docker.stderr.on('data', d => (stderr += d.toString()));
+      docker.on('error', err => reject(err));
+      docker.on('close', code => {
+        if (code !== 0) reject(new Error(stderr));
+        else resolve();
+      });
+    });
+
+    const output = await fs.readFile(outputPath, 'utf8');
+    res.send(output);
   } catch (err) {
-    res.status(500).send('An error occurred while processing your request.');
+    console.error('Error during code execution:', err);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    if (workDir) {
+      await fs.rm(workDir, { recursive: true, force: true });
+    }
   }
 });
 
