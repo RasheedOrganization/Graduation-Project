@@ -29,7 +29,6 @@ function SignupPage() {
         setError(data.message || 'Signup failed');
         return;
       }
-      localStorage.setItem('token', data.token);
       navigate('/login');
     } catch (err) {
       setError('Signup failed');
