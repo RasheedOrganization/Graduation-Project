@@ -13,6 +13,7 @@ services:
   server:
     build: ./codespace/server
     restart: unless-stopped
+    user: root
     environment:
       - MONGODB_URI=${MONGODB_URI}
       - TEST_DATA_DIR=${TEST_DATA_DIR}
@@ -20,6 +21,8 @@ services:
       - REDIS_URL=${REDIS_URL}
     ports: [6909:6909]
     depends_on: [mongo, redis]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
   frontend:
     build: ./codespace/frontend
     restart: unless-stopped
