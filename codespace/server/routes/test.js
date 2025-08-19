@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
       docker.stderr.on('data', d => (stderr += d.toString()));
       docker.on('error', err => reject(err));
       docker.on('close', code => {
-        if (code !== 0) reject(new Error(stderr));
+        if (code !== 0) reject({ code, stderr });
         else resolve();
       });
     });
@@ -48,7 +48,13 @@ router.post('/', async (req, res) => {
     res.send(output);
   } catch (err) {
     console.error('Error during code execution:', err);
-    res.status(500).send('Internal Server Error');
+    if (err.code === 'ENOENT') {
+      res.status(500).send('Docker is not installed or not in PATH');
+    } else if (err.stderr) {
+      res.status(400).send(err.stderr);
+    } else {
+      res.status(500).send('Internal Server Error');
+    }
   } finally {
     if (workDir) {
       await fs.rm(workDir, { recursive: true, force: true });

@@ -8,7 +8,7 @@ import BACKEND_URL from '../../config';
 
 const api = `${BACKEND_URL}/api/problem-list`;
 
-export default function MainLHS({socketRef,currentProbId,setCurrentProb}) {
+export default function MainLHS({socketRef,currentProbId,setCurrentProb, problemModalOpen, setProblemModalOpen}) {
   // when we change the problem, just broadcast the problem id, and everything will change
   const [text, setText] = useState("");
   const [input, setInput] = useState(""); // current raw statement
@@ -125,7 +125,7 @@ export default function MainLHS({socketRef,currentProbId,setCurrentProb}) {
       {/* <CopyLinkButton link={sharedlink} /> */}
 
       {text!=="" && <Samples sampleInput={sampleInput} sampleOutput={sampleOutput}/>}
-      <NestedModal socketRef={socketRef} setCurrentProb={setCurrentProb} setProblemName={setProblemName} setSampleInput={setSampleInput} setSampleOutput={setSampleOutput} text={text} setText={setText} input={input} setInput = {setInput} />
+      <NestedModal open={problemModalOpen} setOpen={setProblemModalOpen} socketRef={socketRef} setCurrentProb={setCurrentProb} setProblemName={setProblemName} setSampleInput={setSampleInput} setSampleOutput={setSampleOutput} text={text} setText={setText} input={input} setInput = {setInput} />
 
     </div>
   )

@@ -124,20 +124,22 @@ function ChildModal({socketRef, text,setText,input,setInput}) {
   );
 }
 
-export default function NestedModal({socketRef, setCurrentProb,setSampleOutput,setSampleInput,setProblemName,text,setText,input,setInput,curr}) {
-  const [open, setOpen] = React.useState(false);
+export default function NestedModal({socketRef, setCurrentProb,setSampleOutput,setSampleInput,setProblemName,text,setText,input,setInput,open,setOpen,curr}) {
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const actualOpen = open !== undefined ? open : internalOpen;
+  const actualSetOpen = setOpen !== undefined ? setOpen : setInternalOpen;
+
   const handleOpen = () => {
-    setOpen(true);
+    actualSetOpen(true);
   };
   const handleClose = () => {
-    setOpen(false);
+    actualSetOpen(false);
   };
-  // console.log("input is " + input);
   return (
     <div>
       <Button onClick={handleOpen}>View Problems</Button>
       <Modal
-        open={open}
+        open={actualOpen}
         onClose={handleClose}
         aria-labelledby="parent-modal-title"
         aria-describedby="parent-modal-description"
