@@ -30,7 +30,9 @@ export default function ChatBox({ socketRef, username }) {
       <div className="chat-messages">
         {messages.map((m, idx) => (
           <div key={idx} className="chat-message">
-            <strong>{m.username}: </strong>{m.msg}
+            <span className="chat-emoji" role="img" aria-label="user">🙂</span>
+            <span className="chat-user">{m.username}:</span>
+            <span className="chat-text">{m.msg}</span>
           </div>
         ))}
       </div>
