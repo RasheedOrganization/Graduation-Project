@@ -1,21 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import NestedModal from './NestedModal';
-import axios from 'axios';
 import Samples from './Samples';
-import BACKEND_URL from '../../config';
 
-const api = `${BACKEND_URL}/api/problem-list`;
-
-export default function MainLHS({socketRef,currentProbId,setCurrentProb, problemModalOpen, setProblemModalOpen}) {
-  // when we change the problem, just broadcast the problem id, and everything will change
+export default function MainLHS({socketRef, externalInput = "", externalSampleInput = "", externalSampleOutput = ""}) {
   const [text, setText] = useState("");
-  const [input, setInput] = useState(""); // current raw statement
-  const [, setProblemName] = useState("");
-  const [sampleInput,setSampleInput] = useState("");
-  const [sampleOutput,setSampleOutput] = useState("");
-  const [data,setData] = useState("");
+  const [input, setInput] = useState(externalInput); // current raw statement
+  const [sampleInput,setSampleInput] = useState(externalSampleInput);
+  const [sampleOutput,setSampleOutput] = useState(externalSampleOutput);
 
   function renderTextWithKaTeX(text) {
     // Normalize multiple dollar signs to exactly two dollar signs
@@ -62,53 +54,17 @@ export default function MainLHS({socketRef,currentProbId,setCurrentProb, problem
     }
   }, [socketRef]);
 
-  const fetchData = useCallback(async () => {
-    try {
-        const response = await axios.get(api);
-        setData(response.data);
-        console.log(response.data);
-    }
-    catch (error) {
-        console.error('Error fetching data from backend:', error.message);
-    }
-  }, []);
-
-  const getProblemPackage = useCallback((problem_id) => {
-    const matchingPackage = data.find(problem => problem.id === problem_id);
-
-    if (!matchingPackage) {
-      throw new Error('Problem not found in the local list');
-    }
-
-    return matchingPackage;
-  }, [data]);
-
-  const go = useCallback((problem_package) => {
-    console.log('received package is' + problem_package);
-    // setCurrentProb(problem_package.id);
-    setInput(problem_package.statement);
-    setSampleOutput(problem_package.soutput);
-    setSampleInput(problem_package.sinput);
-    setProblemName(problem_package.problem_name);
-  }, [setProblemName]);
-
   useEffect(() => {
     if(socketRef.current){
         socketRef.current.on('receive-problem-statement', (payload) => {
           setInput(payload.statement);
         });
-
-        socketRef.current.on('change-main-problem', (payload) => {
-          async function yo(){
-            await fetchData();
-            const problem_package = getProblemPackage(payload.problem_id);
-            go(problem_package);
-          }
-          yo();
-        });
-
     }
-  },[socketRef, fetchData, getProblemPackage, go]);
+  },[socketRef]);
+
+  useEffect(() => { setInput(externalInput); }, [externalInput]);
+  useEffect(() => { setSampleInput(externalSampleInput); }, [externalSampleInput]);
+  useEffect(() => { setSampleOutput(externalSampleOutput); }, [externalSampleOutput]);
 
   useEffect(() => {
     console.log("input is " + input);
@@ -125,7 +81,6 @@ export default function MainLHS({socketRef,currentProbId,setCurrentProb, problem
       {/* <CopyLinkButton link={sharedlink} /> */}
 
       {text!=="" && <Samples sampleInput={sampleInput} sampleOutput={sampleOutput}/>}
-      <NestedModal open={problemModalOpen} setOpen={setProblemModalOpen} socketRef={socketRef} setCurrentProb={setCurrentProb} setProblemName={setProblemName} setSampleInput={setSampleInput} setSampleOutput={setSampleOutput} text={text} setText={setText} input={input} setInput = {setInput} />
 
     </div>
   )
