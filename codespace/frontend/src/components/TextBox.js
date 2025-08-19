@@ -108,7 +108,13 @@ export default function TextBox({socketRef,currentProbId}) {
     return (
     <div className="RHS">
         <div className="code-area">
-            <CodeMirror value={textvalue} width='170vh' height="86vh" onChange={Handlechange} extensions={[cpp()]} />
+            <CodeMirror
+                value={textvalue}
+                height="60vh"
+                width="100%"
+                onChange={Handlechange}
+                extensions={[cpp()]}
+            />
         </div>
         <div className="input-output">
             <div className="input-area">
