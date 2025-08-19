@@ -8,12 +8,15 @@ import MembersList from './MembersList';
 import IconButton from '@mui/material/IconButton';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import io from 'socket.io-client';
 import SimplePeer from 'simple-peer';
 import BACKEND_URL from '../config';
 import '../styles/RoomPage.css';
 
 import styled from "styled-components";
+import CFparser from './LHS/CFparser';
 
 
 
@@ -47,6 +50,15 @@ const Video = (props) => {
 }
 
 
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'white',
+  padding: '20px',
+};
+
 export default function Room() {
     const roomid = localStorage.getItem('roomid');
     const userid = localStorage.getItem('userid');
@@ -58,7 +70,10 @@ export default function Room() {
     const [isMicOn, setIsMicOn] = useState(false);
     const [currentProbId,setCurrentProb] = useState(null);
     const [showProblem, setShowProblem] = useState(false);
-    const [problemModalOpen, setProblemModalOpen] = useState(false);
+    const [problemStatement, setProblemStatement] = useState("");
+    const [sampleInput, setSampleInput] = useState("");
+    const [sampleOutput, setSampleOutput] = useState("");
+    const [fetchOpen, setFetchOpen] = useState(false);
     const userVideo = useRef();
     const socketRef = useRef();
     const peersRef = useRef([]);
@@ -107,7 +122,7 @@ export default function Room() {
       if (!showProblem) {
         setShowProblem(true);
       }
-      setProblemModalOpen(true);
+      setFetchOpen(true);
     };
 
     useEffect(() => {
@@ -230,8 +245,9 @@ export default function Room() {
                   socketRef={socketRef}
                   currentProbId={currentProbId}
                   setCurrentProb={setCurrentProb}
-                  problemModalOpen={problemModalOpen}
-                  setProblemModalOpen={setProblemModalOpen}
+                  externalInput={problemStatement}
+                  externalSampleInput={sampleInput}
+                  externalSampleOutput={sampleOutput}
                 />
               )}
             </div>
@@ -240,6 +256,18 @@ export default function Room() {
             </div>
           </div>
         </div>
+        <Modal open={fetchOpen} onClose={() => setFetchOpen(false)}>
+          <Box sx={modalStyle}>
+            <CFparser
+              setStatement={(stmt) => { setProblemStatement(stmt); }}
+              setProblemName={() => {}}
+              setSampleInput={setSampleInput}
+              setSampleOutput={setSampleOutput}
+              setInput={(stmt) => { setProblemStatement(stmt); }}
+              onFetched={() => setFetchOpen(false)}
+            />
+          </Box>
+        </Modal>
         <Container style={{ display: 'none' }}>
           <StyledVideo muted ref={userVideo} autoPlay playsInline />
           {peers.map((peer, index) => (

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import BACKEND_URL from '../../config';
 
-const CFparser = ({setStatement,setProblemName,setSampleInput,setSampleOutput,setInput}) => {
+// optional callback `onFetched` is triggered after a successful fetch
+const CFparser = ({setStatement, setProblemName, setSampleInput, setSampleOutput, setInput, onFetched}) => {
   const [param, setparam] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -80,31 +81,32 @@ const CFparser = ({setStatement,setProblemName,setSampleInput,setSampleOutput,se
  
   }
 
-  const handleKeyPress = async (e) => {
-    if (e.key === 'Enter') {
-      setLoading(true);
-      setError(null);
-      try {
-        const encodedURL = encodeURIComponent(param);
-        const response = await axios.get(`${BACKEND_URL}/api/parse_problem/${encodedURL}`);
-        go(response.data);
-      } catch (err) {   
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const handleFetch = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const encodedURL = encodeURIComponent(param);
+      const response = await axios.get(`${BACKEND_URL}/api/parse_problem/${encodedURL}`);
+      await go(response.data);
+      if (onFetched) {
+        onFetched();
       }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <input 
-        type="text" 
-        value={param} 
-        onChange={handleInputChange} 
-        onKeyPress={handleKeyPress} 
-        placeholder="codeforces link" 
+      <input
+        type="text"
+        value={param}
+        onChange={handleInputChange}
+        placeholder="codeforces link"
       />
+      <button onClick={handleFetch} disabled={loading}>Fetch</button>
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
       {/* {data && <pre>{JSON.stringify(data, null, 2)}</pre>} */}
