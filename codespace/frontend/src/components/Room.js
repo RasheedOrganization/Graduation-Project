@@ -3,7 +3,6 @@ import '../styles/App.css'
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MiniDrawer from './SideDrawer';
-import Split from 'react-split';
 import MainLHS from './LHS/MainLHS';
 import ChatBox from './ChatBox';
 import io from 'socket.io-client';
@@ -55,6 +54,7 @@ export default function Room() {
     const [members, setMembers] = useState([]);
     const [isMicOn, setIsMicOn] = useState(false);
     const [currentProbId,setCurrentProb] = useState(null);
+    const [showProblem, setShowProblem] = useState(false);
     const userVideo = useRef();
     const socketRef = useRef();
     const peersRef = useRef([]);
@@ -97,6 +97,10 @@ export default function Room() {
         socketRef.current.disconnect();
       }
       navigate('/rooms');
+    };
+
+    const toggleProblemView = () => {
+      setShowProblem(prev => !prev);
     };
 
     useEffect(() => {
@@ -196,45 +200,32 @@ export default function Room() {
         <div className="editor-background">
         <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
         <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} isMicOn={isMicOn}>
-        <div className='main'>
-            <Split
-              direction='vertical'
-              sizes={[80, 20]}
-              minSize={100}
-              className='vertical-split'
-            >
-              <div className='top-pane'>
-                <Split
-                  sizes={[40, 60]}
-                  minSize={200}
-                  maxSize={1000}
-                  direction="horizontal"
-                  gutterSize={10}
-                  gutterAlign="center"
-                  className="split"
-                  gutter={(index, direction) => {
-                      const gutter = document.createElement('div');
-                      gutter.className = `gutter gutter-${direction}`;
-                      return gutter;
-                  }}
-                >
-                  <div className="LHS-container">
-                    <MainLHS socketRef={socketRef} currentProbId={currentProbId} setCurrentProb={setCurrentProb} />
-                  </div>
-                  <div className="RHS-container">
-                    <TextBox socketRef={socketRef} currentProbId={currentProbId} />
-                  </div>
-                </Split>
-                <Container>
-                  <StyledVideo muted ref={userVideo} autoPlay playsInline />
-                  {peers.map((peer, index) => (
-                    <Video key={index} peer={peer} />
-                  ))}
-                </Container>
-              </div>
-              <ChatBox socketRef={socketRef} username={username} />
-            </Split>
+        <div className='room-main'>
+          <div className='problem-view'>
+            <button className='view-problem-button' onClick={toggleProblemView}>
+              {showProblem ? 'Hide Problem' : 'View Problem'}
+            </button>
+            {showProblem && (
+              <MainLHS
+                socketRef={socketRef}
+                currentProbId={currentProbId}
+                setCurrentProb={setCurrentProb}
+              />
+            )}
+          </div>
+          <div className='editor-container'>
+            <TextBox socketRef={socketRef} currentProbId={currentProbId} />
+          </div>
+          <div className='chat-container'>
+            <ChatBox socketRef={socketRef} username={username} />
+          </div>
         </div>
+        <Container style={{ display: 'none' }}>
+          <StyledVideo muted ref={userVideo} autoPlay playsInline />
+          {peers.map((peer, index) => (
+            <Video key={index} peer={peer} />
+          ))}
+        </Container>
         </MiniDrawer>
         </div>
     );
