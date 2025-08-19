@@ -85,7 +85,7 @@ const MemberCard = ({ id, member }) => {
   );
 };
 
-export default function MiniDrawer({ toggleMic, roomid, members = [], isMicOn }) {
+export default function MiniDrawer({ toggleMic, roomid, members = [], isMicOn, children }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
@@ -105,7 +105,7 @@ export default function MiniDrawer({ toggleMic, roomid, members = [], isMicOn })
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex' }}>
       <Drawer variant="permanent" open={open}>
         <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
           <IconButton
@@ -149,7 +149,7 @@ export default function MiniDrawer({ toggleMic, roomid, members = [], isMicOn })
         </div>
       </Drawer>
       <ContentContainer open={open} theme={theme}>
-        {/* Your main content goes here */}
+        {children}
       </ContentContainer>
     </div>
   );
