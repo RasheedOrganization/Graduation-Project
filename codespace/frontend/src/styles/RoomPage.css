@@ -5,13 +5,13 @@
   background: linear-gradient(135deg, #e3f2fd, #ffffff);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   transition: background 0.5s ease;
 }
 
 .editor-background .main {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .split {

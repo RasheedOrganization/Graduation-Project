@@ -5,6 +5,8 @@
   flex-direction: column;
   background: #f5f5f5;
   border-top: 2px solid #ddd;
+  position: relative;
+  z-index: 10;
 }
 
 .chat-messages {
