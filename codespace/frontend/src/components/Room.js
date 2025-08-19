@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import MiniDrawer from './SideDrawer';
 import Split from 'react-split';
 import MainLHS from './LHS/MainLHS';
+import ChatBox from './ChatBox';
 import io from 'socket.io-client';
 import SimplePeer from 'simple-peer';
 import BACKEND_URL from '../config';
@@ -101,11 +102,6 @@ export default function Room() {
     useEffect(() => {
       socketRef.current = io(BACKEND_URL, { transports: ['websocket'] });
 
-      socketRef.current.on('receive message', (payload) => {
-        console.log(`I am ${userid}`);
-        console.log(payload.msg);
-      });
-
       // previous implementation relied on an 'all users' broadcast which
       // could fire before a microphone stream was available, leaving new
       // participants without peers. The logic has moved to the
@@ -199,37 +195,47 @@ export default function Room() {
       return (
         <div className="editor-background">
         <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
+        <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} isMicOn={isMicOn}>
         <div className='main'>
-              <Split
-                  sizes={[20, 80]}
-                minSize={200}
-                maxSize={1000}
-                direction="horizontal"
-                gutterSize={10}
-                gutterAlign="center"
-                className="split"
-                gutter={(index, direction) => {
-                    const gutter = document.createElement('div');
-                    gutter.className = `gutter gutter-${direction}`;
-                    return gutter;
-                }}
+            <Split
+              direction='vertical'
+              sizes={[80, 20]}
+              minSize={100}
+              className='vertical-split'
             >
-                <div className="LHS-container">
+              <div className='top-pane'>
+                <Split
+                  sizes={[40, 60]}
+                  minSize={200}
+                  maxSize={1000}
+                  direction="horizontal"
+                  gutterSize={10}
+                  gutterAlign="center"
+                  className="split"
+                  gutter={(index, direction) => {
+                      const gutter = document.createElement('div');
+                      gutter.className = `gutter gutter-${direction}`;
+                      return gutter;
+                  }}
+                >
+                  <div className="LHS-container">
                     <MainLHS socketRef={socketRef} currentProbId={currentProbId} setCurrentProb={setCurrentProb} />
-                </div>
-                <div className="RHS-container">
+                  </div>
+                  <div className="RHS-container">
                     <TextBox socketRef={socketRef} currentProbId={currentProbId} />
-                </div>
-            </Split>
-              <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} isMicOn={isMicOn} />
-            {/* <AudioRecorder socket={socket} username={username} roomid={roomid}/> */}
-            <Container>
-                <StyledVideo muted ref={userVideo} autoPlay playsInline />
-                {peers.map((peer, index) => (
+                  </div>
+                </Split>
+                <Container>
+                  <StyledVideo muted ref={userVideo} autoPlay playsInline />
+                  {peers.map((peer, index) => (
                     <Video key={index} peer={peer} />
-                ))}
-            </Container>
+                  ))}
+                </Container>
+              </div>
+              <ChatBox socketRef={socketRef} username={username} />
+            </Split>
         </div>
+        </MiniDrawer>
         </div>
     );
 };

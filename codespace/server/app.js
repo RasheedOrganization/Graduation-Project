@@ -102,7 +102,11 @@ io.on('connection', (socket) => {
 
     socket.on('send-message', async (payload) => {
         await addMessage(socket.roomid, socket.userid, socket.username, payload.msg);
-        io.to(socket.roomid).emit('receive message',{msg: payload.msg});
+        io.to(socket.roomid).emit('receive message', {
+            userid: socket.userid,
+            username: socket.username,
+            msg: payload.msg
+        });
     })
 
     socket.on('sending offer', (payload) => {
