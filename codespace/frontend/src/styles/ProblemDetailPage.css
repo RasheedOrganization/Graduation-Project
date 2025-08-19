@@ -1,12 +1,12 @@
 .problem-detail-container {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   height: 90vh;
 }
 
 .problem-view,
-.editor-view,
-.chat-view {
+.editor-view {
   flex: 1;
   border: 1px solid #ccc;
   padding: 10px;
