@@ -2,9 +2,12 @@ import TextBox from './TextBox';
 import '../styles/App.css'
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MiniDrawer from './SideDrawer';
 import MainLHS from './LHS/MainLHS';
 import ChatBox from './ChatBox';
+import MembersList from './MembersList';
+import IconButton from '@mui/material/IconButton';
+import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
+import MicOffIcon from '@mui/icons-material/MicOff';
 import io from 'socket.io-client';
 import SimplePeer from 'simple-peer';
 import BACKEND_URL from '../config';
@@ -199,26 +202,37 @@ export default function Room() {
       return (
         <div className="editor-background">
         <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
-        <MiniDrawer toggleMic={toggleMic} roomid={roomid} members={members} isMicOn={isMicOn}>
-        <div className='room-main'>
-          <div className='problem-view'>
-            <button className='view-problem-button' onClick={toggleProblemView}>
-              {showProblem ? 'Hide Problem' : 'View Problem'}
-            </button>
-            {showProblem && (
-              <MainLHS
-                socketRef={socketRef}
-                currentProbId={currentProbId}
-                setCurrentProb={setCurrentProb}
-              />
-            )}
+        <div className='room-wrapper'>
+          <div className='room-main'>
+            <div className='problem-view'>
+              <button className='view-problem-button' onClick={toggleProblemView}>
+                {showProblem ? 'Hide Problem' : 'View Problem'}
+              </button>
+              {showProblem && (
+                <MainLHS
+                  socketRef={socketRef}
+                  currentProbId={currentProbId}
+                  setCurrentProb={setCurrentProb}
+                />
+              )}
+            </div>
+            <div className='editor-container'>
+              <TextBox socketRef={socketRef} currentProbId={currentProbId} />
+            </div>
           </div>
-          <div className='editor-container'>
-            <TextBox socketRef={socketRef} currentProbId={currentProbId} />
-          </div>
-          <div className='chat-container'>
-            <ChatBox socketRef={socketRef} username={username} />
-          </div>
+          <aside className='right-sidebar'>
+            <div className='members-section'>
+              <IconButton variant="contained" color="primary" onClick={toggleMic}>
+                {isMicOn ? <HeadsetMicIcon /> : <MicOffIcon />}
+              </IconButton>
+              <div className='members-list'>
+                <MembersList members={members} />
+              </div>
+            </div>
+            <div className='chat-section'>
+              <ChatBox socketRef={socketRef} username={username} />
+            </div>
+          </aside>
         </div>
         <Container style={{ display: 'none' }}>
           <StyledVideo muted ref={userVideo} autoPlay playsInline />
@@ -226,7 +240,6 @@ export default function Room() {
             <Video key={index} peer={peer} />
           ))}
         </Container>
-        </MiniDrawer>
         </div>
     );
 };
