@@ -58,6 +58,7 @@ export default function Room() {
     const [isMicOn, setIsMicOn] = useState(false);
     const [currentProbId,setCurrentProb] = useState(null);
     const [showProblem, setShowProblem] = useState(false);
+    const [problemModalOpen, setProblemModalOpen] = useState(false);
     const userVideo = useRef();
     const socketRef = useRef();
     const peersRef = useRef([]);
@@ -102,8 +103,11 @@ export default function Room() {
       navigate('/rooms');
     };
 
-    const toggleProblemView = () => {
-      setShowProblem(prev => !prev);
+    const openProblemForm = () => {
+      if (!showProblem) {
+        setShowProblem(true);
+      }
+      setProblemModalOpen(true);
     };
 
     useEffect(() => {
@@ -218,14 +222,16 @@ export default function Room() {
           </aside>
           <div className='room-main'>
             <div className='problem-view'>
-              <button className='view-problem-button' onClick={toggleProblemView}>
-                {showProblem ? 'Hide Problem' : 'View Problem'}
+              <button className='view-problem-button' onClick={openProblemForm}>
+                Fetch Problem
               </button>
               {showProblem && (
                 <MainLHS
                   socketRef={socketRef}
                   currentProbId={currentProbId}
                   setCurrentProb={setCurrentProb}
+                  problemModalOpen={problemModalOpen}
+                  setProblemModalOpen={setProblemModalOpen}
                 />
               )}
             </div>

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const {Job, Queue, Worker} = require('bullmq')
 const {redisClient} = require('../model/redisModel')
-const {exec} = require('child_process');
+const {execFile} = require('child_process');
 const { stderr } = require('process');
 
 // Allow configuration of the Redis connection while providing sensible defaults
@@ -19,7 +19,7 @@ async function scrapingWorker(job) {
     const req_problem = job.data;
     console.log(req_problem);
     return new Promise((resolve, reject) => {
-        exec(`python3 routes/scraper.py ${req_problem}`, (error, stdout, stderr) => {
+        execFile('python3', ['routes/scraper.py', req_problem], (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
                 reject(`Error: ${error.message}`);
@@ -32,7 +32,6 @@ async function scrapingWorker(job) {
             }
             try {
                 const parsedOutput = JSON.parse(stdout);
-                //TODO: backend crashes here if link is invalid
                 if (redisClient.isOpen) {
                     redisClient.setEx(req_problem, 60000, JSON.stringify(parsedOutput));
                 }
@@ -40,7 +39,6 @@ async function scrapingWorker(job) {
             } catch (err) {
                 console.error(err);
                 reject("Invalid link");
-                throw err;
             }
         });
     });

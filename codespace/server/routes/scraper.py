@@ -8,7 +8,13 @@ import sys
 
 url = sys.argv[1]
 
-response = requests.get(url)
+try:
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+except Exception as e:
+    print(str(e), file=sys.stderr)
+    sys.exit(1)
 
 soup = BeautifulSoup(response.text, 'html.parser')
 
