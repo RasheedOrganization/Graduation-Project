@@ -4,7 +4,6 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import NavBar from '../components/NavBar';
 import TextBox from '../components/TextBox';
-import ChatWidget from '../components/ChatWidget';
 import BACKEND_URL from '../config';
 import '../styles/ProblemDetailPage.css';
 
@@ -12,7 +11,6 @@ function ProblemDetailPage() {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
   const socketRef = useRef(null);
-  const username = localStorage.getItem('username');
 
   useEffect(() => {
     async function fetchProblem() {
@@ -82,7 +80,6 @@ function ProblemDetailPage() {
             <TextBox socketRef={socketRef} currentProbId={id} />
           </div>
         </div>
-        <ChatWidget socketRef={socketRef} username={username || 'Anon'} />
         </>
       ) : (
         <p>Loading...</p>

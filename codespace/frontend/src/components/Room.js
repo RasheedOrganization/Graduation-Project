@@ -203,6 +203,19 @@ export default function Room() {
         <div className="editor-background">
         <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
         <div className='room-wrapper'>
+          <aside className='left-sidebar'>
+            <div className='members-section'>
+              <IconButton variant="contained" color="primary" onClick={toggleMic}>
+                {isMicOn ? <HeadsetMicIcon /> : <MicOffIcon />}
+              </IconButton>
+              <div className='members-list'>
+                <MembersList members={members} />
+              </div>
+            </div>
+            <div className='chat-section'>
+              <ChatBox socketRef={socketRef} username={username} />
+            </div>
+          </aside>
           <div className='room-main'>
             <div className='problem-view'>
               <button className='view-problem-button' onClick={toggleProblemView}>
@@ -220,19 +233,6 @@ export default function Room() {
               <TextBox socketRef={socketRef} currentProbId={currentProbId} />
             </div>
           </div>
-          <aside className='right-sidebar'>
-            <div className='members-section'>
-              <IconButton variant="contained" color="primary" onClick={toggleMic}>
-                {isMicOn ? <HeadsetMicIcon /> : <MicOffIcon />}
-              </IconButton>
-              <div className='members-list'>
-                <MembersList members={members} />
-              </div>
-            </div>
-            <div className='chat-section'>
-              <ChatBox socketRef={socketRef} username={username} />
-            </div>
-          </aside>
         </div>
         <Container style={{ display: 'none' }}>
           <StyledVideo muted ref={userVideo} autoPlay playsInline />

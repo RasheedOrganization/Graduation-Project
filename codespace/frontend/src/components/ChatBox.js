@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../styles/ChatBox.css';
 
 export default function ChatBox({ socketRef, username }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (socketRef.current) {
@@ -14,6 +15,10 @@ export default function ChatBox({ socketRef, username }) {
       return () => socketRef.current.off('receive message', handler);
     }
   }, [socketRef]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -35,6 +40,7 @@ export default function ChatBox({ socketRef, username }) {
             <span className="chat-text">{m.msg}</span>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <form className="chat-input" onSubmit={sendMessage}>
         <input
