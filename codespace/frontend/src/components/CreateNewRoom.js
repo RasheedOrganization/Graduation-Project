@@ -84,7 +84,7 @@ export default function CreateNewRoom({ onBack }) {
         <button type="submit">Create</button>
       </form>
         <p className="switch-link">
-          <button type="button" onClick={onBack}>Back to join</button>
+          <button type="button" id = "BackToJoin-BTN"onClick={onBack}>Back to join</button>
         </p>
       </div>
     );

@@ -9,11 +9,12 @@
 
 .auth-card {
   background: #ffffff;
-  padding: 2rem;
+  padding: 3rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
+  position: relative;
 }
 
 .auth-card h2 {
@@ -47,8 +48,8 @@
 }
 
 .auth-card button:hover {
-  background-color: #115293;
-  transform: scale(1.02);
+  background-color: #9bbcdc79;
+  transform: scale(1.04);
 }
 
 .error {
@@ -73,4 +74,13 @@
 
 .switch-link button:hover {
   text-decoration: underline;
+}
+
+#Create-Room-BTN {
+  min-width: 120px;
+  font-size:14px;
+}
+#BackToJoin-BTN {
+  position: absolute;
+  left: 7%;
 }

@@ -13,18 +13,6 @@ function HomePage() {
         <p className="home-tagline">A free collection of curated, high-quality resources</p>
         <p className="home-tagline">to take you from Bronze to Platinum and beyond.</p>
       </main>
-      <section className="home-gallery">
-        <img
-          src={architectureImg}
-          alt="Architecture diagram"
-          className="gallery-image"
-        />
-        <img
-          src={awwImg}
-          alt="Collaborative coding"
-          className="gallery-image"
-        />
-      </section>
       <footer className="home-footer">Created by the CP Initiative</footer>
     </div>
   );

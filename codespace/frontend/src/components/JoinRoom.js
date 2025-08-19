@@ -80,7 +80,7 @@ export default function JoinRoom({ onCreateClick }) {
       </form>
       <p className="switch-link">
         Don't want to join?{' '}
-        <button type="button" onClick={onCreateClick}>Create a room</button>
+        <button type="button" id = "Create-Room-BTN" onClick={onCreateClick}>Create a room</button>
       </p>
     </div>
   );
