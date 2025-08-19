@@ -4,7 +4,7 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import NavBar from '../components/NavBar';
 import TextBox from '../components/TextBox';
-import ChatBox from '../components/ChatBox';
+import ChatWidget from '../components/ChatWidget';
 import BACKEND_URL from '../config';
 import '../styles/ProblemDetailPage.css';
 
@@ -48,6 +48,7 @@ function ProblemDetailPage() {
     <div>
       <NavBar />
       {problem ? (
+        <>
         <div className="problem-detail-container">
           <div className="problem-view">
             <h1>{problem.problem_name || problem.title}</h1>
@@ -80,10 +81,9 @@ function ProblemDetailPage() {
           <div className="editor-view">
             <TextBox socketRef={socketRef} currentProbId={id} />
           </div>
-          <div className="chat-view">
-            <ChatBox socketRef={socketRef} username={username || 'Anon'} />
-          </div>
         </div>
+        <ChatWidget socketRef={socketRef} username={username || 'Anon'} />
+        </>
       ) : (
         <p>Loading...</p>
       )}
