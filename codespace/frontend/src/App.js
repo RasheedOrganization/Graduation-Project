@@ -2,7 +2,7 @@ import './styles/App.css';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Room from './components/Room';
 import ContestPage from './pages/ContestPage';
 import RoomsPage from './pages/RoomsPage';
@@ -27,6 +27,7 @@ function App(){
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/room" element={<Room />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
   );
 }
