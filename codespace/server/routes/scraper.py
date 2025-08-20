@@ -9,8 +9,11 @@ import sys
 url = sys.argv[1]
 
 try:
-    headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://codeforces.com/"
+    }
+    response = requests.get(url, headers=headers, timeout=10)
     response.raise_for_status()
 except Exception as e:
     print(str(e), file=sys.stderr)
