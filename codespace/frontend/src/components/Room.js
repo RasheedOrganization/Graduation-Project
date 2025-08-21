@@ -76,6 +76,7 @@ export default function Room() {
     const [fetchOpen, setFetchOpen] = useState(false);
     const userVideo = useRef();
     const socketRef = useRef();
+    const [socket, setSocket] = useState(null);
     const peersRef = useRef([]);
     const streamRef = useRef();
     const navigate = useNavigate();
@@ -127,6 +128,7 @@ export default function Room() {
 
     useEffect(() => {
       socketRef.current = io(BACKEND_URL, { transports: ['websocket'] });
+      setSocket(socketRef.current);
 
       // previous implementation relied on an 'all users' broadcast which
       // could fire before a microphone stream was available, leaving new
@@ -232,7 +234,7 @@ export default function Room() {
               </div>
             </div>
             <div className='chat-section'>
-              <ChatBox socketRef={socketRef} username={username} />
+              <ChatBox socket={socket} username={username} />
             </div>
           </aside>
           <div className='room-main'>

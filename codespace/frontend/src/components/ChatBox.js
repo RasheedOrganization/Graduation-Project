@@ -1,32 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/ChatBox.css';
 
-export default function ChatBox({ socketRef, username }) {
+export default function ChatBox({ socket, username }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const MAX_MESSAGES = 50;
 
+  // Handle incoming chat messages
   useEffect(() => {
-    if (socketRef.current) {
-      const handler = (payload) => {
-        setMessages((prev) => [...prev.slice(-MAX_MESSAGES + 1), { username: payload.username, msg: payload.msg }]);
-      };
-      socketRef.current.on('receive message', handler);
-      return () => socketRef.current.off('receive message', handler);
-    }
-  }, [socketRef]);
+    if (!socket) return;
+    const handler = (payload) => {
+      setMessages((prev) => [
+        ...prev.slice(-MAX_MESSAGES + 1),
+        { username: payload.username, msg: payload.msg },
+      ]);
+    };
+    socket.on('receive message', handler);
+    return () => socket.off('receive message', handler);
+  }, [socket]);
 
+  // Fetch and receive existing room messages
   useEffect(() => {
-    if (socketRef.current) {
-      const handler = (payload) => {
-        setMessages(payload.map(m => ({ username: m.username, msg: m.msg })));
-      };
-      socketRef.current.on('room-messages', handler);
-      return () => socketRef.current.off('room-messages', handler);
-    }
-  }, [socketRef]);
+    if (!socket) return;
+    const handler = (payload) => {
+      setMessages(payload.map((m) => ({ username: m.username, msg: m.msg })));
+    };
+    socket.on('room-messages', handler);
+    socket.emit('get-messages');
+    return () => socket.off('room-messages', handler);
+  }, [socket]);
 
+  // Always scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -34,11 +39,12 @@ export default function ChatBox({ socketRef, username }) {
   const sendMessage = (e) => {
     e.preventDefault();
     const trimmed = message.trim();
-    if (!trimmed) return;
-    if (socketRef.current) {
-      socketRef.current.emit('send-message', { msg: trimmed });
-    }
-    setMessages((prev) => [...prev.slice(-MAX_MESSAGES + 1), { username, msg: trimmed }]);
+    if (!trimmed || !socket) return;
+    socket.emit('send-message', { msg: trimmed });
+    setMessages((prev) => [
+      ...prev.slice(-(MAX_MESSAGES - 1)),
+      { username, msg: trimmed },
+    ]);
     setMessage('');
   };
 
@@ -47,7 +53,9 @@ export default function ChatBox({ socketRef, username }) {
       <div className="chat-messages">
         {messages.map((m, idx) => (
           <div key={idx} className="chat-message">
-            <span className="chat-emoji" role="img" aria-label="user">🙂</span>
+            <span className="chat-emoji" role="img" aria-label="user">
+              🙂
+            </span>
             <span className="chat-user">{m.username}:</span>
             <span className="chat-text">{m.msg}</span>
           </div>
