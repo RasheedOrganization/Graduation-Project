@@ -43,6 +43,10 @@ async function getMessages(roomid, limit = 50) {
   return messages.reverse();
 }
 
+async function deleteMessages(roomid) {
+  await Message.deleteMany({ roomid });
+}
+
 module.exports = {
   addUserToRoom,
   removeUserFromRoom,
@@ -51,4 +55,5 @@ module.exports = {
   updateMicStatus,
   addMessage,
   getMessages,
+  deleteMessages,
 };

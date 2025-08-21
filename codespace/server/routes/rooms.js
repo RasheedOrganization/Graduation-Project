@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Room = require('../model/roomModel');
-const { getUsersInRoom, getMessages } = require('../utils/roomStore');
+const { getUsersInRoom, getMessages, deleteMessages } = require('../utils/roomStore');
 
 const router = express.Router();
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
@@ -68,6 +68,16 @@ router.post('/join', async (req, res) => {
     try {
       const messages = await getMessages(req.params.id);
       res.json(messages);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.delete('/:id', async (req, res) => {
+    try {
+      await Room.deleteOne({ roomid: req.params.id });
+      await deleteMessages(req.params.id);
+      res.json({ message: 'Room deleted' });
     } catch (err) {
       res.status(500).json({ message: 'Server error' });
     }

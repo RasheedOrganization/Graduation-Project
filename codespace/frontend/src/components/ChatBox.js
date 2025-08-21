@@ -22,7 +22,6 @@ export default function ChatBox({ socketRef, username }) {
       const handler = (payload) => {
         setMessages(payload.map(m => ({ username: m.username, msg: m.msg })));
       };
-      socketRef.current.emit('get-messages');
       socketRef.current.on('room-messages', handler);
       return () => socketRef.current.off('room-messages', handler);
     }
