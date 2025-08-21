@@ -26,6 +26,12 @@
   word-break: break-word;
 }
 
+.chat-message.self {
+  background: #d1e7dd;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
 .chat-emoji {
   margin-right: 0.5rem;
 }

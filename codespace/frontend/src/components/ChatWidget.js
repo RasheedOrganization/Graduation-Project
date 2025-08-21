@@ -11,7 +11,7 @@ export default function ChatWidget({ socketRef, username }) {
     <div className="chat-widget">
       {open && (
         <div className="chat-popup">
-          <ChatBox socketRef={socketRef} username={username} />
+          <ChatBox socket={socketRef.current} username={username} />
         </div>
       )}
       <button className="chat-toggle" onClick={toggleChat} aria-label="Toggle chat">

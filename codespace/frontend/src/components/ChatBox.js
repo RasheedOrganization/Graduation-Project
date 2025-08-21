@@ -51,15 +51,25 @@ export default function ChatBox({ socket, username }) {
   return (
     <div className="chat-container">
       <div className="chat-messages">
-        {messages.map((m, idx) => (
-          <div key={idx} className="chat-message">
-            <span className="chat-emoji" role="img" aria-label="user">
-              🙂
-            </span>
-            <span className="chat-user">{m.username}:</span>
-            <span className="chat-text">{m.msg}</span>
-          </div>
-        ))}
+        {messages.map((m, idx) => {
+          const self = m.username === username;
+          return (
+            <div
+              key={idx}
+              className={`chat-message${self ? ' self' : ''}`}
+            >
+              {!self && (
+                <>
+                  <span className="chat-emoji" role="img" aria-label="user">
+                    🙂
+                  </span>
+                  <span className="chat-user">{m.username}:</span>
+                </>
+              )}
+              <span className="chat-text">{m.msg}</span>
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
       <form className="chat-input" onSubmit={sendMessage}>
