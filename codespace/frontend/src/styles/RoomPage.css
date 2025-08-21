@@ -41,6 +41,7 @@
   display: flex;
   flex-direction: column;
   margin-right: 1rem;
+  height: 100%;
 }
 
 .members-section {
@@ -61,8 +62,6 @@
   flex-direction: column;
   min-height: 0;
   margin-top: 1rem;
-  max-height: 40vh;
-  overflow: hidden;
 }
 
 .chat-section .chat-container {
