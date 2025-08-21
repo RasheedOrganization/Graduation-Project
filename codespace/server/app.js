@@ -91,6 +91,13 @@ io.on('connection', (socket) => {
         const usersInRoom = await getUsersInRoom(payload.roomid);
         io.to(socket.roomid).emit('all users',{users: usersInRoom.map(u => u.userid)});
         io.to(socket.roomid).emit('users-in-room', { users: usersInRoom.map(u => ({ userid: u.userid, username: u.username, micOn: u.micOn })) });
+
+        const history = await getMessages(payload.roomid);
+        socket.emit('room-messages', history.map(m => ({
+            userid: m.userid,
+            username: m.username,
+            msg: m.message
+        })));
     })
     
     socket.on('update-code', (payload) => {
