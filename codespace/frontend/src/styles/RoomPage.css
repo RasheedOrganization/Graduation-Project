@@ -61,10 +61,13 @@
   flex-direction: column;
   min-height: 0;
   margin-top: 1rem;
+  max-height: 40vh;
+  overflow: hidden;
 }
 
 .chat-section .chat-container {
   flex: 1;
+  height: 100%;
 }
 
 .view-problem-button {

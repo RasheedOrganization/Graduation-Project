@@ -1,5 +1,6 @@
 const RoomUser = require('../model/roomUserModel');
 const Message = require('../model/messageModel');
+const Room = require('../model/roomModel');
 
 async function addUserToRoom(roomid, userid, username) {
   await RoomUser.findOneAndUpdate(
@@ -32,7 +33,9 @@ async function updateMicStatus(roomid, userid, micOn) {
 }
 
 async function addMessage(roomid, userid, username, msg) {
-  const message = new Message({ roomid, userid, username, message: msg });
+  const room = await Room.findOne({ roomid });
+  if (!room) return;
+  const message = new Message({ room: room._id, roomid, userid, username, message: msg });
   await message.save();
 }
 
