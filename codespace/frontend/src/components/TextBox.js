@@ -119,17 +119,17 @@ export default function TextBox({socketRef,currentProbId}) {
         <div className="input-output">
             <div className="input-area">
                 <textarea
-                    style={{height: '5vh',resize: "none" }}
+                    style={{ height: '5vh', resize: 'none' }}
                     id="input"
                     value={inputvalue}
                     onChange={Handlechangeinput}
                     placeholder="Enter input here"
                 ></textarea>
             </div>
-            <div className="output-area" style={{ padding: '1px', width: '100%', height: '6vh', border: '2px solid black' , color: color}}>
-  Output: {outputvalue}
-</div>
-{/* <div> Output Value: {outputvalue}</div> */}
+            <div className="output-area" style={{ color }}>
+                Output: {outputvalue}
+            </div>
+            {/* <div> Output Value: {outputvalue}</div> */}
         </div>
         <div>
             <button onClick={Handlecompile}>Compile</button>

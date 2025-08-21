@@ -29,6 +29,13 @@
   padding: 1rem;
 }
 
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 60vh;
+}
+
 .left-sidebar {
   width: 300px;
   display: flex;

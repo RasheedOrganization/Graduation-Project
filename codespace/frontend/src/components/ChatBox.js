@@ -27,6 +27,7 @@ export default function ChatBox({ socketRef, username }) {
     if (socketRef.current) {
       socketRef.current.emit('send-message', { msg: trimmed });
     }
+    setMessages((prev) => [...prev, { username, msg: trimmed }]);
     setMessage('');
   };
 
