@@ -5,14 +5,26 @@ export default function ChatBox({ socketRef, username }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
+  const MAX_MESSAGES = 50;
 
   useEffect(() => {
     if (socketRef.current) {
       const handler = (payload) => {
-        setMessages((prev) => [...prev, { username: payload.username, msg: payload.msg }]);
+        setMessages((prev) => [...prev.slice(-MAX_MESSAGES + 1), { username: payload.username, msg: payload.msg }]);
       };
       socketRef.current.on('receive message', handler);
       return () => socketRef.current.off('receive message', handler);
+    }
+  }, [socketRef]);
+
+  useEffect(() => {
+    if (socketRef.current) {
+      const handler = (payload) => {
+        setMessages(payload.map(m => ({ username: m.username, msg: m.msg })));
+      };
+      socketRef.current.emit('get-messages');
+      socketRef.current.on('room-messages', handler);
+      return () => socketRef.current.off('room-messages', handler);
     }
   }, [socketRef]);
 
@@ -27,7 +39,7 @@ export default function ChatBox({ socketRef, username }) {
     if (socketRef.current) {
       socketRef.current.emit('send-message', { msg: trimmed });
     }
-    setMessages((prev) => [...prev, { username, msg: trimmed }]);
+    setMessages((prev) => [...prev.slice(-MAX_MESSAGES + 1), { username, msg: trimmed }]);
     setMessage('');
   };
 
