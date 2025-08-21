@@ -54,6 +54,7 @@ const {
   getUsersInRoom,
   updateMicStatus,
   addMessage,
+  getMessages,
 } = require('./utils/roomStore');
 const username_to_socket = {};
 const pairSet = new Map();
@@ -107,6 +108,15 @@ io.on('connection', (socket) => {
             username: socket.username,
             msg: payload.msg
         });
+    })
+
+    socket.on('get-messages', async () => {
+        const history = await getMessages(socket.roomid);
+        socket.emit('room-messages', history.map(m => ({
+            userid: m.userid,
+            username: m.username,
+            msg: m.message
+        })));
     })
 
     socket.on('sending offer', (payload) => {

@@ -36,8 +36,11 @@ async function addMessage(roomid, userid, username, msg) {
   await message.save();
 }
 
-async function getMessages(roomid) {
-  return await Message.find({ roomid }).sort({ createdAt: 1 });
+async function getMessages(roomid, limit = 50) {
+  const messages = await Message.find({ roomid })
+    .sort({ createdAt: -1 })
+    .limit(limit);
+  return messages.reverse();
 }
 
 module.exports = {
