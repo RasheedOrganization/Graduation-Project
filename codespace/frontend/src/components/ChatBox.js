@@ -41,10 +41,7 @@ export default function ChatBox({ socket, username }) {
     const trimmed = message.trim();
     if (!trimmed || !socket) return;
     socket.emit('send-message', { msg: trimmed });
-    setMessages((prev) => [
-      ...prev.slice(-(MAX_MESSAGES - 1)),
-      { username, msg: trimmed },
-    ]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     setMessage('');
   };
 
