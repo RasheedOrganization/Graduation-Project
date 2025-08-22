@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Logout from '@mui/icons-material/Logout';
 import '../styles/NavBar.css';
 import logo from '../assets/images/logo.svg';
 import userIcon from '../assets/images/user.svg';
 
 function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,10 +20,18 @@ function NavBar() {
     setLoggedIn(!!token);
   }, []);
 
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     setLoggedIn(false);
-    setOpen(false);
+    handleClose();
     navigate('/login');
   };
 
@@ -39,21 +53,29 @@ function NavBar() {
         {!loggedIn && <li><Link to="/login">Login</Link></li>}
         {loggedIn && (
           <li className="profile-container">
-            <button className="profile-button" onClick={() => setOpen(!open)}>
+            <button className="profile-button" onClick={handleMenu}>
               <img src={userIcon} alt="User avatar" className="profile-avatar" />
             </button>
-            {open && (
-              <ul className="profile-dropdown">
-                <li>
-                  <Link to="/profile" onClick={() => setOpen(false)}>
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <button onClick={handleLogout}>Log out</button>
-                </li>
-              </ul>
-            )}
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                <ListItemIcon>
+                  <AccountCircle fontSize="small" />
+                </ListItemIcon>
+                Profile
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <ListItemIcon>
+                  <Logout fontSize="small" />
+                </ListItemIcon>
+                Log out
+              </MenuItem>
+            </Menu>
           </li>
         )}
       </ul>
