@@ -1,14 +1,15 @@
 .contact-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
+  min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
 }
 
 .contact-content {
   width: 100%;
   max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
 .contact-info {

@@ -74,6 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
 }
 
 .profile-avatar {
@@ -82,35 +83,6 @@
   border-radius: 50%;
 }
 
-.profile-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  background: #fff;
-  list-style: none;
-  margin: 0;
-  padding: 0.5rem 0;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-}
-
-.profile-dropdown li {
-  padding: 0.5rem 1rem;
-}
-
-.profile-dropdown li:hover {
-  background: #f0f0f0;
-}
-
-.profile-dropdown li a,
-.profile-dropdown li button {
-  background: none;
-  border: none;
-  text-decoration: none;
-  color: #333;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
+.profile-button:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
