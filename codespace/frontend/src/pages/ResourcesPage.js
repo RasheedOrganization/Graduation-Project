@@ -3,6 +3,8 @@ import axios from 'axios';
 import NavBar from '../components/NavBar';
 import '../styles/ResourcesPage.css';
 import BACKEND_URL from '../config';
+import ResourcesSidebar from '../components/ResourcesSidebar';
+import ResourceList from '../components/ResourceList';
 
 
 const statusOptions = [
@@ -141,173 +143,35 @@ function ResourcesPage() {
           />
         </div>
         <div className="resources-content">
-          <div className="left-menu">
-            <div className="button-group">
-              <button onClick={() => setShowForm(!showForm)}>New</button>
-              <button onClick={() => setShowTopicForm(!showTopicForm)}>New Topic</button>
-              <button onClick={() => setShowSubtopicForm(!showSubtopicForm)}>New Subtopic</button>
-            </div>
-            {showForm && (
-              <form className="add-resource-form" onSubmit={addResource}>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={handleFormChange}
-                  required
-                />
-                <input
-                  type="text"
-                  name="link"
-                  placeholder="Link"
-                  value={formData.link}
-                  onChange={handleFormChange}
-                  required
-                />
-                <select
-                  name="topic"
-                  value={formData.topic}
-                  onChange={handleFormChange}
-                  required
-                >
-                  <option value="">Select Topic</option>
-                  {Object.keys(topics).map((topic) => (
-                    <option key={topic} value={topic}>{topic}</option>
-                  ))}
-                </select>
-                <select
-                  name="subtopic"
-                  value={formData.subtopic}
-                  onChange={handleFormChange}
-                  disabled={!formData.topic}
-                  required
-                >
-                  <option value="">Select Subtopic</option>
-                  {formData.topic && topics[formData.topic].map((sub) => (
-                    <option key={sub} value={sub}>{sub}</option>
-                  ))}
-                </select>
-                <button type="submit">Add</button>
-              </form>
-            )}
-            {showTopicForm && (
-              <form className="add-topic-form" onSubmit={addTopic}>
-                <input
-                  type="text"
-                  value={newTopic}
-                  onChange={(e) => setNewTopic(e.target.value)}
-                  placeholder="Topic Name"
-                  required
-                />
-                <button type="submit">Add</button>
-              </form>
-            )}
-            {showSubtopicForm && (
-              <form className="add-subtopic-form" onSubmit={addSubtopic}>
-                <select
-                  value={newSubtopic.topic}
-                  onChange={(e) =>
-                    setNewSubtopic((prev) => ({ ...prev, topic: e.target.value }))
-                  }
-                  required
-                >
-                  <option value="">Select Topic</option>
-                  {Object.keys(topics).map((topic) => (
-                    <option key={topic} value={topic}>
-                      {topic}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  value={newSubtopic.name}
-                  onChange={(e) =>
-                    setNewSubtopic((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  placeholder="Subtopic Name"
-                  required
-                />
-                <button type="submit">Add</button>
-              </form>
-            )}
-            <select value={selectedTopic} onChange={handleTopicChange}>
-              <option value="">All Topics</option>
-              {Object.keys(topics).map((topic) => (
-                <option key={topic} value={topic}>{topic}</option>
-              ))}
-            </select>
-            <select
-              value={selectedSubtopic}
-              onChange={(e) => setSelectedSubtopic(e.target.value)}
-              disabled={!selectedTopic}
-            >
-              <option value="">All Subtopics</option>
-              {selectedTopic &&
-                topics[selectedTopic].map((sub) => (
-                  <option key={sub} value={sub}>
-                    {sub}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div className="right-resources">
-            {filteredResources.map((res) => {
-              const statusClass = `status-${res.status.toLowerCase().replace(/ /g, '-')}`;
-              const isOpen = openStatusId === res._id;
-              return (
-                <div
-                  key={res._id}
-                  className="resource-card"
-                  onClick={() => {
-                    const link =
-                      res.link.startsWith('http://') || res.link.startsWith('https://')
-                        ? res.link
-                        : `https://${res.link}`;
-                    window.open(link, '_blank', 'noopener,noreferrer');
-                  }}
-                >
-                  <div className="resource-header">
-                    <h3>{res.name}</h3>
-                  </div>
-                  <p className="resource-link">{res.link}</p>
-                  <div
-                    className={`status-circle ${statusClass}`}
-                    title={res.status}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenStatusId(isOpen ? null : res._id);
-                    }}
-                  ></div>
-                  {isOpen && (
-                    <ul className="status-dropdown" onClick={(e) => e.stopPropagation()}>
-                      {statusOptions.map(({ value, emoji }) => (
-                        <li
-                          key={value}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            updateStatus(res._id, value);
-                            setOpenStatusId(null);
-                          }}
-                        >
-                          <span
-                            className={`status-emoji status-${value
-                              .toLowerCase()
-                              .replace(/ /g, '-')}`}
-                            role="img"
-                            aria-label={value}
-                          >
-                            {emoji}
-                          </span>
-                          {value}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <ResourcesSidebar
+            showForm={showForm}
+            setShowForm={setShowForm}
+            showTopicForm={showTopicForm}
+            setShowTopicForm={setShowTopicForm}
+            showSubtopicForm={showSubtopicForm}
+            setShowSubtopicForm={setShowSubtopicForm}
+            formData={formData}
+            handleFormChange={handleFormChange}
+            addResource={addResource}
+            topics={topics}
+            newTopic={newTopic}
+            setNewTopic={setNewTopic}
+            addTopic={addTopic}
+            newSubtopic={newSubtopic}
+            setNewSubtopic={setNewSubtopic}
+            addSubtopic={addSubtopic}
+            selectedTopic={selectedTopic}
+            handleTopicChange={handleTopicChange}
+            selectedSubtopic={selectedSubtopic}
+            setSelectedSubtopic={setSelectedSubtopic}
+          />
+          <ResourceList
+            resources={filteredResources}
+            openStatusId={openStatusId}
+            setOpenStatusId={setOpenStatusId}
+            updateStatus={updateStatus}
+            statusOptions={statusOptions}
+          />
         </div>
       </div>
     </div>
