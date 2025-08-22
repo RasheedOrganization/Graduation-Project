@@ -114,6 +114,7 @@
   border-radius: 8px;
   position: relative;
   cursor: pointer;
+  max-height: 25%;
 }
 
 .resource-header {
@@ -163,22 +164,45 @@
   background: #374151;
 }
 
-.status-circle.status-not-attempted { background: #6b7280; }
-.status-circle.status-solving { background: #3b82f6; }
-.status-circle.status-solved { background: #22c55e; }
-.status-circle.status-reviewing { background: #eab308; }
-.status-circle.status-skipped { background: #f97316; }
-.status-circle.status-ignored { background: #ef4444; }
+.status-circle.status-not-attempted {
+  background: #6b7280;
+}
+.status-circle.status-solving {
+  background: #3b82f6;
+}
+.status-circle.status-solved {
+  background: #22c55e;
+}
+.status-circle.status-reviewing {
+  background: #eab308;
+}
+.status-circle.status-skipped {
+  background: #f97316;
+}
+.status-circle.status-ignored {
+  background: #ef4444;
+}
 
 .status-emoji {
   font-size: 1.2em;
   background: none;
 }
 
-.status-emoji.status-not-attempted { color: #6b7280; }
-.status-emoji.status-solving { color: #3b82f6; }
-.status-emoji.status-solved { color: #22c55e; }
-.status-emoji.status-reviewing { color: #eab308; }
-.status-emoji.status-skipped { color: #f97316; }
-.status-emoji.status-ignored { color: #ef4444; }
-
+.status-emoji.status-not-attempted {
+  color: #6b7280;
+}
+.status-emoji.status-solving {
+  color: #3b82f6;
+}
+.status-emoji.status-solved {
+  color: #22c55e;
+}
+.status-emoji.status-reviewing {
+  color: #eab308;
+}
+.status-emoji.status-skipped {
+  color: #f97316;
+}
+.status-emoji.status-ignored {
+  color: #ef4444;
+}
