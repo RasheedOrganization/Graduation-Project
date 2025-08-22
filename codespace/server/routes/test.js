@@ -29,9 +29,9 @@ router.post('/', async (req, res) => {
     return res.status(500).send('Docker is not installed or not in PATH');
   }
 
-  const tmpDir = path.join(__dirname, '..', 'test-data');
-  await fs.mkdir(tmpDir, { recursive: true });
-  const tmpBase = path.join(tmpDir, 'sandbox-');
+  const TEST_DATA_DIR = process.env.TEST_DATA_DIR || path.join(__dirname, '..', 'test-data');
+  await fs.mkdir(TEST_DATA_DIR, { recursive: true });
+  const tmpBase = path.join(TEST_DATA_DIR, 'sandbox-');
   let workDir;
 
   try {
