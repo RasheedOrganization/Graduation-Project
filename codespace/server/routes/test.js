@@ -2,7 +2,21 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const os = require('os');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
+const util = require('util');
+const execAsync = util.promisify(exec);
+
+// Allow overriding the docker binary via environment variable
+const DOCKER_CMD = process.env.DOCKER_CMD || 'docker';
+
+async function isDockerAvailable() {
+  try {
+    await execAsync(`${DOCKER_CMD} --version`);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const router = express.Router();
 
@@ -10,6 +24,10 @@ router.post('/', async (req, res) => {
   const { code, input } = req.body;
   if (!code) {
     return res.status(400).send('Code is required.');
+  }
+
+  if (!(await isDockerAvailable())) {
+    return res.status(500).send('Docker is not installed or not in PATH');
   }
 
   const tmpBase = path.join(os.tmpdir(), 'sandbox-');
@@ -25,7 +43,7 @@ router.post('/', async (req, res) => {
     await fs.writeFile(inputPath, input || '', 'utf8');
 
     await new Promise((resolve, reject) => {
-      const docker = spawn('docker', [
+      const docker = spawn(DOCKER_CMD, [
         'run', '--rm',
         '--memory', '256m', '--network', 'none',
         '-v', `${workDir}:/workspace`,
