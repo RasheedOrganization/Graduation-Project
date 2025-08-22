@@ -17,6 +17,7 @@
   flex-direction: column;
   gap: 1rem;
   overflow: visible;
+  flex: 1;
 }
 
 .problem-view,
@@ -25,6 +26,8 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .editor-container {
@@ -122,5 +125,16 @@
 .leave-room-button:hover {
   background: #9a0007;
   transform: scale(1.03);
+}
+
+@media (min-width: 768px) {
+  .room-main {
+    flex-direction: row;
+  }
+
+  .problem-view,
+  .editor-container {
+    max-height: 90vh;
+  }
 }
 
