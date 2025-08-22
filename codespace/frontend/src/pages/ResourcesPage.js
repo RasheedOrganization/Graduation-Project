@@ -4,10 +4,6 @@ import NavBar from '../components/NavBar';
 import '../styles/ResourcesPage.css';
 import BACKEND_URL from '../config';
 
-const initialTopics = {
-  'Graph Algorithms': ['BFS', 'DFS'],
-  'Dynamic Programming': ['Knapsack', 'LIS'],
-};
 
 const statusOptions = [
   { value: 'Not Attempted', emoji: '⏳' },
@@ -33,7 +29,7 @@ function ResourcesPage() {
     topic: '',
     subtopic: '',
   });
-  const [topics, setTopics] = useState(initialTopics);
+  const [topics, setTopics] = useState({});
   const [newTopic, setNewTopic] = useState('');
   const [newSubtopic, setNewSubtopic] = useState({ topic: '', name: '' });
 
@@ -46,7 +42,16 @@ function ResourcesPage() {
         console.error('Failed to fetch resources', err);
       }
     };
+    const fetchTopics = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/topics`);
+        setTopics(res.data);
+      } catch (err) {
+        console.error('Failed to fetch topics', err);
+      }
+    };
     fetchResources();
+    fetchTopics();
   }, []);
 
   const handleTopicChange = (e) => {
@@ -63,24 +68,34 @@ function ResourcesPage() {
     }));
   };
 
-  const addTopic = (e) => {
+  const addTopic = async (e) => {
     e.preventDefault();
     if (!newTopic) return;
-    setTopics((prev) => ({ ...prev, [newTopic]: [] }));
-    setNewTopic('');
-    setShowTopicForm(false);
+    try {
+      await axios.post(`${BACKEND_URL}/api/topics`, { topic: newTopic });
+      setTopics((prev) => ({ ...prev, [newTopic]: [] }));
+      setNewTopic('');
+      setShowTopicForm(false);
+    } catch (err) {
+      console.error('Failed to add topic', err);
+    }
   };
 
-  const addSubtopic = (e) => {
+  const addSubtopic = async (e) => {
     e.preventDefault();
     const { topic, name } = newSubtopic;
     if (!topic || !name) return;
-    setTopics((prev) => ({
-      ...prev,
-      [topic]: [...prev[topic], name],
-    }));
-    setNewSubtopic({ topic: '', name: '' });
-    setShowSubtopicForm(false);
+    try {
+      await axios.post(`${BACKEND_URL}/api/topics`, { topic, subtopic: name });
+      setTopics((prev) => ({
+        ...prev,
+        [topic]: [...prev[topic], name],
+      }));
+      setNewSubtopic({ topic: '', name: '' });
+      setShowSubtopicForm(false);
+    } catch (err) {
+      console.error('Failed to add subtopic', err);
+    }
   };
 
   const addResource = async (e) => {

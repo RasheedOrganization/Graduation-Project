@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const topicSchema = new mongoose.Schema({
   topic: { type: String, required: true },
-  subtopic: { type: String, required: true }
+  subtopic: { type: String }
 });
 
 // Ensure each topic/subtopic pair is unique
