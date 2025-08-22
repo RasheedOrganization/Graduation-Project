@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const Resource = require('../model/resourceModel');
+const Topic = require('../model/topicModel');
 
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 
@@ -15,7 +16,13 @@ async function seed() {
   try {
     await mongoose.connect(url);
     await Resource.deleteMany({});
+    await Topic.deleteMany({});
     await Resource.insertMany(resources);
+
+    // Seed unique topic/subtopic pairs
+    const topicOps = resources.map(({ topic, subtopic }) => ({ topic, subtopic }));
+    await Topic.insertMany(topicOps, { ordered: false }).catch(() => {});
+
     console.log('Resources seeded');
     await mongoose.disconnect();
   } catch (err) {
