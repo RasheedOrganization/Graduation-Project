@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
-const os = require('os');
 const { spawn, exec } = require('child_process');
 const util = require('util');
 const execAsync = util.promisify(exec);
@@ -30,7 +29,9 @@ router.post('/', async (req, res) => {
     return res.status(500).send('Docker is not installed or not in PATH');
   }
 
-  const tmpBase = path.join(os.tmpdir(), 'sandbox-');
+  const tmpDir = path.join(__dirname, '..', 'test-data');
+  await fs.mkdir(tmpDir, { recursive: true });
+  const tmpBase = path.join(tmpDir, 'sandbox-');
   let workDir;
 
   try {
