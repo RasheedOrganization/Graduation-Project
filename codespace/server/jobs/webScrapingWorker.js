@@ -4,11 +4,12 @@ const {redisClient} = require('../model/redisModel')
 const {execFile} = require('child_process');
 const { stderr } = require('process');
 
-const redis_url = process.env.REDIS_URL; 
+// Allow configuration of the Redis connection while providing sensible defaults.
+// Log the final URL so developers can verify which endpoint is being used.
+const redis_url = process.env.REDIS_URL || 'redis://localhost:6379';
 console.log("Redis URL:", redis_url);
 
-// Allow configuration of the Redis connection while providing sensible defaults
-const { hostname: redisHost, port: redisPort } = new URL(process.env.REDIS_URL || 'redis://localhost:6379');
+const { hostname: redisHost, port: redisPort } = new URL(redis_url);
 const connectionOptions = {
     host: redisHost,
     port: parseInt(redisPort, 10)
