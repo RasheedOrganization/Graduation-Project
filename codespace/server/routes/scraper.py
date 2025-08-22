@@ -2,30 +2,24 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import sys
-import cloudscraper
 
 # url = 'https://codeforces.com/contest/1826/problem/A'
 # url = 'https://codeforces.com/contest/1826/problem/B'
 
 url = sys.argv[1]
 
-# try:
-#     headers = {
-#         "User-Agent": "Mozilla/5.0",
-#         "Referer": "https://codeforces.com/"
-#     }
-#     response = requests.get(url, headers=headers, timeout=10)
-#     response.raise_for_status()
-# except Exception as e:
-#     print(str(e), file=sys.stderr)
-#     sys.exit(1)
+try:
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://codeforces.com/"
+    }
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
+except Exception as e:
+    print(str(e), file=sys.stderr)
+    sys.exit(1)
 
-scraper = cloudscraper.create_scraper(
-    browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False}
-)
-html = scraper.get(url, timeout=20).text
-
-soup = BeautifulSoup(html, 'html.parser')
+soup = BeautifulSoup(response.text, 'html.parser')
 
 # everything that matters is in this class
 problem_statements = soup.find_all(class_='problem-statement')
