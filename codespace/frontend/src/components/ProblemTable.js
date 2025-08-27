@@ -12,6 +12,15 @@ function ProblemTable({ problems }) {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const getDomain = (link) => {
+    try {
+      const url = new URL(link.startsWith('http') ? link : `https://${link}`);
+      return url.hostname.replace(/^www\./, '');
+    } catch {
+      return '';
+    }
+  };
+
   const current = problems.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -25,7 +34,7 @@ function ProblemTable({ problems }) {
             <th>Name</th>
             <th>Topic</th>
             <th>Subtopic</th>
-            <th>Domain</th>
+            <th>Website</th>
             <th>Difficulty</th>
           </tr>
         </thead>
@@ -35,7 +44,7 @@ function ProblemTable({ problems }) {
               <td>{p.name}</td>
               <td>{p.topic}</td>
               <td>{p.subtopic}</td>
-              <td>{p.domain}</td>
+              <td>{p.domain || getDomain(p.link)}</td>
               <td>{p.difficulty}</td>
             </tr>
           ))}
