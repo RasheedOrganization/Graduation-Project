@@ -97,3 +97,14 @@ npm start
 
 Adjust any variables in the `.env` files if your local services run on different
 hosts or ports.
+
+### Code execution sandbox
+
+The `/test` endpoint compiles and runs user-submitted C++ code inside a
+throwaway Docker container for isolation. Make sure the Docker daemon is
+available and the `docker` CLI is installed on the machine running the API
+server. If the CLI lives at a non-default path, set the `DOCKER_CMD`
+environment variable to the desired executable before starting the server.
+The `codespace/server/test-data` directory is bind-mounted into the server
+container, ensuring the Docker daemon can access temporary source files created
+for compilation.

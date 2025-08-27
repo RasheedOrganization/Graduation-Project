@@ -23,6 +23,7 @@ services:
     depends_on: [mongo, redis]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./codespace/server/test-data:/app/test-data
   frontend:
     build: ./codespace/frontend
     restart: unless-stopped
