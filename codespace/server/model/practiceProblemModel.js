@@ -5,7 +5,8 @@ const practiceProblemSchema = new mongoose.Schema({
   link: { type: String, required: true },
   topic: { type: String, required: true },
   subtopic: { type: String, required: true },
-  difficulty: { type: String, required: true }
+  difficulty: { type: String, required: true },
+  domain: { type: String, required: true }
 });
 
 module.exports = mongoose.model('PracticeProblem', practiceProblemSchema);

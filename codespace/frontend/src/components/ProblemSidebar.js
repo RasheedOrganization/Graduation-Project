@@ -75,14 +75,18 @@ function ProblemSidebar({
                 </option>
               ))}
           </select>
-          <input
-            type="text"
+          <select
             name="difficulty"
-            placeholder="Difficulty"
             value={formData.difficulty}
             onChange={handleFormChange}
             required
-          />
+          >
+            <option value="">Select Difficulty</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+            <option value="Insane">Insane</option>
+          </select>
           <button type="submit">Add</button>
         </form>
       )}
