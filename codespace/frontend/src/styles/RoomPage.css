@@ -1,17 +1,18 @@
 
+
 .editor-background {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(135deg, #e3f2fd, #ffffff);
   display: flex;
-  overflow: hidden;
+  overflow-y: auto;
   transition: background 0.5s ease;
 }
 
 .room-wrapper {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .room-main {
@@ -126,19 +127,9 @@
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
+
 .leave-room-button:hover {
   background: #9a0007;
   transform: scale(1.03);
-}
-
-@media (min-width: 768px) {
-  .room-main {
-    flex-direction: row;
-  }
-
-  .problem-view,
-  .editor-container {
-    max-height: 90vh;
-  }
 }
 
