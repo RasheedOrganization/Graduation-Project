@@ -108,20 +108,19 @@ export default function TextBox({socketRef,currentProbId}) {
     
 
     return (
-    <div className="RHS">
+    <div className="editor-wrapper">
         <div className="code-area">
             <CodeMirror
                 value={textvalue}
-                height="60vh"
+                height="100%"
                 width="100%"
                 onChange={Handlechange}
                 extensions={[cpp()]}
             />
         </div>
-        <div className="input-output">
+        <div className="io-wrapper">
             <div className="input-area">
                 <textarea
-                    style={{ height: '5vh', resize: 'none' }}
                     id="input"
                     value={inputvalue}
                     onChange={Handlechangeinput}
@@ -131,12 +130,10 @@ export default function TextBox({socketRef,currentProbId}) {
             <div className="output-area" style={{ color }}>
                 Output: {String(outputvalue)}
             </div>
-            {/* <div> Output Value: {outputvalue}</div> */}
-        </div>
-        <div>
-            <button onClick={Handlecompile}>Compile</button>
-            <button onClick={Handlesubmit}>Submit</button>
-            {/* <div>{verdict}</div> */}
+            <div className="action-buttons">
+                <button onClick={Handlecompile}>Compile</button>
+                <button onClick={Handlesubmit}>Submit</button>
+            </div>
         </div>
     </div>
     )
