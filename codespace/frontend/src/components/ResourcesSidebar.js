@@ -25,7 +25,7 @@ function ResourcesSidebar({
   return (
     <div className="left-menu">
       <div className="button-group">
-        <button onClick={() => setShowForm(!showForm)}>New</button>
+        <button onClick={() => setShowForm(!showForm)}>New Resource</button>
         <button onClick={() => setShowTopicForm(!showTopicForm)}>New Topic</button>
         <button onClick={() => setShowSubtopicForm(!showSubtopicForm)}>New Subtopic</button>
       </div>
