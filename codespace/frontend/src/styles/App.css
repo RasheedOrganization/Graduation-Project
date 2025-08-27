@@ -59,6 +59,7 @@ input {
 
 .input-area {
   flex: 1;
+  overflow: auto;
 }
 
 .input-area textarea {
@@ -69,6 +70,7 @@ input {
   border-radius: 8px;
   background: #fafafa;
   resize: none;
+  overflow: auto;
 }
 
 .output-area {
