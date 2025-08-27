@@ -25,6 +25,7 @@ function ProblemTable({ problems }) {
             <th>Name</th>
             <th>Topic</th>
             <th>Subtopic</th>
+            <th>Domain</th>
             <th>Difficulty</th>
           </tr>
         </thead>
@@ -34,6 +35,7 @@ function ProblemTable({ problems }) {
               <td>{p.name}</td>
               <td>{p.topic}</td>
               <td>{p.subtopic}</td>
+              <td>{p.domain}</td>
               <td>{p.difficulty}</td>
             </tr>
           ))}

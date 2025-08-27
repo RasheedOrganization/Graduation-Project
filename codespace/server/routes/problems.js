@@ -8,10 +8,26 @@ const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_pro
 
 mongoose.connect(url);
 
+const getDomain = (link) => {
+  try {
+    const url = new URL(link.startsWith('http') ? link : `https://${link}`);
+    return url.hostname.replace(/^www\./, '').split('.')[0];
+  } catch {
+    return '';
+  }
+};
+
 router.get('/', async (req, res) => {
   try {
     const problems = await Problem.find();
-    res.json(problems);
+    const withDomains = problems.map((p) => {
+      const obj = p.toObject();
+      if (!obj.domain) {
+        obj.domain = getDomain(obj.link);
+      }
+      return obj;
+    });
+    res.json(withDomains);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch problems' });
   }
@@ -20,7 +36,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, link, topic, subtopic, difficulty } = req.body;
-    const problem = new Problem({ name, link, topic, subtopic, difficulty });
+    const domain = getDomain(link);
+    const problem = new Problem({ name, link, topic, subtopic, difficulty, domain });
     await problem.save();
 
     await Topic.updateOne(
@@ -40,7 +57,10 @@ router.patch('/:id', async (req, res) => {
     const { name, link, topic, subtopic, difficulty } = req.body;
     const update = {};
     if (name !== undefined) update.name = name;
-    if (link !== undefined) update.link = link;
+    if (link !== undefined) {
+      update.link = link;
+      update.domain = getDomain(link);
+    }
     if (topic !== undefined) update.topic = topic;
     if (subtopic !== undefined) update.subtopic = subtopic;
     if (difficulty !== undefined) update.difficulty = difficulty;
