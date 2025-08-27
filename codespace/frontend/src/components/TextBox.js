@@ -35,13 +35,15 @@ export default function TextBox({socketRef,currentProbId}) {
 
 
     useEffect(() => {
-        console.log(`outputvalue changed to ${outputvalue}`);
-        // outputvalue = outputvalue.trim();
-        if(outputvalue==="Submitting.." || outputvalue===""){
+        // Ensure outputvalue is treated as a string before any string operations
+        const outputStr = String(outputvalue);
+        console.log(`outputvalue changed to ${outputStr}`);
+
+        if(outputStr === "Submitting.." || outputStr === ""){
             setColor('black');
         }
         else{
-            setColor(outputvalue.trim()==="Accepted" ? 'green' : 'red');
+            setColor(outputStr.trim()==="Accepted" ? 'green' : 'red');
         }
       }, [outputvalue]);
 
@@ -127,7 +129,7 @@ export default function TextBox({socketRef,currentProbId}) {
                 ></textarea>
             </div>
             <div className="output-area" style={{ color }}>
-                Output: {outputvalue}
+                Output: {String(outputvalue)}
             </div>
             {/* <div> Output Value: {outputvalue}</div> */}
         </div>
