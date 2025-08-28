@@ -5,6 +5,7 @@ import SignupPage from './pages/SignupPage';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Room from './components/Room';
 import ContestPage from './pages/ContestPage';
+import ContestDetailPage from './pages/ContestDetailPage';
 import RoomsPage from './pages/RoomsPage';
 import ProblemsPage from './pages/ProblemsPage';
 import ResourcesPage from './pages/ResourcesPage';
@@ -22,7 +23,8 @@ function App(){
         <Route path="/problems" element={<ProblemsPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/sections" element={<SectionsPage />} />
-        <Route path="/contest" element={<ContestPage />} />
+        <Route path="/contests" element={<ContestPage />} />
+        <Route path="/contests/:id" element={<ContestDetailPage />} />
         <Route path="/rooms" element={<RoomsPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/profile" element={<ProfilePage />} />

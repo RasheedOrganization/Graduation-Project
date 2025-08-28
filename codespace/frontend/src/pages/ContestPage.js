@@ -1,9 +1,39 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Box,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Typography
+} from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 
+function ContestCard({ contest, onRegister }) {
+  return (
+    <Card sx={{ mb: 2 }}>
+      <CardContent component={Link} to={`/contests/${contest._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Typography variant="h6">{contest.name}</Typography>
+        <Typography variant="body2">Start: {new Date(contest.startTime).toLocaleString()}</Typography>
+        <Typography variant="body2">Duration: {contest.duration} minutes</Typography>
+      </CardContent>
+      {onRegister && (
+        <CardActions>
+          <Button size="small" onClick={() => onRegister(contest._id)}>Register</Button>
+        </CardActions>
+      )}
+    </Card>
+  );
+}
+
 function ContestPage() {
-  const [contests, setContests] = useState([]);
+  const [tab, setTab] = useState(0);
+  const [upcoming, setUpcoming] = useState([]);
+  const [past, setPast] = useState([]);
 
   useEffect(() => {
     async function fetchContests() {
@@ -11,11 +41,30 @@ function ContestPage() {
         const res = await fetch(`${BACKEND_URL}/api/contests`);
         if (res.ok) {
           const data = await res.json();
-          setContests(data);
+          setUpcoming(data.upcoming);
+          setPast(data.past);
+          return;
         }
       } catch (err) {
         console.error('Failed to fetch contests');
       }
+      // dummy data fallback
+      setUpcoming([
+        {
+          _id: 'sample-upcoming',
+          name: 'Sample Upcoming Contest',
+          startTime: new Date().toISOString(),
+          duration: 90
+        }
+      ]);
+      setPast([
+        {
+          _id: 'sample-past',
+          name: 'Sample Past Contest',
+          startTime: new Date(Date.now() - 86400000).toISOString(),
+          duration: 120
+        }
+      ]);
     }
     fetchContests();
   }, []);
@@ -26,7 +75,7 @@ function ContestPage() {
       const res = await fetch(`${BACKEND_URL}/api/contests/${id}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId })
       });
       const data = await res.json();
       if (res.ok) {
@@ -40,20 +89,25 @@ function ContestPage() {
   };
 
   return (
-    <div>
+    <>
       <NavBar />
-      <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
-        <h2>Upcoming Contests</h2>
-        {contests.map((contest) => (
-          <div key={contest._id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}>
-            <h3>{contest.name}</h3>
-            <p>Start: {new Date(contest.startTime).toLocaleString()}</p>
-            <p>Duration: {contest.duration} minutes</p>
-            <button onClick={() => register(contest._id)}>Register</button>
-          </div>
-        ))}
-      </div>
-    </div>
+      <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
+        <Tabs value={tab} onChange={(e, v) => setTab(v)}>
+          <Tab label="Upcoming" />
+          <Tab label="Past" />
+        </Tabs>
+        <Box hidden={tab !== 0} sx={{ mt: 2 }}>
+          {upcoming.map((contest) => (
+            <ContestCard key={contest._id} contest={contest} onRegister={register} />
+          ))}
+        </Box>
+        <Box hidden={tab !== 1} sx={{ mt: 2 }}>
+          {past.map((contest) => (
+            <ContestCard key={contest._id} contest={contest} />
+          ))}
+        </Box>
+      </Box>
+    </>
   );
 }
 

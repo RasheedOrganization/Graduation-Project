@@ -30,6 +30,23 @@ files in their own directories when running without Docker.
 Default values for both Docker and manual setups are shown in the `.env.example`
 files.
 
+## Contests
+
+The project now includes a simple contests module.
+
+### API Endpoints
+
+- `GET /api/contests` – list upcoming and past contests
+- `GET /api/contests/:id` – fetch a specific contest
+- `POST /api/contests/:id/register` – register the current user
+- `POST /api/contests/:id/unregister` – unregister the user
+- `POST /api/contests` – create a contest *(admin only; authentication TBD)*
+
+### Frontend Pages
+
+- `/contests` – shows upcoming and past contests with registration buttons
+- `/contests/:id` – template page for a contest's problems, scoreboard and timer
+
 ## Migrating existing S3 data
 
 If you previously stored tests in S3, you can copy them locally using the
