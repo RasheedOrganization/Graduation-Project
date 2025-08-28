@@ -70,6 +70,14 @@ function SectionsPage() {
     }
   };
 
+  const openLink = (link) => {
+    const url =
+      link.startsWith('http://') || link.startsWith('https://')
+        ? link
+        : `https://${link}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div>
       <NavBar />
@@ -129,15 +137,25 @@ function SectionsPage() {
                 <div className="resources-side">
                   <h3>Resources</h3>
                   {resources.length ? (
-                    <ul>
-                      {resources.map((r) => (
-                        <li key={r._id}>
-                          <a href={r.link} target="_blank" rel="noreferrer">
-                            {r.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
+                    <table className="resources-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {resources.map((r) => (
+                          <tr
+                            key={r._id}
+                            onClick={() => openLink(r.link)}
+                          >
+                            <td>{r.name}</td>
+                            <td>{r.status || 'Not Attempted'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   ) : (
                     <p>No resources available.</p>
                   )}
@@ -158,7 +176,7 @@ function SectionsPage() {
                         {problems.map((p) => (
                           <tr
                             key={p._id}
-                            onClick={() => window.open(p.link, '_blank', 'noopener,noreferrer')}
+                            onClick={() => openLink(p.link)}
                           >
                             <td>{p.status || 'Not Attempted'}</td>
                             <td>{p.domain}</td>
@@ -175,11 +193,19 @@ function SectionsPage() {
               </div>
               <div className="progress-section">
                 <h3>Progress</h3>
-                <select value={progress} onChange={(e) => updateProgress(e.target.value)}>
-                  <option value="not started">Not Started</option>
-                  <option value="reading">Reading</option>
-                  <option value="finished">Finished</option>
-                </select>
+                <FormControl className="progress-select">
+                  <InputLabel id="progress-select-label">Progress</InputLabel>
+                  <Select
+                    labelId="progress-select-label"
+                    value={progress}
+                    label="Progress"
+                    onChange={(e) => updateProgress(e.target.value)}
+                  >
+                    <MenuItem value="not started">Not Started</MenuItem>
+                    <MenuItem value="reading">Reading</MenuItem>
+                    <MenuItem value="finished">Finished</MenuItem>
+                  </Select>
+                </FormControl>
               </div>
             </div>
           ) : (
