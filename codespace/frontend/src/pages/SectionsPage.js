@@ -74,15 +74,20 @@ function SectionsPage() {
       <NavBar />
       <div className="sections-page">
         <div className="sections-sidebar">
-          <div className="stages-list">
+          <ul className="stages-list">
             {stages.map((stage) => (
-              <div key={stage} className="stage-item">
-                <button
-                  className={openStage === stage ? 'active' : ''}
-                  onClick={() => setOpenStage(openStage === stage ? null : stage)}
+              <li
+                key={stage}
+                className={`stage-item ${openStage === stage ? 'active' : ''}`}
+              >
+                <div
+                  className="stage-title"
+                  onClick={() =>
+                    setOpenStage(openStage === stage ? null : stage)
+                  }
                 >
                   {stage}
-                </button>
+                </div>
                 {openStage === stage && (
                   <div className="topics-list">
                     {Object.keys(topics[stage] || {}).map((t) => (
@@ -109,9 +114,9 @@ function SectionsPage() {
                     ))}
                   </div>
                 )}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
         <div className="sections-content">
           {selectedSubtopic ? (
