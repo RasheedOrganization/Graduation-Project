@@ -47,7 +47,7 @@ function NavBar() {
         <li><Link to="/problems">Problems</Link></li>
         <li><Link to="/resources">Resources</Link></li>
         <li><Link to="/sections">Sections</Link></li>
-        <li><Link to="/contest">Contest</Link></li>
+        <li><Link to="/contests">Contests</Link></li>
         <li><Link to="/rooms">Rooms</Link></li>
         <li><Link to="/contact">Contact Us</Link></li>
         {!loggedIn && <li><Link to="/login">Login</Link></li>}
