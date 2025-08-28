@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const topicSchema = new mongoose.Schema({
-  level: {
+  stage: {
     type: String,
     enum: ['Bronze', 'Silver', 'Gold'],
     required: true,
@@ -15,7 +15,7 @@ const topicSchema = new mongoose.Schema({
   },
 });
 
-// Ensure each level/topic/subtopic combination is unique
-topicSchema.index({ level: 1, topic: 1, subtopic: 1 }, { unique: true });
+// Ensure each stage/topic/subtopic combination is unique
+topicSchema.index({ stage: 1, topic: 1, subtopic: 1 }, { unique: true });
 
 module.exports = mongoose.model('Topic', topicSchema);

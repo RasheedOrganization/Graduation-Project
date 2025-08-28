@@ -4,11 +4,12 @@ import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 import '../styles/SectionsPage.css';
 
-const levels = ['Bronze', 'Silver', 'Gold'];
+const stages = ['Bronze', 'Silver', 'Gold'];
 
 function SectionsPage() {
-  const [level, setLevel] = useState('Bronze');
   const [topics, setTopics] = useState({});
+  const [openStage, setOpenStage] = useState(null);
+  const [selectedStage, setSelectedStage] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedSubtopic, setSelectedSubtopic] = useState(null);
   const [subtopicId, setSubtopicId] = useState(null);
@@ -19,33 +20,38 @@ function SectionsPage() {
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/topics`, { params: { level } });
-        setTopics(res.data);
+        const res = await axios.get(`${BACKEND_URL}/api/topics`);
+        const grouped = {};
+        Object.entries(res.data).forEach(([topicName, subs]) => {
+          subs.forEach(({ _id, subtopic, progress, stage }) => {
+            if (!grouped[stage]) grouped[stage] = {};
+            if (!grouped[stage][topicName]) grouped[stage][topicName] = [];
+            grouped[stage][topicName].push({ _id, subtopic, progress });
+          });
+        });
+        setTopics(grouped);
       } catch (err) {
         console.error('Failed to fetch topics', err);
       }
     };
     fetchTopics();
-    setSelectedTopic(null);
-    setSelectedSubtopic(null);
-    setResources([]);
-    setProblems([]);
-  }, [level]);
+  }, []);
 
-  const loadContent = async (topicName, sub) => {
+  const loadContent = async (stage, topicName, sub) => {
     try {
       const resResources = await axios.get(`${BACKEND_URL}/api/resources`, {
-        params: { level, topic: topicName, subtopic: sub.subtopic },
+        params: { stage, topic: topicName, subtopic: sub.subtopic },
       });
       setResources(resResources.data);
 
       const resProblems = await axios.get(`${BACKEND_URL}/api/problems`, {
-        params: { level, topic: topicName, subtopic: sub.subtopic },
+        params: { stage, topic: topicName, subtopic: sub.subtopic },
       });
       setProblems(resProblems.data);
 
       setProgress(sub.progress || 'not started');
       setSubtopicId(sub._id);
+      setSelectedStage(stage);
       setSelectedTopic(topicName);
       setSelectedSubtopic(sub.subtopic);
     } catch (err) {
@@ -68,36 +74,41 @@ function SectionsPage() {
       <NavBar />
       <div className="sections-page">
         <div className="sections-sidebar">
-          <div className="level-selector">
-            {levels.map((lvl) => (
-              <button
-                key={lvl}
-                className={lvl === level ? 'active' : ''}
-                onClick={() => setLevel(lvl)}
-              >
-                {lvl}
-              </button>
-            ))}
-          </div>
-          <div className="topics-list">
-            {Object.keys(topics).map((t) => (
-              <div key={t} className="topic-item">
-                <div className="topic-name">{t}</div>
-                <ul>
-                  {topics[t].map((sub) => (
-                    <li
-                      key={sub._id}
-                      className={
-                        selectedSubtopic === sub.subtopic && selectedTopic === t
-                          ? 'selected'
-                          : ''
-                      }
-                      onClick={() => loadContent(t, sub)}
-                    >
-                      {sub.subtopic}
-                    </li>
-                  ))}
-                </ul>
+          <div className="stages-list">
+            {stages.map((stage) => (
+              <div key={stage} className="stage-item">
+                <button
+                  className={openStage === stage ? 'active' : ''}
+                  onClick={() => setOpenStage(openStage === stage ? null : stage)}
+                >
+                  {stage}
+                </button>
+                {openStage === stage && (
+                  <div className="topics-list">
+                    {Object.keys(topics[stage] || {}).map((t) => (
+                      <div key={t} className="topic-item">
+                        <div className="topic-name">{t}</div>
+                        <ul>
+                          {topics[stage][t].map((sub) => (
+                            <li
+                              key={sub._id}
+                              className={
+                                selectedStage === stage &&
+                                selectedTopic === t &&
+                                selectedSubtopic === sub.subtopic
+                                  ? 'selected'
+                                  : ''
+                              }
+                              onClick={() => loadContent(stage, t, sub)}
+                            >
+                              {sub.subtopic}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -106,7 +117,7 @@ function SectionsPage() {
           {selectedSubtopic ? (
             <div>
               <h2>
-                {selectedTopic} / {selectedSubtopic}
+                {selectedStage} / {selectedTopic} / {selectedSubtopic}
               </h2>
               <div className="content-block">
                 <h3>Resources</h3>

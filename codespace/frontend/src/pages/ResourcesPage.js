@@ -18,6 +18,7 @@ const statusOptions = [
 
 function ResourcesPage() {
   const [search, setSearch] = useState('');
+  const [selectedStage, setSelectedStage] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
   const [selectedSubtopic, setSelectedSubtopic] = useState('');
   const [resources, setResources] = useState([]);
@@ -28,12 +29,13 @@ function ResourcesPage() {
   const [formData, setFormData] = useState({
     name: '',
     link: '',
+    stage: '',
     topic: '',
     subtopic: '',
   });
   const [topics, setTopics] = useState({});
-  const [newTopic, setNewTopic] = useState('');
-  const [newSubtopic, setNewSubtopic] = useState({ topic: '', name: '' });
+  const [newTopic, setNewTopic] = useState({ stage: '', name: '' });
+  const [newSubtopic, setNewSubtopic] = useState({ stage: '', topic: '', name: '' });
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -47,7 +49,15 @@ function ResourcesPage() {
     const fetchTopics = async () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/api/topics`);
-        setTopics(res.data);
+        const grouped = {};
+        Object.entries(res.data).forEach(([topicName, subs]) => {
+          subs.forEach(({ stage, subtopic }) => {
+            if (!grouped[stage]) grouped[stage] = {};
+            if (!grouped[stage][topicName]) grouped[stage][topicName] = [];
+            grouped[stage][topicName].push(subtopic);
+          });
+        });
+        setTopics(grouped);
       } catch (err) {
         console.error('Failed to fetch topics', err);
       }
@@ -55,6 +65,12 @@ function ResourcesPage() {
     fetchResources();
     fetchTopics();
   }, []);
+
+  const handleStageChange = (e) => {
+    setSelectedStage(e.target.value);
+    setSelectedTopic('');
+    setSelectedSubtopic('');
+  };
 
   const handleTopicChange = (e) => {
     setSelectedTopic(e.target.value);
@@ -66,17 +82,22 @@ function ResourcesPage() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === 'stage' ? { topic: '', subtopic: '' } : {}),
       ...(name === 'topic' ? { subtopic: '' } : {}),
     }));
   };
 
   const addTopic = async (e) => {
     e.preventDefault();
-    if (!newTopic) return;
+    const { stage, name } = newTopic;
+    if (!stage || !name) return;
     try {
-      await axios.post(`${BACKEND_URL}/api/topics`, { topic: newTopic });
-      setTopics((prev) => ({ ...prev, [newTopic]: [] }));
-      setNewTopic('');
+      await axios.post(`${BACKEND_URL}/api/topics`, { stage, topic: name });
+      setTopics((prev) => ({
+        ...prev,
+        [stage]: { ...(prev[stage] || {}), [name]: [] },
+      }));
+      setNewTopic({ stage: '', name: '' });
       setShowTopicForm(false);
     } catch (err) {
       console.error('Failed to add topic', err);
@@ -85,15 +106,18 @@ function ResourcesPage() {
 
   const addSubtopic = async (e) => {
     e.preventDefault();
-    const { topic, name } = newSubtopic;
-    if (!topic || !name) return;
+    const { stage, topic, name } = newSubtopic;
+    if (!stage || !topic || !name) return;
     try {
-      await axios.post(`${BACKEND_URL}/api/topics`, { topic, subtopic: name });
+      await axios.post(`${BACKEND_URL}/api/topics`, { stage, topic, subtopic: name });
       setTopics((prev) => ({
         ...prev,
-        [topic]: [...prev[topic], name],
+        [stage]: {
+          ...(prev[stage] || {}),
+          [topic]: [...(prev[stage]?.[topic] || []), name],
+        },
       }));
-      setNewSubtopic({ topic: '', name: '' });
+      setNewSubtopic({ stage: '', topic: '', name: '' });
       setShowSubtopicForm(false);
     } catch (err) {
       console.error('Failed to add subtopic', err);
@@ -105,7 +129,7 @@ function ResourcesPage() {
     try {
       const res = await axios.post(`${BACKEND_URL}/api/resources`, formData);
       setResources((prev) => [...prev, res.data]);
-      setFormData({ name: '', link: '', topic: '', subtopic: '' });
+      setFormData({ name: '', link: '', stage: '', topic: '', subtopic: '' });
       setShowForm(false);
     } catch (err) {
       console.error('Failed to add resource', err);
@@ -124,10 +148,11 @@ function ResourcesPage() {
   };
 
   const filteredResources = resources.filter((r) => {
+    const matchesStage = selectedStage ? r.stage === selectedStage : true;
     const matchesTopic = selectedTopic ? r.topic === selectedTopic : true;
     const matchesSubtopic = selectedSubtopic ? r.subtopic === selectedSubtopic : true;
     const matchesSearch = r.name.toLowerCase().includes(search.toLowerCase());
-    return matchesTopic && matchesSubtopic && matchesSearch;
+    return matchesStage && matchesTopic && matchesSubtopic && matchesSearch;
   });
 
   return (
@@ -160,6 +185,8 @@ function ResourcesPage() {
             newSubtopic={newSubtopic}
             setNewSubtopic={setNewSubtopic}
             addSubtopic={addSubtopic}
+            selectedStage={selectedStage}
+            handleStageChange={handleStageChange}
             selectedTopic={selectedTopic}
             handleTopicChange={handleTopicChange}
             selectedSubtopic={selectedSubtopic}
