@@ -10,7 +10,12 @@ mongoose.connect(url);
 
 router.get('/', async (req, res) => {
   try {
-    const resources = await Resource.find();
+    const { level, topic, subtopic } = req.query;
+    const filter = {};
+    if (level) filter.level = level;
+    if (topic) filter.topic = topic;
+    if (subtopic) filter.subtopic = subtopic;
+    const resources = await Resource.find(filter);
     res.json(resources);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch resources' });
@@ -19,14 +24,13 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, link, topic, subtopic } = req.body;
-    const resource = new Resource({ name, link, topic, subtopic });
+    const { name, link, level, topic, subtopic } = req.body;
+    const resource = new Resource({ name, link, level, topic, subtopic });
     await resource.save();
 
-    // Ensure the topic/subtopic pair exists in the topics collection
     await Topic.updateOne(
-      { topic, subtopic },
-      { topic, subtopic },
+      { level, topic, subtopic },
+      { level, topic, subtopic },
       { upsert: true }
     );
 
@@ -38,21 +42,21 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { status, name, link, topic, subtopic } = req.body;
+    const { status, name, link, level, topic, subtopic } = req.body;
     const update = {};
     if (status !== undefined) update.status = status;
     if (name !== undefined) update.name = name;
     if (link !== undefined) update.link = link;
+    if (level !== undefined) update.level = level;
     if (topic !== undefined) update.topic = topic;
     if (subtopic !== undefined) update.subtopic = subtopic;
 
     const resource = await Resource.findByIdAndUpdate(req.params.id, update, { new: true });
 
-    // If the topic or subtopic was updated, ensure the pair exists in topics
-    if (resource && (update.topic !== undefined || update.subtopic !== undefined)) {
+    if (resource && (update.level !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
       await Topic.updateOne(
-        { topic: resource.topic, subtopic: resource.subtopic },
-        { topic: resource.topic, subtopic: resource.subtopic },
+        { level: resource.level, topic: resource.topic, subtopic: resource.subtopic },
+        { level: resource.level, topic: resource.topic, subtopic: resource.subtopic },
         { upsert: true }
       );
     }
