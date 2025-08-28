@@ -3,12 +3,13 @@ import axios from 'axios';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 import '../styles/SectionsPage.css';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 const stages = ['Bronze', 'Silver', 'Gold'];
 
 function SectionsPage() {
   const [topics, setTopics] = useState({});
-  const [openStage, setOpenStage] = useState(null);
+  const [stageFilter, setStageFilter] = useState(stages[0]);
   const [selectedStage, setSelectedStage] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedSubtopic, setSelectedSubtopic] = useState(null);
@@ -74,49 +75,49 @@ function SectionsPage() {
       <NavBar />
       <div className="sections-page">
         <div className="sections-sidebar">
-          <ul className="stages-list">
-            {stages.map((stage) => (
-              <li
-                key={stage}
-                className={`stage-item ${openStage === stage ? 'active' : ''}`}
-              >
-                <div
-                  className="stage-title"
-                  onClick={() =>
-                    setOpenStage(openStage === stage ? null : stage)
-                  }
-                >
+          <FormControl fullWidth className="stage-select">
+            <InputLabel id="stage-select-label">Stage</InputLabel>
+            <Select
+              labelId="stage-select-label"
+              value={stageFilter}
+              label="Stage"
+              onChange={(e) => {
+                setStageFilter(e.target.value);
+                setSelectedTopic(null);
+                setSelectedSubtopic(null);
+              }}
+            >
+              {stages.map((stage) => (
+                <MenuItem key={stage} value={stage}>
                   {stage}
-                </div>
-                {openStage === stage && (
-                  <div className="topics-list">
-                    {Object.keys(topics[stage] || {}).map((t) => (
-                      <div key={t} className="topic-item">
-                        <div className="topic-name">{t}</div>
-                        <ul>
-                          {topics[stage][t].map((sub) => (
-                            <li
-                              key={sub._id}
-                              className={
-                                selectedStage === stage &&
-                                selectedTopic === t &&
-                                selectedSubtopic === sub.subtopic
-                                  ? 'selected'
-                                  : ''
-                              }
-                              onClick={() => loadContent(stage, t, sub)}
-                            >
-                              {sub.subtopic}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </li>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <div className="topics-list">
+            {Object.keys(topics[stageFilter] || {}).map((t) => (
+              <div key={t} className="topic-item">
+                <div className="topic-name">{t}</div>
+                <ul>
+                  {topics[stageFilter][t].map((sub) => (
+                    <li
+                      key={sub._id}
+                      className={
+                        selectedStage === stageFilter &&
+                        selectedTopic === t &&
+                        selectedSubtopic === sub.subtopic
+                          ? 'selected'
+                          : ''
+                      }
+                      onClick={() => loadContent(stageFilter, t, sub)}
+                    >
+                      {sub.subtopic}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
         <div className="sections-content">
           {selectedSubtopic ? (
