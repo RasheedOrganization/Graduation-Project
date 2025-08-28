@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, Button, List, ListItem } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, TextField, MenuItem } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 
@@ -9,6 +9,8 @@ function ContestDetailPage() {
   const [contest, setContest] = useState(null);
   const [timeLeft, setTimeLeft] = useState('');
   const [registered, setRegistered] = useState(false);
+  const [problemList, setProblemList] = useState([]);
+  const [selectedProblem, setSelectedProblem] = useState('');
 
   useEffect(() => {
     async function fetchContest() {
@@ -38,6 +40,21 @@ function ContestDetailPage() {
     }
     fetchContest();
   }, [id]);
+
+  useEffect(() => {
+    async function fetchProblems() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/problem-list`);
+        if (res.ok) {
+          const data = await res.json();
+          setProblemList(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch problems');
+      }
+    }
+    fetchProblems();
+  }, []);
 
   useEffect(() => {
     let interval;
@@ -93,6 +110,25 @@ function ContestDetailPage() {
     }
   };
 
+  const addProblem = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/contests/${id}/problems`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ problem: selectedProblem })
+      });
+      if (res.ok) {
+        setContest((prev) => ({
+          ...prev,
+          problems: [...(prev.problems || []), selectedProblem]
+        }));
+        setSelectedProblem('');
+      }
+    } catch (err) {
+      console.error('Failed to add problem');
+    }
+  };
+
   return (
     <>
       <NavBar />
@@ -120,6 +156,28 @@ function ContestDetailPage() {
                   <ListItem>No problems available</ListItem>
                 )}
               </List>
+              <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                <TextField
+                  select
+                  label="Add Problem"
+                  value={selectedProblem}
+                  onChange={(e) => setSelectedProblem(e.target.value)}
+                  sx={{ minWidth: 200 }}
+                >
+                  {problemList.map((p) => (
+                    <MenuItem key={p.id} value={p.problem_name}>
+                      {p.problem_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <Button
+                  variant="contained"
+                  onClick={addProblem}
+                  disabled={!selectedProblem}
+                >
+                  Add
+                </Button>
+              </Box>
             </Box>
 
             <Box sx={{ mt: 4 }}>
@@ -134,14 +192,16 @@ function ContestDetailPage() {
               <Typography>{timeLeft}</Typography>
             </Box>
 
-            <Box sx={{ mt: 4 }}>
-              <Typography variant="h6">Registration Status</Typography>
-              {registered ? (
-                <Button variant="contained" onClick={unregister}>Unregister</Button>
-              ) : (
-                <Button variant="contained" onClick={register}>Register</Button>
-              )}
-            </Box>
+            {new Date(contest.startTime) > Date.now() && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6">Registration Status</Typography>
+                {registered ? (
+                  <Button variant="contained" onClick={unregister}>Unregister</Button>
+                ) : (
+                  <Button variant="contained" onClick={register}>Register</Button>
+                )}
+              </Box>
+            )}
           </>
         ) : (
           <Typography>Loading...</Typography>

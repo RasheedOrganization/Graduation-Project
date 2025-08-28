@@ -14,7 +14,8 @@ import {
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 
-function ContestCard({ contest, onRegister }) {
+function ContestCard({ contest, onRegister, userId }) {
+  const isRegistered = userId && contest.participants && contest.participants.includes(userId);
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent component={Link} to={`/contests/${contest._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -24,7 +25,9 @@ function ContestCard({ contest, onRegister }) {
       </CardContent>
       {onRegister && (
         <CardActions>
-          <Button size="small" onClick={() => onRegister(contest._id)}>Register</Button>
+          <Button size="small" onClick={() => onRegister(contest._id)} disabled={isRegistered}>
+            {isRegistered ? 'Registered' : 'Register'}
+          </Button>
         </CardActions>
       )}
     </Card>
@@ -36,6 +39,7 @@ function ContestPage() {
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
   const [form, setForm] = useState({ name: '', startTime: '', duration: '' });
+  const userId = localStorage.getItem('userid');
 
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -102,7 +106,6 @@ function ContestPage() {
   };
 
   const register = async (id) => {
-    const userId = localStorage.getItem('userid');
     try {
       const res = await fetch(`${BACKEND_URL}/api/contests/${id}/register`, {
         method: 'POST',
@@ -111,6 +114,13 @@ function ContestPage() {
       });
       const data = await res.json();
       if (res.ok) {
+        setUpcoming((prev) =>
+          prev.map((c) =>
+            c._id === id
+              ? { ...c, participants: [...(c.participants || []), userId] }
+              : c
+          )
+        );
         alert('Registered');
       } else {
         alert(data.message || 'Registration failed');
@@ -158,7 +168,7 @@ function ContestPage() {
         <Box hidden={tab !== 0} sx={{ mt: 2 }}>
           {upcoming.length > 0 ? (
             upcoming.map((contest) => (
-              <ContestCard key={contest._id} contest={contest} onRegister={register} />
+              <ContestCard key={contest._id} contest={contest} onRegister={register} userId={userId} />
             ))
           ) : (
             <Typography>No upcoming contests</Typography>
