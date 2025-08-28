@@ -6,6 +6,14 @@ import '../styles/SectionsPage.css';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 const stages = ['Bronze', 'Silver', 'Gold'];
+const statusOptions = [
+  'Not Attempted',
+  'Solving',
+  'Solved',
+  'Reviewing',
+  'Skipped',
+  'Ignored',
+];
 
 function SectionsPage() {
   const [topics, setTopics] = useState({});
@@ -67,6 +75,28 @@ function SectionsPage() {
       setProgress(value);
     } catch (err) {
       console.error('Failed to update progress', err);
+    }
+  };
+
+  const updateResourceStatus = async (id, status) => {
+    try {
+      await axios.patch(`${BACKEND_URL}/api/resources/${id}`, { status });
+      setResources((prev) =>
+        prev.map((r) => (r._id === id ? { ...r, status } : r))
+      );
+    } catch (err) {
+      console.error('Failed to update resource status', err);
+    }
+  };
+
+  const updateProblemStatus = async (id, status) => {
+    try {
+      await axios.patch(`${BACKEND_URL}/api/problems/${id}`, { status });
+      setProblems((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, status } : p))
+      );
+    } catch (err) {
+      console.error('Failed to update problem status', err);
     }
   };
 
@@ -151,7 +181,21 @@ function SectionsPage() {
                             onClick={() => openLink(r.link)}
                           >
                             <td>{r.name}</td>
-                            <td>{r.status || 'Not Attempted'}</td>
+                            <td onClick={(e) => e.stopPropagation()}>
+                              <Select
+                                value={r.status || 'Not Attempted'}
+                                onChange={(e) =>
+                                  updateResourceStatus(r._id, e.target.value)
+                                }
+                                size="small"
+                              >
+                                {statusOptions.map((s) => (
+                                  <MenuItem key={s} value={s}>
+                                    {s}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -178,7 +222,21 @@ function SectionsPage() {
                             key={p._id}
                             onClick={() => openLink(p.link)}
                           >
-                            <td>{p.status || 'Not Attempted'}</td>
+                            <td onClick={(e) => e.stopPropagation()}>
+                              <Select
+                                value={p.status || 'Not Attempted'}
+                                onChange={(e) =>
+                                  updateProblemStatus(p._id, e.target.value)
+                                }
+                                size="small"
+                              >
+                                {statusOptions.map((s) => (
+                                  <MenuItem key={s} value={s}>
+                                    {s}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </td>
                             <td>{p.domain}</td>
                             <td>{p.name}</td>
                             <td>{p.difficulty}</td>
