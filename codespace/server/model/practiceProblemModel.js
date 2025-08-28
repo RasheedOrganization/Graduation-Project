@@ -11,7 +11,8 @@ const practiceProblemSchema = new mongoose.Schema({
   topic: { type: String, required: true },
   subtopic: { type: String, required: true },
   difficulty: { type: String, required: true },
-  domain: { type: String, required: true }
+  domain: { type: String, required: true },
+  status: { type: String, default: 'Not Attempted' }
 });
 
 module.exports = mongoose.model('PracticeProblem', practiceProblemSchema);
