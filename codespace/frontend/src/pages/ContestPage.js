@@ -8,7 +8,8 @@ import {
   CardContent,
   CardActions,
   Button,
-  Typography
+  Typography,
+  TextField
 } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
@@ -34,40 +35,71 @@ function ContestPage() {
   const [tab, setTab] = useState(0);
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
+  const [form, setForm] = useState({ name: '', startTime: '', duration: '' });
+
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const fetchContests = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/contests`);
+      if (res.ok) {
+        const data = await res.json();
+        setUpcoming(data.upcoming);
+        setPast(data.past);
+        return;
+      }
+    } catch (err) {
+      console.error('Failed to fetch contests');
+    }
+    // dummy data fallback
+    setUpcoming([
+      {
+        _id: 'sample-upcoming',
+        name: 'Sample Upcoming Contest',
+        startTime: new Date().toISOString(),
+        duration: 90
+      }
+    ]);
+    setPast([
+      {
+        _id: 'sample-past',
+        name: 'Sample Past Contest',
+        startTime: new Date(Date.now() - 86400000).toISOString(),
+        duration: 120
+      }
+    ]);
+  };
 
   useEffect(() => {
-    async function fetchContests() {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/contests`);
-        if (res.ok) {
-          const data = await res.json();
-          setUpcoming(data.upcoming);
-          setPast(data.past);
-          return;
-        }
-      } catch (err) {
-        console.error('Failed to fetch contests');
-      }
-      // dummy data fallback
-      setUpcoming([
-        {
-          _id: 'sample-upcoming',
-          name: 'Sample Upcoming Contest',
-          startTime: new Date().toISOString(),
-          duration: 90
-        }
-      ]);
-      setPast([
-        {
-          _id: 'sample-past',
-          name: 'Sample Past Contest',
-          startTime: new Date(Date.now() - 86400000).toISOString(),
-          duration: 120
-        }
-      ]);
-    }
     fetchContests();
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/contests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          startTime: new Date(form.startTime).toISOString(),
+          duration: Number(form.duration)
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setForm({ name: '', startTime: '', duration: '' });
+        fetchContests();
+        alert('Contest scheduled');
+      } else {
+        alert(data.message || 'Failed to create contest');
+      }
+    } catch (err) {
+      alert('Server error');
+    }
+  };
 
   const register = async (id) => {
     const userId = localStorage.getItem('userid');
@@ -92,6 +124,33 @@ function ContestPage() {
     <>
       <NavBar />
       <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          <TextField
+            label="Name"
+            name="name"
+            value={form.name}
+            onChange={handleInputChange}
+            required
+          />
+          <TextField
+            label="Start Time"
+            type="datetime-local"
+            name="startTime"
+            value={form.startTime}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+          <TextField
+            label="Duration (min)"
+            type="number"
+            name="duration"
+            value={form.duration}
+            onChange={handleInputChange}
+            required
+          />
+          <Button type="submit" variant="contained">Schedule</Button>
+        </Box>
         <Tabs value={tab} onChange={(e, v) => setTab(v)}>
           <Tab label="Upcoming" />
           <Tab label="Past" />
