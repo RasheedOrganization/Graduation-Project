@@ -46,6 +46,33 @@
   margin-bottom: 1.5rem;
 }
 
+.content-split {
+  display: flex;
+  gap: 2rem;
+}
+
+.resources-side,
+.problems-side {
+  flex: 1;
+}
+
+.problems-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.problems-table th,
+.problems-table td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.problems-table tr:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
 .progress-section {
   margin-top: 2rem;
 }

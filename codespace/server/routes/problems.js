@@ -40,9 +40,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, link, stage, topic, subtopic, difficulty } = req.body;
+    const { name, link, stage, topic, subtopic, difficulty, status } = req.body;
     const domain = getDomain(link);
-    const problem = new Problem({ name, link, stage, topic, subtopic, difficulty, domain });
+    const problem = new Problem({ name, link, stage, topic, subtopic, difficulty, domain, status });
     await problem.save();
 
     await Topic.updateOne(
@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { name, link, stage, topic, subtopic, difficulty } = req.body;
+    const { name, link, stage, topic, subtopic, difficulty, status } = req.body;
     const update = {};
     if (name !== undefined) update.name = name;
     if (link !== undefined) {
@@ -70,6 +70,7 @@ router.patch('/:id', async (req, res) => {
     if (topic !== undefined) update.topic = topic;
     if (subtopic !== undefined) update.subtopic = subtopic;
     if (difficulty !== undefined) update.difficulty = difficulty;
+    if (status !== undefined) update.status = status;
 
     const problem = await Problem.findByIdAndUpdate(req.params.id, update, { new: true });
 

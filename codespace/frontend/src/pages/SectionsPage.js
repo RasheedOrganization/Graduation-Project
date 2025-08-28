@@ -125,37 +125,53 @@ function SectionsPage() {
               <h2>
                 {selectedStage} / {selectedTopic} / {selectedSubtopic}
               </h2>
-              <div className="content-block">
-                <h3>Resources</h3>
-                {resources.length ? (
-                  <ul>
-                    {resources.map((r) => (
-                      <li key={r._id}>
-                        <a href={r.link} target="_blank" rel="noreferrer">
-                          {r.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No resources available.</p>
-                )}
-              </div>
-              <div className="content-block">
-                <h3>Problems</h3>
-                {problems.length ? (
-                  <ul>
-                    {problems.map((p) => (
-                      <li key={p._id}>
-                        <a href={p.link} target="_blank" rel="noreferrer">
-                          {p.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No problems available.</p>
-                )}
+              <div className="content-block content-split">
+                <div className="resources-side">
+                  <h3>Resources</h3>
+                  {resources.length ? (
+                    <ul>
+                      {resources.map((r) => (
+                        <li key={r._id}>
+                          <a href={r.link} target="_blank" rel="noreferrer">
+                            {r.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No resources available.</p>
+                  )}
+                </div>
+                <div className="problems-side">
+                  <h3>Problems</h3>
+                  {problems.length ? (
+                    <table className="problems-table">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Source Problem</th>
+                          <th>Name</th>
+                          <th>Difficulty</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {problems.map((p) => (
+                          <tr
+                            key={p._id}
+                            onClick={() => window.open(p.link, '_blank', 'noopener,noreferrer')}
+                          >
+                            <td>{p.status || 'Not Attempted'}</td>
+                            <td>{p.domain}</td>
+                            <td>{p.name}</td>
+                            <td>{p.difficulty}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p>No problems available.</p>
+                  )}
+                </div>
               </div>
               <div className="progress-section">
                 <h3>Progress</h3>
