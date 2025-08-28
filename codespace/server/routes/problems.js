@@ -19,9 +19,9 @@ const getDomain = (link) => {
 
 router.get('/', async (req, res) => {
   try {
-    const { level, topic, subtopic } = req.query;
+    const { stage, topic, subtopic } = req.query;
     const filter = {};
-    if (level) filter.level = level;
+    if (stage) filter.stage = stage;
     if (topic) filter.topic = topic;
     if (subtopic) filter.subtopic = subtopic;
     const problems = await Problem.find(filter);
@@ -40,14 +40,14 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, link, level, topic, subtopic, difficulty } = req.body;
+    const { name, link, stage, topic, subtopic, difficulty } = req.body;
     const domain = getDomain(link);
-    const problem = new Problem({ name, link, level, topic, subtopic, difficulty, domain });
+    const problem = new Problem({ name, link, stage, topic, subtopic, difficulty, domain });
     await problem.save();
 
     await Topic.updateOne(
-      { level, topic, subtopic },
-      { level, topic, subtopic },
+      { stage, topic, subtopic },
+      { stage, topic, subtopic },
       { upsert: true }
     );
 
@@ -59,24 +59,24 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { name, link, level, topic, subtopic, difficulty } = req.body;
+    const { name, link, stage, topic, subtopic, difficulty } = req.body;
     const update = {};
     if (name !== undefined) update.name = name;
     if (link !== undefined) {
       update.link = link;
       update.domain = getDomain(link);
     }
-    if (level !== undefined) update.level = level;
+    if (stage !== undefined) update.stage = stage;
     if (topic !== undefined) update.topic = topic;
     if (subtopic !== undefined) update.subtopic = subtopic;
     if (difficulty !== undefined) update.difficulty = difficulty;
 
     const problem = await Problem.findByIdAndUpdate(req.params.id, update, { new: true });
 
-    if (problem && (update.level !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
+    if (problem && (update.stage !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
       await Topic.updateOne(
-        { level: problem.level, topic: problem.topic, subtopic: problem.subtopic },
-        { level: problem.level, topic: problem.topic, subtopic: problem.subtopic },
+        { stage: problem.stage, topic: problem.topic, subtopic: problem.subtopic },
+        { stage: problem.stage, topic: problem.topic, subtopic: problem.subtopic },
         { upsert: true }
       );
     }

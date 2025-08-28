@@ -17,6 +17,8 @@ function ProblemSidebar({
   newSubtopic,
   setNewSubtopic,
   addSubtopic,
+  selectedStage,
+  handleStageChange,
   selectedTopic,
   handleTopicChange,
   selectedSubtopic,
@@ -48,17 +50,32 @@ function ProblemSidebar({
             required
           />
           <select
-            name="topic"
-            value={formData.topic}
+            name="stage"
+            value={formData.stage}
             onChange={handleFormChange}
             required
           >
-            <option value="">Select Topic</option>
-            {Object.keys(topics).map((topic) => (
-              <option key={topic} value={topic}>
-                {topic}
+            <option value="">Select Stage</option>
+            {['Bronze', 'Silver', 'Gold'].map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
+          </select>
+          <select
+            name="topic"
+            value={formData.topic}
+            onChange={handleFormChange}
+            disabled={!formData.stage}
+            required
+          >
+            <option value="">Select Topic</option>
+            {formData.stage &&
+              Object.keys(topics[formData.stage] || {}).map((topic) => (
+                <option key={topic} value={topic}>
+                  {topic}
+                </option>
+              ))}
           </select>
           <select
             name="subtopic"
@@ -68,8 +85,9 @@ function ProblemSidebar({
             required
           >
             <option value="">Select Subtopic</option>
-            {formData.topic &&
-              topics[formData.topic].map((sub) => (
+            {formData.stage &&
+              formData.topic &&
+              topics[formData.stage][formData.topic].map((sub) => (
                 <option key={sub} value={sub}>
                   {sub}
                 </option>
@@ -92,10 +110,22 @@ function ProblemSidebar({
       )}
       {showTopicForm && (
         <form className="add-topic-form" onSubmit={addTopic}>
+          <select
+            value={newTopic.stage}
+            onChange={(e) => setNewTopic((prev) => ({ ...prev, stage: e.target.value }))}
+            required
+          >
+            <option value="">Select Stage</option>
+            {['Bronze', 'Silver', 'Gold'].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
           <input
             type="text"
-            value={newTopic}
-            onChange={(e) => setNewTopic(e.target.value)}
+            value={newTopic.name}
+            onChange={(e) => setNewTopic((prev) => ({ ...prev, name: e.target.value }))}
             placeholder="Topic Name"
             required
           />
@@ -105,16 +135,30 @@ function ProblemSidebar({
       {showSubtopicForm && (
         <form className="add-subtopic-form" onSubmit={addSubtopic}>
           <select
+            value={newSubtopic.stage}
+            onChange={(e) => setNewSubtopic((prev) => ({ ...prev, stage: e.target.value, topic: '' }))}
+            required
+          >
+            <option value="">Select Stage</option>
+            {['Bronze', 'Silver', 'Gold'].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <select
             value={newSubtopic.topic}
             onChange={(e) => setNewSubtopic((prev) => ({ ...prev, topic: e.target.value }))}
+            disabled={!newSubtopic.stage}
             required
           >
             <option value="">Select Topic</option>
-            {Object.keys(topics).map((topic) => (
-              <option key={topic} value={topic}>
-                {topic}
-              </option>
-            ))}
+            {newSubtopic.stage &&
+              Object.keys(topics[newSubtopic.stage] || {}).map((topic) => (
+                <option key={topic} value={topic}>
+                  {topic}
+                </option>
+              ))}
           </select>
           <input
             type="text"
@@ -126,13 +170,22 @@ function ProblemSidebar({
           <button type="submit">Add</button>
         </form>
       )}
-      <select value={selectedTopic} onChange={handleTopicChange}>
-        <option value="">All Topics</option>
-        {Object.keys(topics).map((topic) => (
-          <option key={topic} value={topic}>
-            {topic}
+      <select value={selectedStage} onChange={handleStageChange}>
+        <option value="">All Stages</option>
+        {['Bronze', 'Silver', 'Gold'].map((s) => (
+          <option key={s} value={s}>
+            {s}
           </option>
         ))}
+      </select>
+      <select value={selectedTopic} onChange={handleTopicChange} disabled={!selectedStage}>
+        <option value="">All Topics</option>
+        {selectedStage &&
+          Object.keys(topics[selectedStage] || {}).map((topic) => (
+            <option key={topic} value={topic}>
+              {topic}
+            </option>
+          ))}
       </select>
       <select
         value={selectedSubtopic}
@@ -140,8 +193,9 @@ function ProblemSidebar({
         disabled={!selectedTopic}
       >
         <option value="">All Subtopics</option>
-        {selectedTopic &&
-          topics[selectedTopic].map((sub) => (
+        {selectedStage &&
+          selectedTopic &&
+          topics[selectedStage][selectedTopic].map((sub) => (
             <option key={sub} value={sub}>
               {sub}
             </option>

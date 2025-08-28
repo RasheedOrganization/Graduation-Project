@@ -10,20 +10,21 @@
   padding: 1rem;
 }
 
-.level-selector {
+.stages-list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
-.level-selector button {
+.stage-item button {
   padding: 0.5rem;
   border: none;
+  width: 100%;
+  text-align: left;
   cursor: pointer;
 }
 
-.level-selector .active {
+.stage-item button.active {
   background-color: #1976d2;
   color: #fff;
 }

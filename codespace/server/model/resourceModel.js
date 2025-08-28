@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const resourceSchema = new mongoose.Schema({
   name: { type: String, required: true },
   link: { type: String, required: true },
-  level: {
+  stage: {
     type: String,
     enum: ['Bronze', 'Silver', 'Gold'],
     required: true,

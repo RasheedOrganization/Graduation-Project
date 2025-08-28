@@ -9,12 +9,12 @@ mongoose.connect(url);
 
 router.get('/', async (req, res) => {
   try {
-    const { level } = req.query;
-    const filter = level ? { level } : {};
+    const { stage } = req.query;
+    const filter = stage ? { stage } : {};
     const topics = await Topic.find(filter).lean();
-    const formatted = topics.reduce((acc, { _id, level, topic, subtopic, progress }) => {
+    const formatted = topics.reduce((acc, { _id, stage, topic, subtopic, progress }) => {
       if (!acc[topic]) acc[topic] = [];
-      acc[topic].push({ _id, subtopic, progress, level });
+      acc[topic].push({ _id, subtopic, progress, stage });
       return acc;
     }, {});
     res.json(formatted);
@@ -25,13 +25,13 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { level, topic, subtopic } = req.body;
+    const { stage, topic, subtopic } = req.body;
     await Topic.updateOne(
-      { level, topic, subtopic },
-      { level, topic, subtopic },
+      { stage, topic, subtopic },
+      { stage, topic, subtopic },
       { upsert: true }
     );
-    res.status(201).json({ level, topic, subtopic });
+    res.status(201).json({ stage, topic, subtopic });
   } catch (err) {
     res.status(500).json({ error: 'Failed to save topic' });
   }
@@ -39,10 +39,10 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { progress, level, topic, subtopic } = req.body;
+    const { progress, stage, topic, subtopic } = req.body;
     const update = {};
     if (progress !== undefined) update.progress = progress;
-    if (level !== undefined) update.level = level;
+    if (stage !== undefined) update.stage = stage;
     if (topic !== undefined) update.topic = topic;
     if (subtopic !== undefined) update.subtopic = subtopic;
     const topicDoc = await Topic.findByIdAndUpdate(req.params.id, update, { new: true });

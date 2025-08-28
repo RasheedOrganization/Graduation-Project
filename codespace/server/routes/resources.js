@@ -10,9 +10,9 @@ mongoose.connect(url);
 
 router.get('/', async (req, res) => {
   try {
-    const { level, topic, subtopic } = req.query;
+    const { stage, topic, subtopic } = req.query;
     const filter = {};
-    if (level) filter.level = level;
+    if (stage) filter.stage = stage;
     if (topic) filter.topic = topic;
     if (subtopic) filter.subtopic = subtopic;
     const resources = await Resource.find(filter);
@@ -24,13 +24,13 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, link, level, topic, subtopic } = req.body;
-    const resource = new Resource({ name, link, level, topic, subtopic });
+    const { name, link, stage, topic, subtopic } = req.body;
+    const resource = new Resource({ name, link, stage, topic, subtopic });
     await resource.save();
 
     await Topic.updateOne(
-      { level, topic, subtopic },
-      { level, topic, subtopic },
+      { stage, topic, subtopic },
+      { stage, topic, subtopic },
       { upsert: true }
     );
 
@@ -42,21 +42,21 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { status, name, link, level, topic, subtopic } = req.body;
+    const { status, name, link, stage, topic, subtopic } = req.body;
     const update = {};
     if (status !== undefined) update.status = status;
     if (name !== undefined) update.name = name;
     if (link !== undefined) update.link = link;
-    if (level !== undefined) update.level = level;
+    if (stage !== undefined) update.stage = stage;
     if (topic !== undefined) update.topic = topic;
     if (subtopic !== undefined) update.subtopic = subtopic;
 
     const resource = await Resource.findByIdAndUpdate(req.params.id, update, { new: true });
 
-    if (resource && (update.level !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
+    if (resource && (update.stage !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
       await Topic.updateOne(
-        { level: resource.level, topic: resource.topic, subtopic: resource.subtopic },
-        { level: resource.level, topic: resource.topic, subtopic: resource.subtopic },
+        { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic },
+        { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic },
         { upsert: true }
       );
     }
