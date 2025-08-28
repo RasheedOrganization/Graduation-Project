@@ -97,14 +97,22 @@ function ContestPage() {
           <Tab label="Past" />
         </Tabs>
         <Box hidden={tab !== 0} sx={{ mt: 2 }}>
-          {upcoming.map((contest) => (
-            <ContestCard key={contest._id} contest={contest} onRegister={register} />
-          ))}
+          {upcoming.length > 0 ? (
+            upcoming.map((contest) => (
+              <ContestCard key={contest._id} contest={contest} onRegister={register} />
+            ))
+          ) : (
+            <Typography>No upcoming contests</Typography>
+          )}
         </Box>
         <Box hidden={tab !== 1} sx={{ mt: 2 }}>
-          {past.map((contest) => (
-            <ContestCard key={contest._id} contest={contest} />
-          ))}
+          {past.length > 0 ? (
+            past.map((contest) => (
+              <ContestCard key={contest._id} contest={contest} />
+            ))
+          ) : (
+            <Typography>No past contests</Typography>
+          )}
         </Box>
       </Box>
     </>

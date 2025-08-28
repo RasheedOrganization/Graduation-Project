@@ -47,6 +47,17 @@ The project now includes a simple contests module.
 - `/contests` – shows upcoming and past contests with registration buttons
 - `/contests/:id` – template page for a contest's problems, scoreboard and timer
 
+### Seeding example contests
+
+With the server running, seed sample data by running:
+
+```
+node codespace/server/scripts/seedContests.js
+```
+
+This script POSTs one upcoming and one past contest to `/api/contests` and
+prints the counts returned by `GET /api/contests`.
+
 ## Migrating existing S3 data
 
 If you previously stored tests in S3, you can copy them locally using the
