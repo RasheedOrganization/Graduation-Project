@@ -62,6 +62,9 @@ router.post('/:id/register', async (req, res) => {
     if (!contest) {
       return res.status(404).json({ message: 'Contest not found' });
     }
+    if (new Date(contest.startTime) <= new Date()) {
+      return res.status(400).json({ message: 'Contest already started' });
+    }
     if (contest.participants.some((id) => id.equals(userId))) {
       return res.status(400).json({ message: 'Already registered' });
     }
@@ -89,6 +92,27 @@ router.post('/:id/unregister', async (req, res) => {
     );
     await contest.save();
     res.json({ message: 'Unregistered' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add a problem to a contest
+router.post('/:id/problems', async (req, res) => {
+  const { problem } = req.body;
+  if (!problem) {
+    return res.status(400).json({ message: 'Problem is required' });
+  }
+  try {
+    const contest = await Contest.findById(req.params.id);
+    if (!contest) {
+      return res.status(404).json({ message: 'Contest not found' });
+    }
+    if (!contest.problems.includes(problem)) {
+      contest.problems.push(problem);
+      await contest.save();
+    }
+    res.json({ message: 'Problem added' });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
