@@ -10,33 +10,8 @@
   padding: 1rem;
 }
 
-.stages-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.stage-item {
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.stage-item:hover {
-  background-color: #f0f0f0;
-}
-
-.stage-item.active {
-  background-color: #1976d2;
-  color: #fff;
-}
-
-.stage-title {
-  font-weight: bold;
+.stage-select {
+  margin-bottom: 1rem;
 }
 
 .topic-item {
