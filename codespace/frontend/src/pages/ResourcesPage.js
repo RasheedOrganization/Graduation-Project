@@ -51,10 +51,12 @@ function ResourcesPage() {
         const res = await axios.get(`${BACKEND_URL}/api/topics`);
         const grouped = {};
         Object.entries(res.data).forEach(([topicName, subs]) => {
-          subs.forEach(({ stage, subtopic }) => {
-            if (!grouped[stage]) grouped[stage] = {};
-            if (!grouped[stage][topicName]) grouped[stage][topicName] = [];
-            grouped[stage][topicName].push(subtopic);
+          const stage = subs[0]?.stage;
+          if (!stage) return;
+          if (!grouped[stage]) grouped[stage] = {};
+          if (!grouped[stage][topicName]) grouped[stage][topicName] = [];
+          subs.forEach(({ subtopic }) => {
+            if (subtopic) grouped[stage][topicName].push(subtopic);
           });
         });
         setTopics(grouped);
