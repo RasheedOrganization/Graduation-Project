@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Box, Typography, Button, List, ListItem, TextField, MenuItem } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
@@ -11,6 +11,7 @@ function ContestDetailPage() {
   const [registered, setRegistered] = useState(false);
   const [problemList, setProblemList] = useState([]);
   const [selectedProblem, setSelectedProblem] = useState('');
+  const isPastContest = contest && new Date(contest.startTime) <= Date.now();
 
   useEffect(() => {
     async function fetchContest() {
@@ -149,35 +150,49 @@ function ContestDetailPage() {
               <Typography variant="h6">Problems</Typography>
               <List>
                 {contest.problems && contest.problems.length > 0 ? (
-                  contest.problems.map((p, idx) => (
-                    <ListItem key={idx}>{p}</ListItem>
-                  ))
+                  contest.problems.map((p, idx) => {
+                    const prob = problemList.find((pr) => pr.problem_name === p);
+                    return prob ? (
+                      <ListItem
+                        key={idx}
+                        component={Link}
+                        to={`/problems/${prob.id}`}
+                        sx={{ cursor: 'pointer' }}
+                      >
+                        {p}
+                      </ListItem>
+                    ) : (
+                      <ListItem key={idx}>{p}</ListItem>
+                    );
+                  })
                 ) : (
                   <ListItem>No problems available</ListItem>
                 )}
               </List>
-              <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                <TextField
-                  select
-                  label="Add Problem"
-                  value={selectedProblem}
-                  onChange={(e) => setSelectedProblem(e.target.value)}
-                  sx={{ minWidth: 200 }}
-                >
-                  {problemList.map((p) => (
-                    <MenuItem key={p.id} value={p.problem_name}>
-                      {p.problem_name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <Button
-                  variant="contained"
-                  onClick={addProblem}
-                  disabled={!selectedProblem}
-                >
-                  Add
-                </Button>
-              </Box>
+              {!isPastContest && (
+                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                  <TextField
+                    select
+                    label="Add Problem"
+                    value={selectedProblem}
+                    onChange={(e) => setSelectedProblem(e.target.value)}
+                    sx={{ minWidth: 200 }}
+                  >
+                    {problemList.map((p) => (
+                      <MenuItem key={p.id} value={p.problem_name}>
+                        {p.problem_name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <Button
+                    variant="contained"
+                    onClick={addProblem}
+                    disabled={!selectedProblem}
+                  >
+                    Add
+                  </Button>
+                </Box>
+              )}
             </Box>
 
             <Box sx={{ mt: 4 }}>

@@ -108,6 +108,9 @@ router.post('/:id/problems', async (req, res) => {
     if (!contest) {
       return res.status(404).json({ message: 'Contest not found' });
     }
+    if (new Date(contest.startTime) <= new Date()) {
+      return res.status(400).json({ message: 'Contest already started' });
+    }
     if (!contest.problems.includes(problem)) {
       contest.problems.push(problem);
       await contest.save();
