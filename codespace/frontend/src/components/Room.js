@@ -14,7 +14,7 @@ import io from 'socket.io-client';
 import SimplePeer from 'simple-peer';
 import BACKEND_URL from '../config';
 import '../styles/RoomPage.css';
-
+import leave from '../assets/images/logout_1.png'
 import styled from "styled-components";
 import CFparser from './LHS/CFparser';
 
@@ -224,7 +224,7 @@ export default function Room() {
         <div className="editor-background">
         
         <div className='room-wrapper'>
-          <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
+          <button className="leave-room-button" onClick={leaveRoom}><img src={leave} style={{width: "25px", height: "25px", textAlign: "center"}}/> </button>
           <aside className='left-sidebar'>
             <div className='members-section'>
               <IconButton variant="contained" color="primary" onClick={toggleMic}>

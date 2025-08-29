@@ -112,17 +112,19 @@
 }
 
 .leave-room-button {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
   position: absolute;
+  width: 50px;
   margin: 3px;
-  right: 10px;
-  z-index: 1000;
-  padding: 0.5rem 1rem;
-  background: #d32f2f;
-  color: #fff;
+  right: 15px;
+  z-index: 1000;  
+  background: #e35a5a;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
