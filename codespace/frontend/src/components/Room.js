@@ -6,8 +6,10 @@ import MainLHS from './LHS/MainLHS';
 import ChatBox from './ChatBox';
 import MembersList from './MembersList';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import io from 'socket.io-client';
@@ -224,7 +226,15 @@ export default function Room() {
         <div className="editor-background">
         
         <div className='room-wrapper'>
-          <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
+          <Button
+            className="leave-room-button"
+            variant="contained"
+            color="error"
+            startIcon={<MeetingRoomIcon />}
+            onClick={leaveRoom}
+          >
+            Leave Room
+          </Button>
           <aside className='left-sidebar'>
             <div className='members-section'>
               <IconButton variant="contained" color="primary" onClick={toggleMic}>
