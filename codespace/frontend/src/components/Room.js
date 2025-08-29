@@ -222,7 +222,7 @@ export default function Room() {
 
       return (
         <div className="editor-background">
-        <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
+        
         <div className='room-wrapper'>
           <aside className='left-sidebar'>
             <div className='members-section'>
@@ -238,7 +238,8 @@ export default function Room() {
             </div>
           </aside>
           <div className='room-main'>
-            <div className='problem-view'>
+            <div className='problem-view' style={{position: "relative", paddingLeft:"30px", marginTop: "40px"}}>
+              <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
               <button className='view-problem-button' onClick={openProblemForm}>
                 Fetch Problem
               </button>
