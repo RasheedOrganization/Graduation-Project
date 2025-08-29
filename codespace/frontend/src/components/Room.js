@@ -224,6 +224,7 @@ export default function Room() {
         <div className="editor-background">
         
         <div className='room-wrapper'>
+          <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
           <aside className='left-sidebar'>
             <div className='members-section'>
               <IconButton variant="contained" color="primary" onClick={toggleMic}>
@@ -239,7 +240,6 @@ export default function Room() {
           </aside>
           <div className='room-main'>
             <div className='problem-view' style={{position: "relative", paddingLeft:"30px", marginTop: "40px"}}>
-              <button className="leave-room-button" onClick={leaveRoom}>Leave Room</button>
               <button className='view-problem-button' onClick={openProblemForm}>
                 Fetch Problem
               </button>
