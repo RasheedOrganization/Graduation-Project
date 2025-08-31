@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
 
   try {
     workDir = await fs.mkdtemp(tmpBase);
-    const sourceName = language === 'python' ? 'main.py' : 'main.cpp';
+    const sourceName = language === 'python' ? 'main.py' : language === 'java' ? 'Main.java' : 'main.cpp';
     const sourcePath = path.join(workDir, sourceName);
     const inputPath = path.join(workDir, 'input.txt');
     const outputPath = path.join(workDir, 'output.txt');
@@ -44,10 +44,17 @@ router.post('/', async (req, res) => {
     await fs.writeFile(sourcePath, code, 'utf8');
     await fs.writeFile(inputPath, input || '', 'utf8');
 
-    const image = language === 'python' ? 'python:3' : 'gcc:13';
-    const runCmd = language === 'python'
-      ? 'python3 main.py < input.txt > output.txt'
-      : 'g++ main.cpp -o main && ./main < input.txt > output.txt';
+    let image, runCmd;
+    if (language === 'python') {
+      image = 'python:3';
+      runCmd = 'python3 main.py < input.txt > output.txt';
+    } else if (language === 'java') {
+      image = 'openjdk:17';
+      runCmd = 'javac Main.java && java Main < input.txt > output.txt';
+    } else {
+      image = 'gcc:13';
+      runCmd = 'g++ main.cpp -o main && ./main < input.txt > output.txt';
+    }
 
     await new Promise((resolve, reject) => {
       const docker = spawn(DOCKER_CMD, [
