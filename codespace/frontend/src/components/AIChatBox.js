@@ -6,6 +6,7 @@ export default function AIChatBox({ code }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -18,6 +19,7 @@ export default function AIChatBox({ code }) {
     if (mode !== 'normal') {
       payload.code = code;
     }
+    setLoading(true);
     try {
       const res = await fetch(`${BACKEND_URL}/api/ai/chat`, {
         method: 'POST',
@@ -34,6 +36,8 @@ export default function AIChatBox({ code }) {
       setMessage('');
     } catch (err) {
       setMessages(prev => [...prev, { self: false, text: 'Error contacting AI' }]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,6 +49,11 @@ export default function AIChatBox({ code }) {
             <span className="chat-text">{m.text}</span>
           </div>
         ))}
+        {loading && (
+          <div className="chat-message">
+            <div className="chat-spinner" />
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="chat-input">
@@ -54,9 +63,9 @@ export default function AIChatBox({ code }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button type="button" onClick={() => send('normal')}>Send</button>
-        <button type="button" onClick={() => send('fix')}>Fix</button>
-        <button type="button" onClick={() => send('explain')}>Explain</button>
+        <button type="button" onClick={() => send('normal')} disabled={loading}>Send</button>
+        <button type="button" onClick={() => send('fix')} disabled={loading}>Fix</button>
+        <button type="button" onClick={() => send('explain')} disabled={loading}>Explain</button>
       </div>
     </div>
   );
