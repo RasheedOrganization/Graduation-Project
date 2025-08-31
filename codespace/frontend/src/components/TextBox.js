@@ -3,17 +3,21 @@ import axios from 'axios';
 import '../styles/App.css';
 import CodeMirror from '@uiw/react-codemirror';
 import { cpp } from '@codemirror/lang-cpp';
+import { python } from '@codemirror/lang-python';
 import { useNavigate } from 'react-router-dom';
 import BACKEND_URL from '../config';
 
 // Replace with the URL you want to send the request to
-const apiUrl = `${BACKEND_URL}/test`; // cpp compilation docker container
+const apiUrl = `${BACKEND_URL}/test`; // compilation sandbox endpoint
 const submitUrl = `${BACKEND_URL}/submit`;
-const defaultText = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n int t;\n cin >> t;\n while(t--){\n\n }\n}";
+
+const defaultCpp = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n int t;\n cin >> t;\n while(t--){\n\n }\n}";
+const defaultPython = `import sys\n\n\ndef solve():\n    pass\n\n\ndef main():\n    t = int(sys.stdin.readline())\n    for _ in range(t):\n        solve()\n\n\nif __name__ == "__main__":\n    main()\n`;
 
 export default function TextBox({socketRef,currentProbId}) {
     console.log('I am textbox and the current problem id is ' + currentProbId);
-    const [textvalue, setTextvalue] = useState(defaultText);
+    const [language, setLanguage] = useState('cpp');
+    const [textvalue, setTextvalue] = useState(defaultCpp);
     const [inputvalue, setInputvalue] = useState('');
     const [outputvalue, setOutputvalue] = useState('');
     const [color, setColor] = useState('black');
@@ -53,6 +57,13 @@ export default function TextBox({socketRef,currentProbId}) {
         SocketEmit('update-code',val);
     }, [SocketEmit]);
 
+    function handleLanguageChange(newLang){
+        setLanguage(newLang);
+        const template = newLang === 'cpp' ? defaultCpp : defaultPython;
+        setTextvalue(template);
+        SocketEmit('update-code',template);
+    }
+
     function Handlechangeinput(e) {
         setInputvalue(e.target.value);
         const newval = e.target.value;
@@ -64,7 +75,8 @@ export default function TextBox({socketRef,currentProbId}) {
         try{
             const requestData = {
                 code: textvalue,
-                input: inputvalue
+                input: inputvalue,
+                language: language
             };
             const response = await axios.post(apiUrl, requestData);
             setOutputvalue(response.data);
@@ -79,7 +91,8 @@ export default function TextBox({socketRef,currentProbId}) {
         try{
             const requestData = {
                 code: textvalue,
-                problem_id: currentProbId
+                problem_id: currentProbId,
+                language: language
             };
             const token = localStorage.getItem('token');
             const response = await axios.post(submitUrl, requestData, {
@@ -99,10 +112,9 @@ export default function TextBox({socketRef,currentProbId}) {
     function Handlecompile(e) {
         sendcompilereq();
     }
-    
+
     function Handlesubmit(e) {
         const res = sendsubmitreq();
-        // setVerdict(res);
         console.log(res);
     }
     
@@ -110,12 +122,28 @@ export default function TextBox({socketRef,currentProbId}) {
     return (
     <div className="editor-wrapper">
         <div className="code-area">
+            <div className="language-select">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={language === 'cpp'}
+                        onChange={() => handleLanguageChange('cpp')}
+                    /> C++
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={language === 'python'}
+                        onChange={() => handleLanguageChange('python')}
+                    /> Python
+                </label>
+            </div>
             <CodeMirror
                 value={textvalue}
                 height="100%"
                 width="100%"
                 onChange={Handlechange}
-                extensions={[cpp()]}
+                extensions={[language === 'cpp' ? cpp() : python()]}
             />
         </div>
         <div className="io-wrapper">

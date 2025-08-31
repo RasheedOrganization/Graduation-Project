@@ -51,15 +51,14 @@ async function runContainer(containerOptions) {
         const container = await docker.createContainer(containerOptions);
         await container.start();
         console.log('Container started successfully.');
-
-        // Additional interactions with the container can be added here
-
-        await container.stop();
-        console.log('Container stopped.');
+        await container.wait();
+        await container.remove();
+        console.log('Container finished.');
     } catch (err) {
         console.error('Error during Docker container operation:', err);
+        throw err;
     }
-} 
+}
 
 async function submissionWorker(job) {
     console.log("Anyone homeeee?")
@@ -79,44 +78,64 @@ async function submissionWorker(job) {
     
             try {
                 // The request has a problem ID and the code
-                const { code, problemId } = job.data;
+                const { code, problemId, language = 'cpp' } = job.data;
                 // Get the test package
                 const testPackage = await getTestPackageData(problemId);
                 console.log("test package is",testPackage);
                 // Define file paths
-                const cppfilepath = path.join(folderPath, 'a.cpp');
+                const sourceName = language === 'python' ? 'a.py' : 'a.cpp';
+                const sourcefilepath = path.join(folderPath, sourceName);
                 const inputfilepath = path.join(folderPath, 'input.txt');
                 const expectedoutputpath = path.join(folderPath, 'expected_output.txt');
                 const verdictfilepath = path.join(folderPath, 'verdict.txt');
+                const outputfilepath = path.join(folderPath, 'output.txt');
                 const test_path = path.join(folderPath);
                 const { expected_output, main_tests } = testPackage;
-    
+
                 // Change files
                 await changeFile(inputfilepath, main_tests);
                 await changeFile(expectedoutputpath, expected_output);
-                await changeFile(cppfilepath, code);
+                await changeFile(sourcefilepath, code);
                 await changeFile(verdictfilepath, ''); // Create empty file
                 console.log('Files changed!');
-    
-                // Container options
-                const containerOptions = {
-                    Image: 'nubskr/compiler:1',
-                    Cmd: ['./doshit.sh'],
-                    HostConfig: {
-                        Memory: 256 * 1024 * 1024, // 256MB
-                        PidsLimit: 100, // Limit number of processes
-                        Binds: [`${test_path}:/contest/`],
-                        NetworkMode: 'none',
-                    }
-                };
-    
-                // Run container
-                await runContainer(containerOptions);
-    
-                // Read verdict data
-                const verdictData = fs.readFileSync(verdictfilepath, 'utf8');
+
+                let verdictData;
+                if (language === 'python') {
+                    const containerOptions = {
+                        Image: 'python:3',
+                        Cmd: ['bash', '-lc', 'python3 a.py < input.txt > output.txt'],
+                        HostConfig: {
+                            Memory: 256 * 1024 * 1024,
+                            PidsLimit: 100,
+                            Binds: [`${test_path}:/contest/`],
+                            NetworkMode: 'none',
+                        }
+                    };
+
+                    await runContainer({ ...containerOptions, WorkingDir: '/contest' });
+
+                    const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                    const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                    verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    await changeFile(verdictfilepath, verdictData);
+                } else {
+                    const containerOptions = {
+                        Image: 'nubskr/compiler:1',
+                        Cmd: ['./doshit.sh'],
+                        WorkingDir: '/contest',
+                        HostConfig: {
+                            Memory: 256 * 1024 * 1024, // 256MB
+                            PidsLimit: 100, // Limit number of processes
+                            Binds: [`${test_path}:/contest/`],
+                            NetworkMode: 'none',
+                        }
+                    };
+
+                    await runContainer(containerOptions);
+                    verdictData = fs.readFileSync(verdictfilepath, 'utf8');
+                }
+
                 console.log(verdictData);
-    
                 resolve(verdictData);
             } catch (err) {
                 reject(`Error: ${err.message}`);

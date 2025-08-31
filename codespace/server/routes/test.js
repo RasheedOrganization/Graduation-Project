@@ -20,7 +20,7 @@ async function isDockerAvailable() {
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { code, input } = req.body;
+  const { code, input, language = 'cpp' } = req.body;
   if (!code) {
     return res.status(400).send('Code is required.');
   }
@@ -36,12 +36,18 @@ router.post('/', async (req, res) => {
 
   try {
     workDir = await fs.mkdtemp(tmpBase);
-    const sourcePath = path.join(workDir, 'main.cpp');
+    const sourceName = language === 'python' ? 'main.py' : 'main.cpp';
+    const sourcePath = path.join(workDir, sourceName);
     const inputPath = path.join(workDir, 'input.txt');
     const outputPath = path.join(workDir, 'output.txt');
 
     await fs.writeFile(sourcePath, code, 'utf8');
     await fs.writeFile(inputPath, input || '', 'utf8');
+
+    const image = language === 'python' ? 'python:3' : 'gcc:13';
+    const runCmd = language === 'python'
+      ? 'python3 main.py < input.txt > output.txt'
+      : 'g++ main.cpp -o main && ./main < input.txt > output.txt';
 
     await new Promise((resolve, reject) => {
       const docker = spawn(DOCKER_CMD, [
@@ -49,9 +55,9 @@ router.post('/', async (req, res) => {
         '--memory', '256m', '--network', 'none',
         '-v', `${workDir}:/workspace`,
         '-w', '/workspace',
-        'gcc:13',
+        image,
         'bash', '-lc',
-        'g++ main.cpp -o main && ./main < input.txt > output.txt'
+        runCmd
       ]);
 
       let stderr = '';
