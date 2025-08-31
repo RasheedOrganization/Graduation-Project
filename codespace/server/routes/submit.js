@@ -25,12 +25,12 @@ function authenticate(req, res, next) {
 }
 
 router.post('/', authenticate, async (req, res) => {
-  const { code, problem_id } = req.body;
+  const { code, problem_id, language = 'cpp' } = req.body;
   if (!code || !problem_id) {
     return res.status(400).send('Code and problem ID are required.');
   }
 
-  const job = await submissionQueue.add('submissionProcess', { code: code, problemId: problem_id });
+  const job = await submissionQueue.add('submissionProcess', { code: code, problemId: problem_id, language });
   const verdictData = await waitforJobCompletion(submissionQueue, job);
 
   try {
@@ -39,6 +39,7 @@ router.post('/', authenticate, async (req, res) => {
       problem: problem_id,
       code,
       verdict: verdictData,
+      language,
     });
     await submission.save();
   } catch (err) {
