@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@uiw/codemirror-extensions-langs": "^4.21.20",
     "@uiw/react-codemirror": "^4.21.20",
+    "@codemirror/lang-java": "^6.0.0",
     "axios": "^1.5.1",
     "katex": "^0.16.10",
     "process": "^0.11.10",

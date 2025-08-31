@@ -4,6 +4,7 @@ import '../styles/App.css';
 import CodeMirror from '@uiw/react-codemirror';
 import { cpp } from '@codemirror/lang-cpp';
 import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
 import { useNavigate } from 'react-router-dom';
 import BACKEND_URL from '../config';
 
@@ -14,6 +15,7 @@ const submitUrl = `${BACKEND_URL}/submit`;
 const defaultCpp = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n int t;\n cin >> t;\n while(t--){\n\n }\n}";
 const defaultPython = `import sys\n\n\ndef solve():\n    pass\n\n\ndef main():\n    t = int(sys.stdin.readline())\n    for _ in range(t):\n        solve()\n\n\nif __name__ == "__main__":\n    main()\n`;
 
+const defaultJava = `import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        int t = Integer.parseInt(br.readLine());\n        while (t-- > 0) {\n            // TODO: solve\n        }\n    }\n}\n`;
 export default function TextBox({socketRef,currentProbId}) {
     console.log('I am textbox and the current problem id is ' + currentProbId);
     const [language, setLanguage] = useState('cpp');
@@ -59,7 +61,7 @@ export default function TextBox({socketRef,currentProbId}) {
 
     function handleLanguageChange(newLang){
         setLanguage(newLang);
-        const template = newLang === 'cpp' ? defaultCpp : defaultPython;
+        const template = newLang === 'cpp' ? defaultCpp : newLang === 'python' ? defaultPython : defaultJava;
         setTextvalue(template);
         SocketEmit('update-code',template);
     }
@@ -137,13 +139,26 @@ export default function TextBox({socketRef,currentProbId}) {
                         onChange={() => handleLanguageChange('python')}
                     /> Python
                 </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={language === 'java'}
+                        onChange={() => handleLanguageChange('java')}
+                    /> Java
+                </label>
             </div>
             <CodeMirror
                 value={textvalue}
                 height="100%"
                 width="100%"
                 onChange={Handlechange}
-                extensions={[language === 'cpp' ? cpp() : python()]}
+                extensions={[
+                    language === 'cpp'
+                        ? cpp()
+                        : language === 'python'
+                        ? python()
+                        : java()
+                ]}
             />
         </div>
         <div className="io-wrapper">
