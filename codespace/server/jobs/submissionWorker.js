@@ -83,7 +83,12 @@ async function submissionWorker(job) {
                 const testPackage = await getTestPackageData(problemId);
                 console.log("test package is",testPackage);
                 // Define file paths
-                const sourceName = language === 'python' ? 'a.py' : 'a.cpp';
+                const sourceName =
+                    language === 'python'
+                        ? 'a.py'
+                        : language === 'java'
+                        ? 'a.java'
+                        : 'a.cpp';
                 const sourcefilepath = path.join(folderPath, sourceName);
                 const inputfilepath = path.join(folderPath, 'input.txt');
                 const expectedoutputpath = path.join(folderPath, 'expected_output.txt');
@@ -104,6 +109,24 @@ async function submissionWorker(job) {
                     const containerOptions = {
                         Image: 'python:3',
                         Cmd: ['bash', '-lc', 'python3 a.py < input.txt > output.txt'],
+                        HostConfig: {
+                            Memory: 256 * 1024 * 1024,
+                            PidsLimit: 100,
+                            Binds: [`${test_path}:/contest/`],
+                            NetworkMode: 'none',
+                        }
+                    };
+
+                    await runContainer({ ...containerOptions, WorkingDir: '/contest' });
+
+                    const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                    const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                    verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    await changeFile(verdictfilepath, verdictData);
+                } else if (language === 'java') {
+                    const containerOptions = {
+                        Image: 'openjdk:17',
+                        Cmd: ['bash', '-lc', 'javac a.java && java a < input.txt > output.txt'],
                         HostConfig: {
                             Memory: 256 * 1024 * 1024,
                             PidsLimit: 100,
