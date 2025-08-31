@@ -47,7 +47,11 @@ input {
   flex: 3;
   border: 1px solid #ddd;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: auto;
+}
+
+.code-area .cm-editor {
+  height: 100%;
 }
 
 .io-wrapper {
