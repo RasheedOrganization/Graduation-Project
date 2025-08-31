@@ -77,6 +77,23 @@
   height: 100%;
 }
 
+.chat-tabs {
+  display: flex;
+}
+
+.chat-tab {
+  flex: 1;
+  padding: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  background: #e0e0e0;
+}
+
+.chat-tab.active {
+  background: #1976d2;
+  color: #fff;
+}
+
 .view-problem-button {
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
