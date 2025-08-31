@@ -16,7 +16,7 @@ const defaultCpp = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main()
 const defaultPython = `import sys\n\n\ndef solve():\n    pass\n\n\ndef main():\n    t = int(sys.stdin.readline())\n    for _ in range(t):\n        solve()\n\n\nif __name__ == "__main__":\n    main()\n`;
 
 const defaultJava = `import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        int t = Integer.parseInt(br.readLine());\n        while (t-- > 0) {\n            // TODO: solve\n        }\n    }\n}\n`;
-export default function TextBox({socketRef,currentProbId}) {
+export default function TextBox({socketRef,currentProbId,onCodeChange}) {
     console.log('I am textbox and the current problem id is ' + currentProbId);
     const [language, setLanguage] = useState('cpp');
     const [textvalue, setTextvalue] = useState(defaultCpp);
@@ -30,6 +30,10 @@ export default function TextBox({socketRef,currentProbId}) {
             socketRef.current.emit(channel,{code:msg});
         }
     }, [socketRef]);
+
+    useEffect(() => {
+        onCodeChange && onCodeChange(defaultCpp);
+    }, [onCodeChange]);
 
     useEffect(() => {
         if(socketRef.current){
@@ -57,13 +61,15 @@ export default function TextBox({socketRef,currentProbId}) {
     const Handlechange = useCallback((val, viewUpdate) => {
         setTextvalue(val);
         SocketEmit('update-code',val);
-    }, [SocketEmit]);
+        onCodeChange && onCodeChange(val);
+    }, [SocketEmit,onCodeChange]);
 
     function handleLanguageChange(newLang){
         setLanguage(newLang);
         const template = newLang === 'cpp' ? defaultCpp : newLang === 'python' ? defaultPython : defaultJava;
         setTextvalue(template);
         SocketEmit('update-code',template);
+        onCodeChange && onCodeChange(template);
     }
 
     function Handlechangeinput(e) {

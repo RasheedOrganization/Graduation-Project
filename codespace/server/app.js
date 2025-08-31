@@ -15,6 +15,7 @@ const resourcesRoute = require("./routes/resources");
 const topicsRoute = require("./routes/topics");
 const problemsRoute = require("./routes/problems");
 const rateLimit = require('express-rate-limit');
+const aiRoute = require("./routes/ai");
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/users', usersRoute)
 app.use('/api/resources', resourcesRoute)
 app.use('/api/topics', topicsRoute)
 app.use('/api/problems', problemsRoute)
+app.use('/api/ai', aiRoute)
 app.use('/test',test)
 app.use('/submit',submit)
 

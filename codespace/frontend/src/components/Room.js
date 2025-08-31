@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLHS from './LHS/MainLHS';
 import ChatBox from './ChatBox';
+import AIChatBox from './AIChatBox';
 import MembersList from './MembersList';
 import IconButton from '@mui/material/IconButton';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
@@ -74,6 +75,8 @@ export default function Room() {
     const [sampleInput, setSampleInput] = useState("");
     const [sampleOutput, setSampleOutput] = useState("");
     const [fetchOpen, setFetchOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('general');
+    const [code, setCode] = useState('');
     const userVideo = useRef();
     const socketRef = useRef();
     const [socket, setSocket] = useState(null);
@@ -235,7 +238,25 @@ export default function Room() {
               </div>
             </div>
             <div className='chat-section'>
-              <ChatBox socket={socket} username={username} />
+              <div className='chat-tabs'>
+                <div
+                  className={`chat-tab${activeTab === 'general' ? ' active' : ''}`}
+                  onClick={() => setActiveTab('general')}
+                >
+                  Chat
+                </div>
+                <div
+                  className={`chat-tab${activeTab === 'ai' ? ' active' : ''}`}
+                  onClick={() => setActiveTab('ai')}
+                >
+                  AI
+                </div>
+              </div>
+              {activeTab === 'general' ? (
+                <ChatBox socket={socket} username={username} />
+              ) : (
+                <AIChatBox code={code} />
+              )}
             </div>
           </aside>
           <div className='room-main'>
@@ -255,7 +276,7 @@ export default function Room() {
               )}
             </div>
             <div className='editor-container'>
-              <TextBox socketRef={socketRef} currentProbId={currentProbId} />
+              <TextBox socketRef={socketRef} currentProbId={currentProbId} onCodeChange={setCode} />
             </div>
           </div>
         </div>
