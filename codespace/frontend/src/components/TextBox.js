@@ -125,27 +125,11 @@ export default function TextBox({socketRef,currentProbId}) {
     <div className="editor-wrapper">
         <div className="code-area">
             <div className="language-select">
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={language === 'cpp'}
-                        onChange={() => handleLanguageChange('cpp')}
-                    /> C++
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={language === 'python'}
-                        onChange={() => handleLanguageChange('python')}
-                    /> Python
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={language === 'java'}
-                        onChange={() => handleLanguageChange('java')}
-                    /> Java
-                </label>
+                <select value={language} onChange={(e) => handleLanguageChange(e.target.value)}>
+                    <option value="cpp">C++</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                </select>
             </div>
             <CodeMirror
                 value={textvalue}
