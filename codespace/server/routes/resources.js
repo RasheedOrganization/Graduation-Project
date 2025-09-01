@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Resource = require('../model/resourceModel');
 const Topic = require('../model/topicModel');
+const auth = require('../middleware/authMiddleware');
+const permit = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
@@ -22,7 +24,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, permit('admin', 'superadmin'), async (req, res) => {
   try {
     const { name, link, stage, topic, subtopic } = req.body;
     const resource = new Resource({ name, link, stage, topic, subtopic });
@@ -40,7 +42,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', auth, permit('admin', 'superadmin'), async (req, res) => {
   try {
     const { status, name, link, stage, topic, subtopic } = req.body;
     const update = {};
