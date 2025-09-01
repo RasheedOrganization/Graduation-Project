@@ -11,6 +11,7 @@ import userIcon from '../assets/images/user.svg';
 
 function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function NavBar() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     setLoggedIn(!!token);
+    setRole(localStorage.getItem("role"));
   }, []);
 
   const handleMenu = (event) => {
@@ -30,6 +32,8 @@ function NavBar() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    setRole(null);
     setLoggedIn(false);
     handleClose();
     navigate('/login');
@@ -50,6 +54,7 @@ function NavBar() {
         <li><Link to="/contests">Contests</Link></li>
         <li><Link to="/rooms">Rooms</Link></li>
         <li><Link to="/contact">Contact Us</Link></li>
+        {(role === 'admin' || role === 'superadmin') && <li><Link to="/admin">Admin</Link></li>}
         {!loggedIn && <li><Link to="/login">Login</Link></li>}
         {loggedIn && (
           <li className="profile-container">
