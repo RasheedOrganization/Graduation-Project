@@ -28,6 +28,7 @@ function LoginPage() {
         const payload = JSON.parse(atob(data.token.split('.')[1]));
         localStorage.setItem('username', payload.username);
         localStorage.setItem('userid', payload.id);
+        localStorage.setItem('role', payload.role);
       } catch (e) {
         console.error('Failed to decode token');
       }
