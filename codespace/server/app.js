@@ -3,7 +3,7 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { Server } = require("socket.io");
 const cors = require('cors');
-const test = require("./routes/test")
+const codeRunner = require("./routes/codeRunner")
 const submit = require("./routes/submit")
 const api1 = require("./routes/api")
 const auth = require("./routes/auth")
@@ -49,7 +49,7 @@ app.use('/api/resources', resourcesRoute)
 app.use('/api/topics', topicsRoute)
 app.use('/api/problems', problemsRoute)
 app.use('/api/ai', aiRoute)
-app.use('/test',test)
+app.use('/test',codeRunner)
 app.use('/submit',submit)
 
 app.get('/', (req, res) => {

@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Contest = require('../model/contestModel');
+const auth = require('../middleware/authMiddleware');
+const permit = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
@@ -12,7 +14,7 @@ if (mongoose.connection.readyState === 0) {
 
 // Create a new contest (admin only - auth not implemented here)
 // TODO: add proper authentication and authorization
-router.post('/', async (req, res) => {
+router.post('/', auth, permit('admin', 'superadmin'), async (req, res) => {
   const { name, startTime, duration, problems = [] } = req.body;
   if (!name || !startTime || !duration) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -98,7 +100,7 @@ router.post('/:id/unregister', async (req, res) => {
 });
 
 // Add a problem to a contest
-router.post('/:id/problems', async (req, res) => {
+router.post('/:id/problems', auth, permit('admin', 'superadmin'), async (req, res) => {
   const { problem } = req.body;
   if (!problem) {
     return res.status(400).json({ message: 'Problem is required' });
