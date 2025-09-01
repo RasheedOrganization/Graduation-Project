@@ -33,13 +33,12 @@ const AdminPage = () => {
   }, [role, token]);
 
   const handleRoleChange = (id, newRole) => {
-    if (role !== 'superadmin') return;
-    const endpoint =
-      newRole === 'admin'
-        ? `${BACKEND_URL}/admin/users/${id}/promote`
-        : `${BACKEND_URL}/admin/users/${id}/demote`;
     axios
-      .post(endpoint, {}, { headers: { Authorization: `Bearer ${token}` } })
+      .patch(
+        `${BACKEND_URL}/admin/users/${id}`,
+        { role: newRole },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then(() => {
         setUsers((prev) =>
           prev.map((u) => (u._id === id ? { ...u, role: newRole } : u))
@@ -64,7 +63,6 @@ const AdminPage = () => {
                 <TableCell>Username</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Role</TableCell>
-                {role === 'superadmin' && <TableCell>Options</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -72,23 +70,23 @@ const AdminPage = () => {
                 <TableRow key={user._id}>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  {role === 'superadmin' && (
-                    <TableCell>
-                      {user.role === 'superadmin' ? (
-                        '—'
-                      ) : (
-                        <Select
-                          size="small"
-                          value={user.role}
-                          onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                        >
-                          <MenuItem value="user">user</MenuItem>
-                          <MenuItem value="admin">admin</MenuItem>
-                        </Select>
-                      )}
-                    </TableCell>
-                  )}
+                  <TableCell>
+                    {(role === 'admin' && user.role === 'superadmin') ? (
+                      user.role
+                    ) : (
+                      <Select
+                        size="small"
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                      >
+                        <MenuItem value="user">user</MenuItem>
+                        <MenuItem value="admin">admin</MenuItem>
+                        {role === 'superadmin' && (
+                          <MenuItem value="superadmin">superadmin</MenuItem>
+                        )}
+                      </Select>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
