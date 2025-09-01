@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import BACKEND_URL from '../config';
 import '../styles/ChatBox.css';
+import MarkdownMessage from './MarkdownMessage';
 
 export default function AIChatBox({ code }) {
   const [message, setMessage] = useState('');
@@ -46,7 +47,9 @@ export default function AIChatBox({ code }) {
       <div className="chat-messages">
         {messages.map((m, idx) => (
           <div key={idx} className={`chat-message${m.self ? ' self' : ''}`}>
-            <span className="chat-text">{m.text}</span>
+            <div className="chat-text">
+              <MarkdownMessage content={m.text} />
+            </div>
           </div>
         ))}
         {loading && (
