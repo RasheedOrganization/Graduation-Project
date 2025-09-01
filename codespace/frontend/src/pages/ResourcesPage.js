@@ -36,6 +36,8 @@ function ResourcesPage() {
   const [topics, setTopics] = useState({});
   const [newTopic, setNewTopic] = useState({ stage: '', name: '' });
   const [newSubtopic, setNewSubtopic] = useState({ stage: '', topic: '', name: '' });
+  const role = localStorage.getItem('role');
+  const isAdmin = role === 'admin' || role === 'superadmin';
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -91,6 +93,7 @@ function ResourcesPage() {
 
   const addTopic = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     const { stage, name } = newTopic;
     if (!stage || !name) return;
     try {
@@ -108,6 +111,7 @@ function ResourcesPage() {
 
   const addSubtopic = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     const { stage, topic, name } = newSubtopic;
     if (!stage || !topic || !name) return;
     try {
@@ -128,6 +132,7 @@ function ResourcesPage() {
 
   const addResource = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     try {
       const res = await axios.post(`${BACKEND_URL}/api/resources`, formData);
       setResources((prev) => [...prev, res.data]);
@@ -171,6 +176,7 @@ function ResourcesPage() {
         </div>
         <div className="resources-content">
           <ResourcesSidebar
+            isAdmin={isAdmin}
             showForm={showForm}
             setShowForm={setShowForm}
             showTopicForm={showTopicForm}
