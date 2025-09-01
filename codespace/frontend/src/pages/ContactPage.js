@@ -14,13 +14,13 @@ function ContactPage() {
         </p>
         <section className="contact-info">
           <p>
-            <strong>Email:</strong> support@example.com
+            <strong>Email:</strong> support@CodeHub.com
           </p>
           <p>
-            <strong>Phone:</strong> +1 (555) 123-4567
+            <strong>Phone:</strong> +972 599123456
           </p>
           <p>
-            <strong>Address:</strong> 1234 Code Hub Lane, Algorithm City, 56789
+            <strong>Address:</strong> Nablus, An-Najah National University
           </p>
         </section>
         <form className="contact-form">
