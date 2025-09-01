@@ -79,7 +79,9 @@ export default function ChatBox({ socket, username }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button type="submit">Send</button>
+        <div className="chat-actions">
+          <button type="submit">Send</button>
+        </div>
       </form>
     </div>
   );

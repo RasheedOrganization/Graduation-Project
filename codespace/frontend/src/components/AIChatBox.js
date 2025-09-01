@@ -66,9 +66,11 @@ export default function AIChatBox({ code }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button type="button" onClick={() => send('normal')} disabled={loading}>Send</button>
-        <button type="button" onClick={() => send('fix')} disabled={loading}>Fix</button>
-        <button type="button" onClick={() => send('explain')} disabled={loading}>Explain</button>
+        <div className="chat-actions">
+          <button type="button" onClick={() => send('normal')} disabled={loading}>Send</button>
+          <button type="button" onClick={() => send('fix')} disabled={loading}>Fix</button>
+          <button type="button" onClick={() => send('explain')} disabled={loading}>Explain</button>
+        </div>
       </div>
     </div>
   );
