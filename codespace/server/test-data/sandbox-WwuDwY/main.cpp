@@ -11,7 +11,7 @@ int fx(int n){
 }
 int main(){
  int t;
- cin >> t;
+ cin >> t; // number of test cases
  while(t--){
   int n;
    cin>>n;

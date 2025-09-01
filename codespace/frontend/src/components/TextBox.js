@@ -12,7 +12,16 @@ import BACKEND_URL from '../config';
 const apiUrl = `${BACKEND_URL}/test`; // compilation sandbox endpoint
 const submitUrl = `${BACKEND_URL}/submit`;
 
-const defaultCpp = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n int t;\n cin >> t;\n while(t--){\n\n }\n}";
+const defaultCpp = `#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int t;
+    cin >> t; // Reads the number of test cases
+    while(t--){
+
+    }
+}`;
 const defaultPython = `import sys\n\n\ndef solve():\n    pass\n\n\ndef main():\n    t = int(sys.stdin.readline())\n    for _ in range(t):\n        solve()\n\n\nif __name__ == "__main__":\n    main()\n`;
 
 const defaultJava = `import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        int t = Integer.parseInt(br.readLine());\n        while (t-- > 0) {\n            // TODO: solve\n        }\n    }\n}\n`;
