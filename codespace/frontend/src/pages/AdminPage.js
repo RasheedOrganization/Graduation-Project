@@ -24,7 +24,7 @@ const AdminPage = () => {
   useEffect(() => {
     if (role === 'admin' || role === 'superadmin') {
       axios
-        .get(`${BACKEND_URL}/admin/users`, {
+        .get(`${BACKEND_URL}/api/admin/users`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then((res) => setUsers(res.data))
@@ -35,7 +35,7 @@ const AdminPage = () => {
   const handleRoleChange = (id, newRole) => {
     axios
       .patch(
-        `${BACKEND_URL}/admin/users/${id}`,
+        `${BACKEND_URL}/api/admin/users/${id}`,
         { role: newRole },
         { headers: { Authorization: `Bearer ${token}` } }
       )
