@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post('/chat', async (req, res) => {
   const { prompt = '', code = '', mode = 'normal' } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = "AIzaSyCxEUSKz296qV7qCFgNvRe_7jYMe9Y8LyI"
   if (!apiKey) {
     return res.status(500).json({ error: 'Missing GEMINI_API_KEY' });
   }
