@@ -61,6 +61,33 @@
   white-space: pre-wrap;
 }
 
+.chat-text pre {
+  background: #f0f0f0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.code-block {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  background: #e0e0e0;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: #d5d5d5;
+}
+
 .chat-spinner {
   width: 24px;
   height: 24px;

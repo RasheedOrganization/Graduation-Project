@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Markdown Rendering
+
+AI chat messages are rendered with [react-markdown](https://github.com/remarkjs/react-markdown) and GitHub Flavored Markdown via `remark-gfm`.
+Content is sanitized using `dompurify` and `rehype-sanitize` before being injected into the DOM.
+Code blocks are highlighted with `react-syntax-highlighter` and include a copy button.
+Links open in a new tab with `rel="noopener noreferrer"` for safety.
+
 ## Available Scripts
 
 In the project directory, you can run:

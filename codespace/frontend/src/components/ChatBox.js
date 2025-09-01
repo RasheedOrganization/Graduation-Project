@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/ChatBox.css';
+import MarkdownMessage from './MarkdownMessage';
 
 export default function ChatBox({ socket, username }) {
   const [message, setMessage] = useState('');
@@ -63,7 +64,9 @@ export default function ChatBox({ socket, username }) {
                   <span className="chat-user">{m.username}:</span>
                 </>
               )}
-              <span className="chat-text">{m.msg}</span>
+              <div className="chat-text">
+                <MarkdownMessage content={m.msg} />
+              </div>
             </div>
           );
         })}
