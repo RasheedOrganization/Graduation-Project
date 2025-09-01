@@ -2,7 +2,6 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
-import DOMPurify from 'dompurify';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -50,7 +49,6 @@ function Code({ inline, className, children, ...props }) {
 }
 
 export function renderMarkdownToSafeHtml(markdown) {
-  const clean = DOMPurify.sanitize(markdown);
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -62,7 +60,7 @@ export function renderMarkdownToSafeHtml(markdown) {
         code: Code
       }}
     >
-      {clean}
+      {markdown}
     </ReactMarkdown>
   );
 }
