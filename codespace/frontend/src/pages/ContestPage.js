@@ -40,6 +40,8 @@ function ContestPage() {
   const [past, setPast] = useState([]);
   const [form, setForm] = useState({ name: '', startTime: '', duration: '' });
   const userId = localStorage.getItem('userid');
+  const role = localStorage.getItem('role');
+  const isAdmin = role === 'admin' || role === 'superadmin';
 
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -82,6 +84,7 @@ function ContestPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAdmin) return;
     try {
       const res = await fetch(`${BACKEND_URL}/api/contests`, {
         method: 'POST',
@@ -134,33 +137,35 @@ function ContestPage() {
     <>
       <NavBar />
       <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, mb: 3 }}>
-          <TextField
-            label="Name"
-            name="name"
-            value={form.name}
-            onChange={handleInputChange}
-            required
-          />
-          <TextField
-            label="Start Time"
-            type="datetime-local"
-            name="startTime"
-            value={form.startTime}
-            onChange={handleInputChange}
-            InputLabelProps={{ shrink: true }}
-            required
-          />
-          <TextField
-            label="Duration (min)"
-            type="number"
-            name="duration"
-            value={form.duration}
-            onChange={handleInputChange}
-            required
-          />
-          <Button type="submit" variant="contained">Schedule</Button>
-        </Box>
+        {isAdmin && (
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            <TextField
+              label="Name"
+              name="name"
+              value={form.name}
+              onChange={handleInputChange}
+              required
+            />
+            <TextField
+              label="Start Time"
+              type="datetime-local"
+              name="startTime"
+              value={form.startTime}
+              onChange={handleInputChange}
+              InputLabelProps={{ shrink: true }}
+              required
+            />
+            <TextField
+              label="Duration (min)"
+              type="number"
+              name="duration"
+              value={form.duration}
+              onChange={handleInputChange}
+              required
+            />
+            <Button type="submit" variant="contained">Schedule</Button>
+          </Box>
+        )}
         <Tabs value={tab} onChange={(e, v) => setTab(v)}>
           <Tab label="Upcoming" />
           <Tab label="Past" />

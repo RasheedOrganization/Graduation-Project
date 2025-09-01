@@ -12,6 +12,8 @@ function ContestDetailPage() {
   const [problemList, setProblemList] = useState([]);
   const [selectedProblem, setSelectedProblem] = useState('');
   const isPastContest = contest && new Date(contest.startTime) <= Date.now();
+  const role = localStorage.getItem('role');
+  const isAdmin = role === 'admin' || role === 'superadmin';
 
   useEffect(() => {
     async function fetchContest() {
@@ -112,6 +114,7 @@ function ContestDetailPage() {
   };
 
   const addProblem = async () => {
+    if (!isAdmin) return;
     try {
       const res = await fetch(`${BACKEND_URL}/api/contests/${id}/problems`, {
         method: 'POST',
@@ -169,7 +172,7 @@ function ContestDetailPage() {
                   <ListItem>No problems available</ListItem>
                 )}
               </List>
-              {!isPastContest && (
+              {!isPastContest && isAdmin && (
                 <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                   <TextField
                     select
