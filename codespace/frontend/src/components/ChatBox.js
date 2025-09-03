@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/ChatBox.css';
 import MarkdownMessage from './MarkdownMessage';
+import userIcon from '../assets/images/user.svg';
 
 export default function ChatBox({ socket, username }) {
   const [message, setMessage] = useState('');
@@ -52,21 +53,27 @@ export default function ChatBox({ socket, username }) {
         {messages.map((m, idx) => {
           const self = m.username === username;
           return (
-            <div
-              key={idx}
-              className={`chat-message${self ? ' self' : ''}`}
-            >
+            <div key={idx} className={`chat-row${self ? ' self' : ''}`}>
               {!self && (
-                <>
-                  <span className="chat-emoji" role="img" aria-label="user">
-                    🙂
-                  </span>
-                  <span className="chat-user">{m.username}:</span>
-                </>
+                <img
+                  src={userIcon}
+                  alt={`${m.username} avatar`}
+                  className="chat-avatar"
+                />
               )}
-              <div className="chat-text">
-                <MarkdownMessage content={m.msg} />
+              <div className="chat-message">
+                {!self && <span className="chat-user">{m.username}</span>}
+                <div className="chat-text">
+                  <MarkdownMessage content={m.msg} />
+                </div>
               </div>
+              {self && (
+                <img
+                  src={userIcon}
+                  alt="Your avatar"
+                  className="chat-avatar"
+                />
+              )}
             </div>
           );
         })}

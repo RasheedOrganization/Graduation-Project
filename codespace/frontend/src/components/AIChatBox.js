@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/ChatBox.css';
 import MarkdownMessage from './MarkdownMessage';
+import userIcon from '../assets/images/user.svg';
+import botIcon from '../assets/images/ai-bot.svg';
 
 export default function AIChatBox({ code, socketRef, username }) {
   const [message, setMessage] = useState('');
@@ -13,15 +15,28 @@ export default function AIChatBox({ code, socketRef, username }) {
     const handleHistory = (history) => {
       setMessages(history.map(m => ({
         self: m.type === 'user' ? m.username === username : false,
-        text: m.text
+        text: m.text,
+        sender: m.type === 'user' ? 'user' : 'bot',
+        username: m.username,
       })));
     };
     const handleUser = (payload) => {
-      setMessages(prev => [...prev, { self: payload.username === username, text: payload.text }]);
+      setMessages(prev => [
+        ...prev,
+        {
+          self: payload.username === username,
+          text: payload.text,
+          sender: 'user',
+          username: payload.username,
+        },
+      ]);
     };
     const handleBot = (payload) => {
       setLoading(false);
-      setMessages(prev => [...prev, { self: false, text: payload.text }]);
+      setMessages(prev => [
+        ...prev,
+        { self: false, text: payload.text, sender: 'bot' },
+      ]);
     };
     socketRef.current.on('ai-chat-history', handleHistory);
     socketRef.current.on('ai-user-message', handleUser);
@@ -51,15 +66,36 @@ export default function AIChatBox({ code, socketRef, username }) {
     <div className="chat-container">
       <div className="chat-messages">
         {messages.map((m, idx) => (
-          <div key={idx} className={`chat-message${m.self ? ' self' : ''}`}>
-            <div className="chat-text">
-              <MarkdownMessage content={m.text} />
+          <div key={idx} className={`chat-row${m.self ? ' self' : ''}`}>
+            {!m.self && (
+              <img
+                src={m.sender === 'bot' ? botIcon : userIcon}
+                alt={m.sender === 'bot' ? 'AI bot avatar' : `${m.username} avatar`}
+                className="chat-avatar"
+              />
+            )}
+            <div className="chat-message">
+              {m.sender === 'user' && !m.self && (
+                <span className="chat-user">{m.username}</span>
+              )}
+              <div className="chat-text">
+                <MarkdownMessage content={m.text} />
+              </div>
             </div>
+            {m.self && (
+              <img
+                src={userIcon}
+                alt="Your avatar"
+                className="chat-avatar"
+              />
+            )}
           </div>
         ))}
         {loading && (
-          <div className="chat-message">
-            <div className="chat-spinner" />
+          <div className="chat-row">
+            <div className="chat-message">
+              <div className="chat-spinner" />
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
