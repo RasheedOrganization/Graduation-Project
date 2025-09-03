@@ -270,16 +270,22 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
             />
         </div>
         <div className="io-wrapper">
-            <div className="input-area">
-                <textarea
-                    id="input"
-                    value={inputvalue}
-                    onChange={Handlechangeinput}
-                    placeholder="Enter input here"
-                ></textarea>
+            <div className="io-section">
+                <div className="io-title">Input</div>
+                <div className="input-area">
+                    <textarea
+                        id="input"
+                        value={inputvalue}
+                        onChange={Handlechangeinput}
+                        placeholder="Enter input here"
+                    ></textarea>
+                </div>
             </div>
-            <div className="output-area" style={{ color }}>
-                Output: {String(outputvalue)}
+            <div className="io-section">
+                <div className="io-title">Output</div>
+                <pre className="output-area" style={{ color }}>
+{String(outputvalue)}
+                </pre>
             </div>
             <div className="action-buttons">
                 <button onClick={Handlecompile}>Compile</button>
