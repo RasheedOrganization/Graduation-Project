@@ -25,11 +25,11 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
     const [color, setColor] = useState('black');
     const navigate = useNavigate();
 
-    const SocketEmit = useCallback((channel,msg) => {
+    const SocketEmit = useCallback((channel,payload) => {
         if(socketRef.current){
-            socketRef.current.emit(channel,{code:msg});
+            socketRef.current.emit(channel,payload);
         }
-    }, [socketRef]);
+    }, [socketRef.current]);
 
     useEffect(() => {
         onCodeChange && onCodeChange(defaultCpp);
@@ -44,6 +44,32 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
         socketRef.current.on('receive-code-update', handleCodeUpdate);
         return () => {
             socketRef.current.off('receive-code-update', handleCodeUpdate);
+        };
+    }, [socketRef.current, onCodeChange]);
+
+    useEffect(() => {
+        if (!socketRef.current) return;
+        const handleInputUpdate = (payload) => {
+            setInputvalue(payload.input);
+        };
+        socketRef.current.on('receive-input-update', handleInputUpdate);
+        return () => {
+            socketRef.current.off('receive-input-update', handleInputUpdate);
+        };
+    }, [socketRef]);
+
+    useEffect(() => {
+        if (!socketRef.current) return;
+        const handleLanguageUpdate = (payload) => {
+            const newLang = payload.language;
+            setLanguage(newLang);
+            const template = newLang === 'cpp' ? defaultCpp : newLang === 'python' ? defaultPython : defaultJava;
+            setTextvalue(template);
+            onCodeChange && onCodeChange(template);
+        };
+        socketRef.current.on('receive-language-update', handleLanguageUpdate);
+        return () => {
+            socketRef.current.off('receive-language-update', handleLanguageUpdate);
         };
     }, [socketRef.current, onCodeChange]);
 
@@ -64,7 +90,7 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
 
     const Handlechange = useCallback((val, viewUpdate) => {
         setTextvalue(val);
-        SocketEmit('update-code',val);
+        SocketEmit('update-code',{code: val});
         onCodeChange && onCodeChange(val);
     }, [SocketEmit,onCodeChange]);
 
@@ -72,14 +98,15 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
         setLanguage(newLang);
         const template = newLang === 'cpp' ? defaultCpp : newLang === 'python' ? defaultPython : defaultJava;
         setTextvalue(template);
-        SocketEmit('update-code',template);
+        SocketEmit('update-code',{code: template});
+        SocketEmit('update-language',{language: newLang});
         onCodeChange && onCodeChange(template);
     }
 
     function Handlechangeinput(e) {
         setInputvalue(e.target.value);
         const newval = e.target.value;
-        SocketEmit('update-input',newval);
+        SocketEmit('update-input',{input: newval});
     }
 
     async function sendcompilereq(){

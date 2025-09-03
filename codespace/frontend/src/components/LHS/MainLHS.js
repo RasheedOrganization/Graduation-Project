@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import Samples from './Samples';
 
-export default function MainLHS({socketRef, externalInput = "", externalSampleInput = "", externalSampleOutput = ""}) {
+export default function MainLHS({ externalInput = "", externalSampleInput = "", externalSampleOutput = "" }) {
   const [text, setText] = useState("");
   const [input, setInput] = useState(externalInput); // current raw statement
   const [sampleInput,setSampleInput] = useState(externalSampleInput);
@@ -48,20 +48,6 @@ export default function MainLHS({socketRef, externalInput = "", externalSampleIn
 }
 
   
-  const SocketEmit = useCallback((channel,msg) => {
-    if(socketRef.current){
-      socketRef.current.emit(channel,{statement:msg});
-    }
-  }, [socketRef]);
-
-  useEffect(() => {
-    if(socketRef.current){
-        socketRef.current.on('receive-problem-statement', (payload) => {
-          setInput(payload.statement);
-        });
-    }
-  },[socketRef]);
-
   useEffect(() => { setInput(externalInput); }, [externalInput]);
   useEffect(() => { setSampleInput(externalSampleInput); }, [externalSampleInput]);
   useEffect(() => { setSampleOutput(externalSampleOutput); }, [externalSampleOutput]);
@@ -69,8 +55,7 @@ export default function MainLHS({socketRef, externalInput = "", externalSampleIn
   useEffect(() => {
     console.log("input is " + input);
     setText(renderTextWithKaTeX(input));
-    SocketEmit('update-problem-statement',input);
-  },[input, SocketEmit]);
+  },[input]);
 
   return (
     <div>

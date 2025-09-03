@@ -183,6 +183,13 @@ export default function Room() {
         setMembers((prev) => prev.map(m => m.userid === payload.userid ? { ...m, micOn: payload.micOn } : m));
       });
 
+      socketRef.current.on('problem-fetched', (payload) => {
+        setProblemStatement(payload.statement);
+        setSampleInput(payload.sampleInput);
+        setSampleOutput(payload.sampleOutput);
+        setShowProblem(true);
+      });
+
       socketRef.current.emit('join room', { roomid: roomid, userid: userid, username: username });
       socketRef.current.emit('get-users-in-room');
 
@@ -265,8 +272,7 @@ export default function Room() {
                 Fetch Problem
               </button>
               {showProblem && (
-                <MainLHS
-                  socketRef={socketRef}
+            <MainLHS
                   currentProbId={currentProbId}
                   setCurrentProb={setCurrentProb}
                   externalInput={problemStatement}
@@ -283,6 +289,7 @@ export default function Room() {
         <Modal open={fetchOpen} onClose={() => setFetchOpen(false)}>
           <Box sx={modalStyle}>
             <CFparser
+              socketRef={socketRef}
               setStatement={(stmt) => { setProblemStatement(stmt); }}
               setProblemName={() => {}}
               setSampleInput={setSampleInput}
