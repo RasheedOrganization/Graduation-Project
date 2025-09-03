@@ -71,7 +71,7 @@ const roomState = {};
 
 function getRoomState(roomid){
   if(!roomState[roomid]){
-    roomState[roomid] = { code: '', statement: '', aiChat: [] };
+    roomState[roomid] = { code: '', statement: '', aiChat: [], language: 'cpp', input: '', sampleInput: '', sampleOutput: '' };
   }
   return roomState[roomid];
 }
@@ -121,7 +121,13 @@ io.on('connection', (socket) => {
             socket.emit('receive-code-update',{code: state.code});
         }
         if(state.statement){
-            socket.emit('receive-problem-statement',{statement: state.statement});
+            socket.emit('problem-fetched',{statement: state.statement, sampleInput: state.sampleInput, sampleOutput: state.sampleOutput});
+        }
+        if(state.language){
+            socket.emit('receive-language-update',{language: state.language});
+        }
+        if(state.input){
+            socket.emit('receive-input-update',{input: state.input});
         }
         if(state.aiChat.length){
             socket.emit('ai-chat-history', state.aiChat);
@@ -135,10 +141,24 @@ io.on('connection', (socket) => {
         socket.to(socket.roomid).emit('receive-code-update', { code: payload.code });
     });
 
-    socket.on('update-problem-statement', (payload) => {
+    socket.on('update-input', (payload) => {
+        const state = getRoomState(socket.roomid);
+        state.input = payload.input;
+        socket.to(socket.roomid).emit('receive-input-update',{input: payload.input});
+    });
+
+    socket.on('update-language', (payload) => {
+        const state = getRoomState(socket.roomid);
+        state.language = payload.language;
+        socket.to(socket.roomid).emit('receive-language-update',{language: payload.language});
+    });
+
+    socket.on('problem-fetched', (payload) => {
         const state = getRoomState(socket.roomid);
         state.statement = payload.statement;
-        io.to(socket.roomid).emit('receive-problem-statement',{statement: payload.statement});
+        state.sampleInput = payload.sampleInput;
+        state.sampleOutput = payload.sampleOutput;
+        socket.to(socket.roomid).emit('problem-fetched', payload);
     });
 
     socket.on('send-message', async (payload) => {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import BACKEND_URL from '../../config';
 
 // optional callback `onFetched` is triggered after a successful fetch
-const CFparser = ({setStatement, setProblemName, setSampleInput, setSampleOutput, setInput, onFetched}) => {
+const CFparser = ({setStatement, setProblemName, setSampleInput, setSampleOutput, setInput, onFetched, socketRef}) => {
   const [param, setparam] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -73,10 +73,17 @@ const CFparser = ({setStatement, setProblemName, setSampleInput, setSampleOutput
       new_statement += "<h3><strong>Output format</strong></h3>\n"
       new_statement += await sanitize(stuff.output_format);
       new_statement += '\n ';
-      setStatement(new_statement); 
+      setStatement(new_statement);
       setInput(new_statement);
       setSampleInput(stuff.sample_input);
       setSampleOutput(stuff.sample_outputs);
+      if (socketRef && socketRef.current) {
+        socketRef.current.emit('problem-fetched', {
+          statement: new_statement,
+          sampleInput: stuff.sample_input,
+          sampleOutput: stuff.sample_outputs
+        });
+      }
     }
  
   }
