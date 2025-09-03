@@ -44,18 +44,43 @@ router.post('/', async (req, res) => {
     await fs.writeFile(sourcePath, code, 'utf8');
     await fs.writeFile(inputPath, input || '', 'utf8');
 
-    let image, runCmd;
+    let image, compileCmd, runCmd;
     if (language === 'python') {
       image = 'python:3';
+      compileCmd = 'python3 -m py_compile main.py';
       runCmd = 'python3 main.py < input.txt > output.txt';
     } else if (language === 'java') {
       image = 'openjdk:17';
-      runCmd = 'javac Main.java && java Main < input.txt > output.txt';
+      compileCmd = 'javac Main.java';
+      runCmd = 'java Main < input.txt > output.txt';
     } else {
       image = 'gcc:13';
-      runCmd = 'g++ main.cpp -o main && ./main < input.txt > output.txt';
+      compileCmd = 'g++ main.cpp -o main';
+      runCmd = './main < input.txt > output.txt';
     }
 
+    // Compile step
+    await new Promise((resolve, reject) => {
+      const docker = spawn(DOCKER_CMD, [
+        'run', '--rm',
+        '--memory', '256m', '--network', 'none',
+        '-v', `${workDir}:/workspace`,
+        '-w', '/workspace',
+        image,
+        'bash', '-lc',
+        compileCmd
+      ]);
+
+      let stderr = '';
+      docker.stderr.on('data', d => (stderr += d.toString()));
+      docker.on('error', err => reject({ type: 'compile', stderr: err.message }));
+      docker.on('close', code => {
+        if (code !== 0) reject({ type: 'compile', stderr });
+        else resolve();
+      });
+    });
+
+    // Run step
     await new Promise((resolve, reject) => {
       const docker = spawn(DOCKER_CMD, [
         'run', '--rm',
@@ -69,9 +94,9 @@ router.post('/', async (req, res) => {
 
       let stderr = '';
       docker.stderr.on('data', d => (stderr += d.toString()));
-      docker.on('error', err => reject(err));
+      docker.on('error', err => reject({ type: 'runtime', stderr: err.message }));
       docker.on('close', code => {
-        if (code !== 0) reject({ code, stderr });
+        if (code !== 0) reject({ type: 'runtime', stderr });
         else resolve();
       });
     });
@@ -82,6 +107,8 @@ router.post('/', async (req, res) => {
     console.error('Error during code execution:', err);
     if (err.code === 'ENOENT') {
       res.status(500).send('Docker is not installed or not in PATH');
+    } else if (err.type === 'compile') {
+      res.status(400).send('Compilation Error');
     } else if (err.stderr) {
       res.status(400).send(err.stderr);
     } else {

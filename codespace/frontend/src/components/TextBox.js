@@ -147,20 +147,6 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
     }, [socketRef.current, userid]);
 
 
-    useEffect(() => {
-        // Ensure outputvalue is treated as a string before any string operations
-        const outputStr = String(outputvalue);
-        console.log(`outputvalue changed to ${outputStr}`);
-
-        if(outputStr === "Submitting.." || outputStr === ""){
-            setColor('black');
-        }
-        else{
-            setColor(outputStr.trim()==="Accepted" ? 'green' : 'red');
-        }
-      }, [outputvalue]);
-
-
     const Handlechange = useCallback((val, viewUpdate) => {
         setTextvalue(val);
         SocketEmit('update-code',{code: val});
@@ -202,6 +188,7 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
 
     async function sendcompilereq(){
         setOutputvalue("Submitting..");
+        setColor('black');
         try{
             const requestData = {
                 code: textvalue,
@@ -210,14 +197,18 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
             };
             const response = await axios.post(apiUrl, requestData);
             setOutputvalue(response.data);
+            setColor('black');
         }
         catch(error){
-            setOutputvalue(error.message);
+            const errMsg = error.response?.data || error.message;
+            setOutputvalue(errMsg);
+            setColor('red');
         }
     }
 
     async function sendsubmitreq(){
         setOutputvalue("Submitting..");
+        setColor('black');
         try{
             const requestData = {
                 code: textvalue,
@@ -229,13 +220,16 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setOutputvalue(response.data);
+            setColor(response.data.trim()==="Accepted" ? 'green' : 'red');
         }
         catch(error){
             if (error.response && error.response.status === 401) {
                 navigate('/login');
                 return;
             }
-            setOutputvalue(error.message);
+            const errMsg = error.response?.data || error.message;
+            setOutputvalue(errMsg);
+            setColor('red');
         }
     }
 
