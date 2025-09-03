@@ -104,7 +104,7 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
         return () => {
             socketRef.current.off('receive-input-update', handleInputUpdate);
         };
-    }, [socketRef]);
+    }, [socketRef.current]);
 
     useEffect(() => {
         if (!socketRef.current) return;
@@ -144,7 +144,7 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
             socketRef.current.off('receive-cursor-update', handleCursor);
             socketRef.current.off('users-in-room', handleUsers);
         };
-    }, [socketRef, userid]);
+    }, [socketRef.current, userid]);
 
 
     useEffect(() => {
