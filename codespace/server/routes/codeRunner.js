@@ -8,6 +8,9 @@ const execAsync = util.promisify(exec);
 // Allow overriding the docker binary via environment variable
 const DOCKER_CMD = process.env.DOCKER_CMD || 'docker';
 
+// Time limit for running user code (in seconds)
+const TIME_LIMIT = parseInt(process.env.TIME_LIMIT_SECONDS, 10) || 5;
+
 async function isDockerAvailable() {
   try {
     await execAsync(`${DOCKER_CMD} --version`);
@@ -48,15 +51,15 @@ router.post('/', async (req, res) => {
     if (language === 'python') {
       image = 'python:3';
       compileCmd = 'python3 -m py_compile main.py';
-      runCmd = 'python3 main.py < input.txt > output.txt';
+      runCmd = `timeout ${TIME_LIMIT}s python3 main.py < input.txt > output.txt`;
     } else if (language === 'java') {
       image = 'openjdk:17';
       compileCmd = 'javac Main.java';
-      runCmd = 'java Main < input.txt > output.txt';
+      runCmd = `timeout ${TIME_LIMIT}s java Main < input.txt > output.txt`;
     } else {
       image = 'gcc:13';
       compileCmd = 'g++ main.cpp -o main';
-      runCmd = './main < input.txt > output.txt';
+      runCmd = `timeout ${TIME_LIMIT}s ./main < input.txt > output.txt`;
     }
 
     // Compile step
@@ -96,7 +99,8 @@ router.post('/', async (req, res) => {
       docker.stderr.on('data', d => (stderr += d.toString()));
       docker.on('error', err => reject({ type: 'runtime', stderr: err.message }));
       docker.on('close', code => {
-        if (code !== 0) reject({ type: 'runtime', stderr });
+        if (code === 124) reject({ type: 'timeout' });
+        else if (code !== 0) reject({ type: 'runtime', stderr });
         else resolve();
       });
     });
@@ -109,6 +113,8 @@ router.post('/', async (req, res) => {
       res.status(500).send('Docker is not installed or not in PATH');
     } else if (err.type === 'compile') {
       res.status(400).send('Compilation Error');
+    } else if (err.type === 'timeout') {
+      res.status(400).send('Time Limit Exceeded');
     } else if (err.stderr) {
       res.status(400).send(err.stderr);
     } else {

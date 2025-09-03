@@ -61,6 +61,18 @@ input {
   gap: 0.75rem;
 }
 
+.io-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.io-title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
 .input-area {
   flex: 1;
   overflow: auto;
@@ -84,6 +96,7 @@ input {
   border-radius: 8px;
   background: #ffffff;
   overflow: auto;
+  white-space: pre-wrap;
 }
 
 .action-buttons {

@@ -5,6 +5,9 @@ const path = require('path');
 const Docker = require('dockerode');
 const docker = new Docker();
 
+// Time limit for running user code (in seconds)
+const TIME_LIMIT = parseInt(process.env.TIME_LIMIT_SECONDS, 10) || 5;
+
 // Allow configuration of the Redis connection while providing sensible defaults
 const { hostname: redisHost, port: redisPort } = new URL(process.env.REDIS_URL || 'redis://localhost:6379');
 const connectionOptions = {
@@ -51,9 +54,10 @@ async function runContainer(containerOptions) {
         const container = await docker.createContainer(containerOptions);
         await container.start();
         console.log('Container started successfully.');
-        await container.wait();
+        const { StatusCode } = await container.wait();
         await container.remove();
         console.log('Container finished.');
+        return StatusCode;
     } catch (err) {
         console.error('Error during Docker container operation:', err);
         throw err;
@@ -108,7 +112,7 @@ async function submissionWorker(job) {
                 if (language === 'python') {
                     const containerOptions = {
                         Image: 'python:3',
-                        Cmd: ['bash', '-lc', 'python3 a.py < input.txt > output.txt'],
+                        Cmd: ['bash', '-lc', `timeout ${TIME_LIMIT}s python3 a.py < input.txt > output.txt`],
                         HostConfig: {
                             Memory: 256 * 1024 * 1024,
                             PidsLimit: 100,
@@ -117,16 +121,22 @@ async function submissionWorker(job) {
                         }
                     };
 
-                    await runContainer({ ...containerOptions, WorkingDir: '/contest' });
+                    const exitCode = await runContainer({ ...containerOptions, WorkingDir: '/contest' });
 
-                    const userOutput = fs.readFileSync(outputfilepath, 'utf8');
-                    const expected = fs.readFileSync(expectedoutputpath, 'utf8');
-                    verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    if (exitCode === 124) {
+                        verdictData = 'Time Limit Exceeded';
+                    } else if (exitCode !== 0) {
+                        verdictData = 'Runtime Error';
+                    } else {
+                        const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                        const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                        verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    }
                     await changeFile(verdictfilepath, verdictData);
                 } else if (language === 'java') {
                     const containerOptions = {
                         Image: 'openjdk:17',
-                        Cmd: ['bash', '-lc', 'javac a.java && java a < input.txt > output.txt'],
+                        Cmd: ['bash', '-lc', `javac a.java && timeout ${TIME_LIMIT}s java a < input.txt > output.txt`],
                         HostConfig: {
                             Memory: 256 * 1024 * 1024,
                             PidsLimit: 100,
@@ -135,11 +145,17 @@ async function submissionWorker(job) {
                         }
                     };
 
-                    await runContainer({ ...containerOptions, WorkingDir: '/contest' });
+                    const exitCode = await runContainer({ ...containerOptions, WorkingDir: '/contest' });
 
-                    const userOutput = fs.readFileSync(outputfilepath, 'utf8');
-                    const expected = fs.readFileSync(expectedoutputpath, 'utf8');
-                    verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    if (exitCode === 124) {
+                        verdictData = 'Time Limit Exceeded';
+                    } else if (exitCode !== 0) {
+                        verdictData = 'Runtime Error';
+                    } else {
+                        const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                        const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                        verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    }
                     await changeFile(verdictfilepath, verdictData);
                 } else {
                     const containerOptions = {
