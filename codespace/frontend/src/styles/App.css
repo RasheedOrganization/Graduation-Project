@@ -59,12 +59,16 @@ input {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  /* Allow children to shrink so scrollbars can appear */
+  min-height: 0;
 }
 
 .io-section {
   flex: 1;
   display: flex;
   flex-direction: column;
+  /* Needed for proper scrolling of child areas */
+  min-height: 0;
 }
 
 .io-title {

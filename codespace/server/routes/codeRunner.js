@@ -78,8 +78,14 @@ router.post('/', async (req, res) => {
       docker.stderr.on('data', d => (stderr += d.toString()));
       docker.on('error', err => reject({ type: 'compile', stderr: err.message }));
       docker.on('close', code => {
-        if (code !== 0) reject({ type: 'compile', stderr });
-        else resolve();
+        if (code === 137) {
+          // Process killed due to memory limit
+          reject({ type: 'memory' });
+        } else if (code !== 0) {
+          reject({ type: 'compile', stderr });
+        } else {
+          resolve();
+        }
       });
     });
 
@@ -99,9 +105,16 @@ router.post('/', async (req, res) => {
       docker.stderr.on('data', d => (stderr += d.toString()));
       docker.on('error', err => reject({ type: 'runtime', stderr: err.message }));
       docker.on('close', code => {
-        if (code === 124) reject({ type: 'timeout' });
-        else if (code !== 0) reject({ type: 'runtime', stderr });
-        else resolve();
+        if (code === 124) {
+          reject({ type: 'timeout' });
+        } else if (code === 137) {
+          // Docker uses 137 when the process is killed (e.g., OOM)
+          reject({ type: 'memory' });
+        } else if (code !== 0) {
+          reject({ type: 'runtime', stderr });
+        } else {
+          resolve();
+        }
       });
     });
 
@@ -115,6 +128,8 @@ router.post('/', async (req, res) => {
       res.status(400).send('Compilation Error');
     } else if (err.type === 'timeout') {
       res.status(400).send('Time Limit Exceeded');
+    } else if (err.type === 'memory') {
+      res.status(400).send('Memory Limit Exceeded');
     } else if (err.stderr) {
       res.status(400).send(err.stderr);
     } else {
