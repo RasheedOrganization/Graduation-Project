@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
@@ -48,6 +49,10 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+router.get('/verify', authMiddleware, (req, res) => {
+  res.json({ id: req.user.id, username: req.user.username, role: req.user.role });
 });
 
 module.exports = router;

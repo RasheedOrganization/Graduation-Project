@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 import defaultAvatar from '../assets/images/user.svg';
@@ -8,11 +9,16 @@ function ProfilePage() {
   const [submissions, setSubmissions] = useState([]);
   const userId = localStorage.getItem('userid');
   const username = localStorage.getItem('username');
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     async function fetchSubmissions() {
-      const token = localStorage.getItem('token');
-      if (!userId || !token) return;
       try {
         const res = await fetch(`${BACKEND_URL}/api/users/${userId}/submissions`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -25,8 +31,10 @@ function ProfilePage() {
         console.error('Failed to fetch submissions', err);
       }
     }
-    fetchSubmissions();
-  }, [userId]);
+    if (userId) {
+      fetchSubmissions();
+    }
+  }, [userId, navigate]);
 
   return (
     <div>

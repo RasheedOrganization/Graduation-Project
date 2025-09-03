@@ -8,6 +8,7 @@ import Logout from '@mui/icons-material/Logout';
 import '../styles/NavBar.css';
 import logo from '../assets/images/logo.svg';
 import userIcon from '../assets/images/user.svg';
+import BACKEND_URL from '../config';
 
 function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -18,8 +19,31 @@ function NavBar() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setLoggedIn(!!token);
-    setRole(localStorage.getItem("role"));
+    if (!token) {
+      setLoggedIn(false);
+      setRole(null);
+      return;
+    }
+
+    fetch(`${BACKEND_URL}/api/auth/verify`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Not authenticated');
+        return res.json();
+      })
+      .then((data) => {
+        setLoggedIn(true);
+        setRole(data.role);
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        setLoggedIn(false);
+        setRole(null);
+      });
   }, []);
 
   const handleMenu = (event) => {
