@@ -153,6 +153,11 @@ io.on('connection', (socket) => {
         socket.to(socket.roomid).emit('receive-language-update',{language: payload.language});
     });
 
+    socket.on('update-cursor', (payload) => {
+        // broadcast cursor position to other users in the room
+        socket.to(socket.roomid).emit('receive-cursor-update', payload);
+    });
+
     socket.on('problem-fetched', (payload) => {
         const state = getRoomState(socket.roomid);
         state.statement = payload.statement;
