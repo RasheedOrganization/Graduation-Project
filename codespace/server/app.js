@@ -131,7 +131,8 @@ io.on('connection', (socket) => {
     socket.on('update-code', (payload) => {
         const state = getRoomState(socket.roomid);
         state.code = payload.code;
-        io.to(socket.roomid).emit('receive-code-update',{code: payload.code});
+        // Broadcast the latest code to everyone else in the room
+        socket.to(socket.roomid).emit('receive-code-update', { code: payload.code });
     });
 
     socket.on('update-problem-statement', (payload) => {
