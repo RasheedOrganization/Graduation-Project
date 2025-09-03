@@ -36,12 +36,16 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
     }, [onCodeChange]);
 
     useEffect(() => {
-        if(socketRef.current){
-            socketRef.current.on('receive-code-update', (payload) => {
-                setTextvalue(payload.code);
-            });
-        }
-    },[socketRef]);
+        if (!socketRef.current) return;
+        const handleCodeUpdate = (payload) => {
+            setTextvalue(payload.code);
+            onCodeChange && onCodeChange(payload.code);
+        };
+        socketRef.current.on('receive-code-update', handleCodeUpdate);
+        return () => {
+            socketRef.current.off('receive-code-update', handleCodeUpdate);
+        };
+    }, [socketRef.current, onCodeChange]);
 
 
     useEffect(() => {
