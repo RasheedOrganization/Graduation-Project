@@ -86,6 +86,20 @@ export default function Room() {
     // TODO: get the username
     // TODO: we join room here
 
+    useEffect(() => {
+      const handleUnload = () => {
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+        }
+      };
+      window.addEventListener('beforeunload', handleUnload);
+      window.addEventListener('offline', handleUnload);
+      return () => {
+        window.removeEventListener('beforeunload', handleUnload);
+        window.removeEventListener('offline', handleUnload);
+      };
+    }, []);
+
     const toggleMic = () => {
       if (isMicOn) {
         // turn off mic
