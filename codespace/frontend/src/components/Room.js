@@ -255,7 +255,7 @@ export default function Room() {
               {activeTab === 'general' ? (
                 <ChatBox socket={socket} username={username} />
               ) : (
-                <AIChatBox code={code} />
+                <AIChatBox code={code} socketRef={socketRef} username={username} />
               )}
             </div>
           </aside>
