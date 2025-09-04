@@ -11,14 +11,20 @@ const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_pro
 mongoose.connect(url);
 
 router.post('/register', async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password, role, displayName } = req.body;
   try {
     const existing = await User.findOne({ $or: [{ username }, { email }] });
     if (existing) {
       return res.status(400).json({ message: 'User already exists' });
     }
     const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashed, role: role || 'user' });
+    const user = new User({
+      username,
+      email,
+      password: hashed,
+      role: role || 'user',
+      displayName: displayName || username,
+    });
     await user.save();
     res.json({ message: 'User created' });
   } catch (err) {
