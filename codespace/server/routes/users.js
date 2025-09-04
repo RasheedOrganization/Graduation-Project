@@ -133,7 +133,13 @@ router.put('/:id', authenticate, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    if (username) user.username = username;
+    if (username && username !== user.username) {
+      const existing = await User.findOne({ username });
+      if (existing && existing._id.toString() !== id) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+      user.username = username;
+    }
     if (typeof displayName !== 'undefined') user.displayName = displayName;
     if (password) {
       if (!currentPassword) {
@@ -148,6 +154,9 @@ router.put('/:id', authenticate, async (req, res) => {
     await user.save();
     res.json({ username: user.username, displayName: user.displayName });
   } catch (err) {
+    if (err.code === 11000 && err.keyPattern && err.keyPattern.username) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
     res.status(500).json({ message: 'Server error' });
   }
 });
