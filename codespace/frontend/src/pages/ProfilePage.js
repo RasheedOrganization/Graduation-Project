@@ -12,7 +12,7 @@ function ProfilePage() {
   const [userInfo, setUserInfo] = useState({ username: '', displayName: '', friends: [] });
   const [showEdit, setShowEdit] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
-  const [form, setForm] = useState({ username: '', displayName: '', password: '' });
+  const [form, setForm] = useState({ username: '', displayName: '', password: '', currentPassword: '' });
   const userId = localStorage.getItem('userid');
   const navigate = useNavigate();
 
@@ -44,7 +44,7 @@ function ProfilePage() {
         if (res.ok) {
           const data = await res.json();
           setUserInfo(data);
-          setForm({ username: data.username || '', displayName: data.displayName || '', password: '' });
+          setForm({ username: data.username || '', displayName: data.displayName || '', password: '', currentPassword: '' });
         }
       } catch (err) {
         console.error('Failed to fetch user', err);
@@ -73,7 +73,10 @@ function ProfilePage() {
         setUserInfo((prev) => ({ ...prev, username: data.username, displayName: data.displayName }));
         localStorage.setItem('username', data.username);
         setShowEdit(false);
-        setForm((prev) => ({ ...prev, password: '' }));
+        setForm((prev) => ({ ...prev, password: '', currentPassword: '' }));
+      } else {
+        const errData = await res.json();
+        alert(errData.message || 'Failed to update profile');
       }
     } catch (err) {
       console.error('Failed to update profile', err);
@@ -135,6 +138,12 @@ function ProfilePage() {
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               placeholder="Display Name"
+            />
+            <input
+              type="password"
+              value={form.currentPassword}
+              onChange={(e) => setForm({ ...form, currentPassword: e.target.value })}
+              placeholder="Current Password"
             />
             <input
               type="password"
