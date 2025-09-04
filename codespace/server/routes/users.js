@@ -53,6 +53,55 @@ router.get('/:id/friends', authenticate, async (req, res) => {
   }
 });
 
+router.post('/:id/friends/:friendId', authenticate, async (req, res) => {
+  const { id, friendId } = req.params;
+  if (req.user.id !== id) {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const friendIndex = user.friends.findIndex(
+      (f) => f.toString() === friendId
+    );
+    let isFriend;
+    if (friendIndex >= 0) {
+      user.friends.splice(friendIndex, 1);
+      isFriend = false;
+    } else {
+      user.friends.push(friendId);
+      isFriend = true;
+    }
+    await user.save();
+    res.json({ isFriend });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.get('/search', authenticate, async (req, res) => {
+  const { username = '' } = req.query;
+  try {
+    const regex = new RegExp(`^${username}`, 'i');
+    const users = await User.find({
+      username: { $regex: regex },
+      _id: { $ne: req.user.id },
+    }).select('username');
+    const current = await User.findById(req.user.id).select('friends');
+    const friendSet = new Set(current.friends.map((f) => f.toString()));
+    const results = users.map((u) => ({
+      id: u._id.toString(),
+      username: u.username,
+      isFriend: friendSet.has(u._id.toString()),
+    }));
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 router.get('/:id', authenticate, async (req, res) => {
   const { id } = req.params;
   if (req.user.id !== id) {

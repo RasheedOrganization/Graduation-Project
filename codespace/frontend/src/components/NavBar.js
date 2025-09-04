@@ -13,6 +13,9 @@ import BACKEND_URL from '../config';
 function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -37,6 +40,7 @@ function NavBar() {
       .then((data) => {
         setLoggedIn(true);
         setRole(data.role);
+        setUserId(data.id);
       })
       .catch(() => {
         localStorage.removeItem('token');
@@ -45,6 +49,40 @@ function NavBar() {
         setRole(null);
       });
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token || !searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    fetch(`${BACKEND_URL}/api/users/search?username=${searchQuery}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Error');
+        return res.json();
+      })
+      .then((data) => setSearchResults(data))
+      .catch(() => setSearchResults([]));
+  }, [searchQuery]);
+
+  const handleToggleFriend = (user) => {
+    const token = localStorage.getItem('token');
+    if (!token || !userId) return;
+    fetch(`${BACKEND_URL}/api/users/${userId}/friends/${user.id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setSearchResults((prev) =>
+          prev.map((u) =>
+            u.id === user.id ? { ...u, isFriend: data.isFriend } : u
+          )
+        );
+      });
+  };
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -70,6 +108,38 @@ function NavBar() {
           <img src={logo} alt="Code Hub logo" className="brand-logo" />
           <span className="brand-name">Code Hub</span>
         </Link>
+      </div>
+      <div className="navbar-search">
+        <input
+          type="text"
+          placeholder="Search users"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchResults.length > 0 && (
+          <div className="navbar-search-results">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Add Friend</th>
+                </tr>
+              </thead>
+              <tbody>
+                {searchResults.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.username}</td>
+                    <td>
+                      <button onClick={() => handleToggleFriend(user)}>
+                        {user.isFriend ? 'Remove' : 'Add'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       <ul className="navbar-links">
         <li><Link to="/problems">Problems</Link></li>
