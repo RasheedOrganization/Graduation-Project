@@ -78,18 +78,25 @@ router.put('/:id', authenticate, async (req, res) => {
   if (req.user.id !== id) {
     return res.status(403).json({ message: 'Forbidden' });
   }
-  const { username, displayName, password } = req.body;
-  const update = {};
-  if (username) update.username = username;
-  if (typeof displayName !== 'undefined') update.displayName = displayName;
-  if (password) {
-    update.password = await bcrypt.hash(password, 10);
-  }
+  const { username, displayName, password, currentPassword } = req.body;
   try {
-    const user = await User.findByIdAndUpdate(id, update, { new: true });
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    if (username) user.username = username;
+    if (typeof displayName !== 'undefined') user.displayName = displayName;
+    if (password) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password required' });
+      }
+      const match = await bcrypt.compare(currentPassword, user.password);
+      if (!match) {
+        return res.status(400).json({ message: 'Current password incorrect' });
+      }
+      user.password = await bcrypt.hash(password, 10);
+    }
+    await user.save();
     res.json({ username: user.username, displayName: user.displayName });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
