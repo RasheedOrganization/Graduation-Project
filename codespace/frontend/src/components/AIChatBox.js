@@ -54,7 +54,8 @@ export default function AIChatBox({ code, socketRef, username }) {
   }, [messages]);
 
   const send = (mode) => {
-    const prompt = message.trim();
+    const trimmed = message.trim();
+    const prompt = trimmed || (mode !== 'normal' ? mode : '');
     if (!socketRef?.current) return;
     if (!prompt && mode === 'normal') return;
     socketRef.current.emit('ai-request', { prompt, mode, code, username });

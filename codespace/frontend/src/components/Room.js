@@ -294,10 +294,18 @@ export default function Room() {
                 />
               ) : (
                 <div className='problem-options'>
-                  <button className='view-problem-button' onClick={handleFetchClick}>
+                  <button
+                    className='view-problem-button'
+                    onClick={handleFetchClick}
+                    title='Fetch a problem from Codeforces'
+                  >
                     Fetch from Codeforces
                   </button>
-                  <button className='view-problem-button' onClick={handleWriteClick}>
+                  <button
+                    className='view-problem-button'
+                    onClick={handleWriteClick}
+                    title='Create and share your own problem'
+                  >
                     Write a Problem
                   </button>
                 </div>
