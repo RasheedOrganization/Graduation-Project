@@ -64,6 +64,7 @@ const {
   updateMicStatus,
   addMessage,
   getMessages,
+  deleteMessages,
 } = require('./utils/roomStore');
 const username_to_socket = {};
 const pairSet = new Map();
@@ -221,6 +222,26 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('clear-messages', async () => {
+        await deleteMessages(socket.roomid);
+        io.to(socket.roomid).emit('messages-cleared');
+    });
+
+    socket.on('clear-ai-chat', () => {
+        const state = getRoomState(socket.roomid);
+        state.aiChat = [];
+        io.to(socket.roomid).emit('ai-chat-cleared');
+    });
+
+    socket.on('clear-problem', () => {
+        const state = getRoomState(socket.roomid);
+        state.statement = '';
+        state.sampleInput = '';
+        state.sampleOutput = '';
+        state.tests = [];
+        io.to(socket.roomid).emit('problem-cleared');
+    });
+
     socket.on('sending offer', (payload) => {
         // if a has already sent to b, then don't sent from b to a
         if(!pairExists(payload.userToSignal,payload.callerID) && !pairExists(payload.callerID,payload.userToSignal)){
@@ -279,9 +300,6 @@ io.on('connection', (socket) => {
           console.log('users currently in room are: ' + usersInRoom.map(u => u.username));
 
           console.log(`${socket.userid} left ${socket.roomid}`);
-          if(usersInRoom.length === 0){
-            delete roomState[socket.roomid];
-          }
         }
         removeuserfrompair();
     });
