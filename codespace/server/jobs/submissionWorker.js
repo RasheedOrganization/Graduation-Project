@@ -169,8 +169,8 @@ async function submissionWorker(job) {
                 } else {
                     const containerOptions = {
                         Image: 'nubskr/compiler:1',
-                        Cmd: ['./doshit.sh'],
-                        WorkingDir: '/contest',
+                        Cmd: ['/doshit.sh'],
+                        WorkingDir: '/',
                         HostConfig: {
                             Memory: 256 * 1024 * 1024, // 256MB
                             PidsLimit: 100, // Limit number of processes
