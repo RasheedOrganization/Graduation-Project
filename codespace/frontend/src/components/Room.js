@@ -83,6 +83,15 @@ export default function Room() {
 
     const handleFetchClick = () => setFetchOpen(true);
     const handleWriteClick = () => setCustomOpen(true);
+    const clearProblem = () => {
+      setProblemStatement('');
+      setSampleInput('');
+      setSampleOutput('');
+      setTests([]);
+      setShowProblem(false);
+      setCurrentProb(null);
+      socketRef.current?.emit('clear-problem');
+    };
     const userVideo = useRef();
     const socketRef = useRef();
     const [socket, setSocket] = useState(null);
@@ -206,6 +215,14 @@ export default function Room() {
         setShowProblem(true);
       });
 
+      socketRef.current.on('problem-cleared', () => {
+        setProblemStatement('');
+        setSampleInput('');
+        setSampleOutput('');
+        setTests([]);
+        setShowProblem(false);
+      });
+
       socketRef.current.emit('join room', { roomid: roomid, userid: userid, username: username });
       socketRef.current.emit('get-users-in-room');
 
@@ -285,13 +302,16 @@ export default function Room() {
           <div className='room-main'>
             <div className='problem-view' style={{position: "relative", paddingLeft:"30px", marginTop: "40px"}}>
               {showProblem ? (
-                <MainLHS
-                  currentProbId={currentProbId}
-                  setCurrentProb={setCurrentProb}
-                  externalInput={problemStatement}
-                  externalSampleInput={sampleInput}
-                  externalSampleOutput={sampleOutput}
-                />
+                <>
+                  <button className='view-problem-button' onClick={clearProblem}>Clear Problem</button>
+                  <MainLHS
+                    currentProbId={currentProbId}
+                    setCurrentProb={setCurrentProb}
+                    externalInput={problemStatement}
+                    externalSampleInput={sampleInput}
+                    externalSampleOutput={sampleOutput}
+                  />
+                </>
               ) : (
                 <div className='problem-options'>
                   <button

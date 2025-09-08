@@ -33,6 +33,13 @@ export default function ChatBox({ socket, username }) {
     return () => socket.off('room-messages', handler);
   }, [socket]);
 
+  useEffect(() => {
+    if (!socket) return;
+    const handleClear = () => setMessages([]);
+    socket.on('messages-cleared', handleClear);
+    return () => socket.off('messages-cleared', handleClear);
+  }, [socket]);
+
   // Always scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -87,6 +94,7 @@ export default function ChatBox({ socket, username }) {
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="chat-actions">
+          <button type="button" onClick={() => socket?.emit('clear-messages')}>Clear</button>
           <button type="submit">Send</button>
         </div>
       </form>

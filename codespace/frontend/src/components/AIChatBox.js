@@ -38,14 +38,17 @@ export default function AIChatBox({ code, socketRef, username }) {
         { self: false, text: payload.text, sender: 'bot' },
       ]);
     };
+    const handleClear = () => setMessages([]);
     socketRef.current.on('ai-chat-history', handleHistory);
     socketRef.current.on('ai-user-message', handleUser);
     socketRef.current.on('ai-bot-message', handleBot);
+    socketRef.current.on('ai-chat-cleared', handleClear);
     socketRef.current.emit('get-ai-messages');
     return () => {
       socketRef.current.off('ai-chat-history', handleHistory);
       socketRef.current.off('ai-user-message', handleUser);
       socketRef.current.off('ai-bot-message', handleBot);
+      socketRef.current.off('ai-chat-cleared', handleClear);
     };
   }, [socketRef, username]);
 
@@ -109,6 +112,7 @@ export default function AIChatBox({ code, socketRef, username }) {
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="chat-actions">
+          <button type="button" onClick={() => socketRef?.current?.emit('clear-ai-chat')} disabled={loading}>Clear</button>
           <button type="button" onClick={() => send('normal')} disabled={loading}>Send</button>
           <button type="button" onClick={() => send('fix')} disabled={loading}>Fix</button>
           <button type="button" onClick={() => send('explain')} disabled={loading}>Explain</button>
