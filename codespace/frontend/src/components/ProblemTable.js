@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 function ProblemTable({ problems }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(problems.length / itemsPerPage) || 1;
-
   const openLink = (link) => {
-    const url = link.startsWith('http://') || link.startsWith('https://')
-      ? link
-      : `https://${link}`;
+    const url =
+      link.startsWith('http://') || link.startsWith('https://')
+        ? link
+        : `https://${link}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -21,44 +18,29 @@ function ProblemTable({ problems }) {
     }
   };
 
-  const current = problems.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   return (
     <div className="right-problems">
-      <table className="problem-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Topic</th>
-            <th>Subtopic</th>
-            <th>Website</th>
-            <th>Difficulty</th>
-          </tr>
-        </thead>
-        <tbody>
-          {current.map((p) => (
-            <tr key={p._id} onClick={() => openLink(p.link)}>
-              <td>{p.name}</td>
-              <td>{p.topic}</td>
-              <td>{p.subtopic}</td>
-              <td>{p.domain || getDomain(p.link)}</td>
-              <td>{p.difficulty}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="pagination">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
-            className={page === currentPage ? 'active' : ''}
+      <div className="problem-grid">
+        {problems.map((p) => (
+          <div
+            key={p._id}
+            className="problem-card"
+            onClick={() => openLink(p.link)}
           >
-            {page}
-          </button>
+            <h3>{p.name}</h3>
+            <p>
+              <strong>Topic:</strong> {p.topic}
+            </p>
+            <p>
+              <strong>Subtopic:</strong> {p.subtopic}
+            </p>
+            <p>
+              <strong>Website:</strong> {p.domain || getDomain(p.link)}
+            </p>
+            <p>
+              <strong>Difficulty:</strong> {p.difficulty}
+            </p>
+          </div>
         ))}
       </div>
     </div>
