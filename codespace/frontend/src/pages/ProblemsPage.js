@@ -28,6 +28,8 @@ function ProblemsPage() {
   const [newSubtopic, setNewSubtopic] = useState({ stage: '', topic: '', name: '' });
   const role = localStorage.getItem('role');
   const isAdmin = role === 'admin' || role === 'superadmin';
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -141,6 +143,16 @@ function ProblemsPage() {
     return matchesStage && matchesTopic && matchesSubtopic && matchesSearch;
   });
 
+  const totalPages = Math.ceil(filteredProblems.length / itemsPerPage) || 1;
+  const currentProblems = filteredProblems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedStage, selectedTopic, selectedSubtopic]);
+
   return (
     <div>
       <NavBar />
@@ -179,8 +191,19 @@ function ProblemsPage() {
             selectedSubtopic={selectedSubtopic}
             setSelectedSubtopic={setSelectedSubtopic}
           />
-          <ProblemTable problems={filteredProblems} />
+          <ProblemTable problems={currentProblems} />
         </div>
+        <footer className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={page === currentPage ? 'active' : ''}
+            >
+              {page}
+            </button>
+          ))}
+        </footer>
       </div>
     </div>
   );
