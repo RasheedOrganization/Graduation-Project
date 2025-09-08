@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
 
     try {
       workDir = await fs.mkdtemp(tmpBase);
-      const dockerWorkDir = path.resolve(workDir).replace(/\/g, '/');
+      const dockerWorkDir = path.resolve(workDir).replace(/\\/g, '/');
       const sourceName = language === 'python' ? 'main.py' : language === 'java' ? 'Main.java' : 'main.cpp';
     const sourcePath = path.join(workDir, sourceName);
     const inputPath = path.join(workDir, 'input.txt');
