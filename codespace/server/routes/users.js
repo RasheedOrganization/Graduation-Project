@@ -26,10 +26,14 @@ function authenticate(req, res, next) {
 
 router.get('/:id/submissions', authenticate, async (req, res) => {
   const { id } = req.params;
-  if (req.user.id !== id) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
   try {
+    if (req.user.id !== id) {
+      const current = await User.findById(req.user.id).select('friends');
+      const isFriend = current && current.friends.some((f) => f.toString() === id);
+      if (!isFriend) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+    }
     const submissions = await Submission.find({ user: id }).sort({ createdAt: -1 });
     res.json(submissions);
   } catch (err) {
@@ -104,10 +108,14 @@ router.get('/search', authenticate, async (req, res) => {
 
 router.get('/:id', authenticate, async (req, res) => {
   const { id } = req.params;
-  if (req.user.id !== id) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
   try {
+    if (req.user.id !== id) {
+      const current = await User.findById(req.user.id).select('friends');
+      const isFriend = current && current.friends.some((f) => f.toString() === id);
+      if (!isFriend) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+    }
     const user = await User.findById(id).populate('friends', 'username displayName');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
