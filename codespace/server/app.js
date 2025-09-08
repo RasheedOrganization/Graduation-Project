@@ -71,7 +71,7 @@ const roomState = {};
 
 function getRoomState(roomid){
   if(!roomState[roomid]){
-    roomState[roomid] = { code: '', statement: '', aiChat: [], language: 'cpp', input: '', sampleInput: '', sampleOutput: '' };
+    roomState[roomid] = { code: '', statement: '', aiChat: [], language: 'cpp', input: '', sampleInput: '', sampleOutput: '', tests: [] };
   }
   return roomState[roomid];
 }
@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
             socket.emit('receive-code-update',{code: state.code});
         }
         if(state.statement){
-            socket.emit('problem-fetched',{statement: state.statement, sampleInput: state.sampleInput, sampleOutput: state.sampleOutput});
+            socket.emit('problem-fetched',{statement: state.statement, sampleInput: state.sampleInput, sampleOutput: state.sampleOutput, tests: state.tests});
         }
         if(state.language){
             socket.emit('receive-language-update',{language: state.language});
@@ -163,6 +163,7 @@ io.on('connection', (socket) => {
         state.statement = payload.statement;
         state.sampleInput = payload.sampleInput;
         state.sampleOutput = payload.sampleOutput;
+        state.tests = payload.tests || [];
         socket.to(socket.roomid).emit('problem-fetched', payload);
     });
 

@@ -33,4 +33,62 @@ router.post('/chat', async (req, res) => {
   }
 });
 
+router.post('/verify-problem', async (req, res) => {
+  const { statement = '' } = req.body;
+  const apiKey = "AIzaSyCxEUSKz296qV7qCFgNvRe_7jYMe9Y8LyI";
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Missing GEMINI_API_KEY' });
+  }
+  const text = `You are a competitive programming problem validator. If the following statement is missing information or is unclear, rewrite it to be complete and unambiguous. Otherwise reply with the original statement.\n\n${statement}`;
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text }] }]
+      })
+    });
+    const data = await response.json();
+    const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts
+      ? data.candidates[0].content.parts.map(p => p.text).join('')
+      : statement;
+    res.json({ statement: aiText });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to verify problem statement' });
+  }
+});
+
+router.post('/generate-tests', async (req, res) => {
+  const { statement = '' } = req.body;
+  const apiKey = "AIzaSyCxEUSKz296qV7qCFgNvRe_7jYMe9Y8LyI";
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Missing GEMINI_API_KEY' });
+  }
+  const text = `Generate a JSON array of test cases for the following competitive programming problem. Each test should be an object with "input" and "output" fields. Only return the JSON.\n\n${statement}`;
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text }] }]
+      })
+    });
+    const data = await response.json();
+    const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts
+      ? data.candidates[0].content.parts.map(p => p.text).join('')
+      : '[]';
+    let tests = [];
+    try {
+      tests = JSON.parse(aiText);
+    } catch (e) {
+      console.error('Failed to parse tests from AI');
+    }
+    res.json({ tests });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to generate tests' });
+  }
+});
+
 module.exports = router;
