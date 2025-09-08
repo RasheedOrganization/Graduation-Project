@@ -61,7 +61,7 @@ class CursorWidget extends WidgetType {
         return span;
     }
 }
-export default function TextBox({socketRef,currentProbId,onCodeChange}) {
+export default function TextBox({socketRef,currentProbId,tests,onCodeChange}) {
     console.log('I am textbox and the current problem id is ' + currentProbId);
     const [language, setLanguage] = useState('cpp');
     const [textvalue, setTextvalue] = useState(defaultCpp);
@@ -212,9 +212,17 @@ export default function TextBox({socketRef,currentProbId,onCodeChange}) {
         try{
             const requestData = {
                 code: textvalue,
-                problem_id: currentProbId,
                 language: language
             };
+            if (currentProbId) {
+                requestData.problem_id = currentProbId;
+            } else if (tests && tests.length > 0) {
+                requestData.tests = tests;
+            } else {
+                setOutputvalue('No tests found');
+                setColor('red');
+                return;
+            }
             const token = localStorage.getItem('token');
             const response = await axios.post(submitUrl, requestData, {
                 headers: { Authorization: `Bearer ${token}` }

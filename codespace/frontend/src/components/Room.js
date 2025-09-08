@@ -312,7 +312,12 @@ export default function Room() {
               )}
             </div>
             <div className='editor-container'>
-              <TextBox socketRef={socketRef} currentProbId={currentProbId} onCodeChange={setCode} />
+              <TextBox
+                socketRef={socketRef}
+                currentProbId={currentProbId}
+                tests={tests}
+                onCodeChange={setCode}
+              />
             </div>
           </div>
         </div>

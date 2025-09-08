@@ -73,7 +73,7 @@ async function submissionWorker(job) {
     return new Promise((resolve, reject) => {
         fs.mkdir(folderPath, { recursive: true }, async (err) => {
             if (err) {
-                reject(`Error: ${err.message}`);
+                reject(err.message);
                 console.error(err);
                 return;
             }
@@ -81,10 +81,19 @@ async function submissionWorker(job) {
             console.log("Folder created!");
     
             try {
-                // The request has a problem ID and the code
-                const { code, problemId, language = 'cpp' } = job.data;
-                // Get the test package
-                const testPackage = await getTestPackageData(problemId);
+                // The request may have either a problem ID or direct tests
+                const { code, problemId, language = 'cpp', tests } = job.data;
+                let testPackage;
+                if (tests && Array.isArray(tests) && tests.length > 0) {
+                    testPackage = {
+                        main_tests: tests.map(t => t.input).join('\n'),
+                        expected_output: tests.map(t => t.output).join('\n')
+                    };
+                } else if (problemId) {
+                    testPackage = await getTestPackageData(problemId);
+                } else {
+                    throw new Error('No tests found');
+                }
                 console.log("test package is",testPackage);
                 // Define file paths
                 const sourceName =
@@ -177,7 +186,7 @@ async function submissionWorker(job) {
                 console.log(verdictData);
                 resolve(verdictData);
             } catch (err) {
-                reject(`Error: ${err.message}`);
+                reject(err.message);
                 console.error(err);
             }
         });
