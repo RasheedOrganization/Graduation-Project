@@ -58,6 +58,17 @@ node codespace/server/scripts/seedContests.js
 This script POSTs one upcoming and one past contest to `/api/contests` and
 prints the counts returned by `GET /api/contests`.
 
+### Seeding all models
+
+To populate the database with sample data for every model, run:
+
+```
+npm run seed --prefix codespace/server
+```
+
+The script inserts ten records per model and skips seeding if data already
+exists, so it only runs once per collection.
+
 ## Migrating existing S3 data
 
 If you previously stored tests in S3, you can copy them locally using the
