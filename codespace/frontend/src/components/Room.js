@@ -18,6 +18,7 @@ import '../styles/RoomPage.css';
 import leave from '../assets/images/logout_1.png'
 import styled from "styled-components";
 import CFparser from './LHS/CFparser';
+import CustomProblemPanel from './CustomProblemPanel';
 
 
 
@@ -75,8 +76,13 @@ export default function Room() {
     const [sampleInput, setSampleInput] = useState("");
     const [sampleOutput, setSampleOutput] = useState("");
     const [fetchOpen, setFetchOpen] = useState(false);
+    const [customOpen, setCustomOpen] = useState(false);
+    const [tests, setTests] = useState([]);
     const [activeTab, setActiveTab] = useState('general');
     const [code, setCode] = useState('');
+
+    const handleFetchClick = () => setFetchOpen(true);
+    const handleWriteClick = () => setCustomOpen(true);
     const userVideo = useRef();
     const socketRef = useRef();
     const [socket, setSocket] = useState(null);
@@ -136,12 +142,7 @@ export default function Room() {
       navigate('/rooms');
     };
 
-    const openProblemForm = () => {
-      if (!showProblem) {
-        setShowProblem(true);
-      }
-      setFetchOpen(true);
-    };
+
 
     useEffect(() => {
       socketRef.current = io(BACKEND_URL, { transports: ['websocket'] });
@@ -201,6 +202,7 @@ export default function Room() {
         setProblemStatement(payload.statement);
         setSampleInput(payload.sampleInput);
         setSampleOutput(payload.sampleOutput);
+        setTests(payload.tests || []);
         setShowProblem(true);
       });
 
@@ -282,17 +284,23 @@ export default function Room() {
           </aside>
           <div className='room-main'>
             <div className='problem-view' style={{position: "relative", paddingLeft:"30px", marginTop: "40px"}}>
-              <button className='view-problem-button' onClick={openProblemForm}>
-                Fetch Problem
-              </button>
-              {showProblem && (
-            <MainLHS
+              {showProblem ? (
+                <MainLHS
                   currentProbId={currentProbId}
                   setCurrentProb={setCurrentProb}
                   externalInput={problemStatement}
                   externalSampleInput={sampleInput}
                   externalSampleOutput={sampleOutput}
                 />
+              ) : (
+                <div className='problem-options'>
+                  <button className='view-problem-button' onClick={handleFetchClick}>
+                    Fetch from Codeforces
+                  </button>
+                  <button className='view-problem-button' onClick={handleWriteClick}>
+                    Write a Problem
+                  </button>
+                </div>
               )}
             </div>
             <div className='editor-container'>
@@ -309,7 +317,24 @@ export default function Room() {
               setSampleInput={setSampleInput}
               setSampleOutput={setSampleOutput}
               setInput={(stmt) => { setProblemStatement(stmt); }}
-              onFetched={() => setFetchOpen(false)}
+              onFetched={() => { setFetchOpen(false); setShowProblem(true); }}
+            />
+          </Box>
+        </Modal>
+        <Modal open={customOpen} onClose={() => setCustomOpen(false)}>
+          <Box sx={modalStyle}>
+            <CustomProblemPanel
+              onAdd={(stmt, genTests) => {
+                setProblemStatement(stmt);
+                setSampleInput('');
+                setSampleOutput('');
+                setTests(genTests);
+                if (socketRef.current) {
+                  socketRef.current.emit('problem-fetched', { statement: stmt, sampleInput: '', sampleOutput: '', tests: genTests });
+                }
+                setShowProblem(true);
+              }}
+              onClose={() => setCustomOpen(false)}
             />
           </Box>
         </Modal>
