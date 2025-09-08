@@ -25,18 +25,33 @@ function authenticate(req, res, next) {
 }
 
 router.post('/', authenticate, async (req, res) => {
-  const { code, problem_id, language = 'cpp' } = req.body;
-  if (!code || !problem_id) {
-    return res.status(400).send('Code and problem ID are required.');
+  const { code, problem_id, language = 'cpp', tests } = req.body;
+  if (!code) {
+    return res.status(400).send('Code is required.');
   }
 
-  const job = await submissionQueue.add('submissionProcess', { code: code, problemId: problem_id, language });
-  const verdictData = await waitforJobCompletion(submissionQueue, job);
+  const jobData = { code, language };
+  if (problem_id) {
+    jobData.problemId = problem_id;
+  } else {
+    if (!Array.isArray(tests) || tests.length === 0) {
+      return res.status(400).send('No tests found');
+    }
+    jobData.tests = tests;
+  }
+
+  const job = await submissionQueue.add('submissionProcess', jobData);
+  let verdictData;
+  try {
+    verdictData = await waitforJobCompletion(submissionQueue, job);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
 
   try {
     const submission = new Submission({
       user: req.user.id,
-      problem: problem_id,
+      problem: problem_id || 'custom',
       code,
       verdict: verdictData,
       language,
