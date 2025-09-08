@@ -79,7 +79,6 @@
 
 /* Inline code segments rendered with single backticks */
 .chat-text :not(pre) > code {
-  background: #f0f0f0;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-family: monospace;
