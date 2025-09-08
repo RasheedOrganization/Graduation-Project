@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const AsyncButton = ({ onClick, onSuccess, children, ...props }) => {
+const AsyncButton = ({ onClick, onSuccess, children, sx, ...props }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -17,14 +17,19 @@ const AsyncButton = ({ onClick, onSuccess, children, ...props }) => {
         if (onSuccess) {
           onSuccess();
         }
-      }, 2000);
+      }, 1000);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Button {...props} onClick={handleClick} disabled={loading}>
+    <Button
+      {...props}
+      onClick={handleClick}
+      disabled={loading}
+      sx={{ minWidth: 120, ...(sx || {}) }}
+    >
       {loading ? <CircularProgress size={20} /> : success ? <CheckCircleIcon color="success" /> : children}
     </Button>
   );
