@@ -77,17 +77,29 @@ export default function Room() {
     const [sampleOutput, setSampleOutput] = useState("");
     const [fetchOpen, setFetchOpen] = useState(false);
     const [customOpen, setCustomOpen] = useState(false);
-    const [tests, setTests] = useState([]);
+    const [tests, setTests] = useState(() => {
+      const saved = roomid ? localStorage.getItem(`tests_${roomid}`) : null;
+      return saved ? JSON.parse(saved) : [];
+    });
     const [activeTab, setActiveTab] = useState('general');
     const [code, setCode] = useState('');
 
     const handleFetchClick = () => setFetchOpen(true);
     const handleWriteClick = () => setCustomOpen(true);
+    const updateTests = (newTests) => {
+      setTests(newTests);
+      if (roomid) {
+        localStorage.setItem(`tests_${roomid}`, JSON.stringify(newTests));
+      }
+    };
     const clearProblem = () => {
       setProblemStatement('');
       setSampleInput('');
       setSampleOutput('');
-      setTests([]);
+      updateTests([]);
+      if (roomid) {
+        localStorage.removeItem(`tests_${roomid}`);
+      }
       setShowProblem(false);
       setCurrentProb(null);
       socketRef.current?.emit('clear-problem');
@@ -211,7 +223,7 @@ export default function Room() {
         setProblemStatement(payload.statement);
         setSampleInput(payload.sampleInput);
         setSampleOutput(payload.sampleOutput);
-        setTests(payload.tests || []);
+        updateTests(payload.tests || []);
         setShowProblem(true);
       });
 
@@ -219,7 +231,10 @@ export default function Room() {
         setProblemStatement('');
         setSampleInput('');
         setSampleOutput('');
-        setTests([]);
+        updateTests([]);
+        if (roomid) {
+          localStorage.removeItem(`tests_${roomid}`);
+        }
         setShowProblem(false);
       });
 
@@ -337,6 +352,7 @@ export default function Room() {
                 currentProbId={currentProbId}
                 tests={tests}
                 onCodeChange={setCode}
+                roomId={roomid}
               />
             </div>
           </div>
@@ -361,7 +377,7 @@ export default function Room() {
                 setProblemStatement(stmt);
                 setSampleInput('');
                 setSampleOutput('');
-                setTests(genTests);
+                updateTests(genTests);
                 if (socketRef.current) {
                   socketRef.current.emit('problem-fetched', { statement: stmt, sampleInput: '', sampleOutput: '', tests: genTests });
                 }

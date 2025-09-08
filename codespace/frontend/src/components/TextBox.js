@@ -61,7 +61,7 @@ class CursorWidget extends WidgetType {
         return span;
     }
 }
-export default function TextBox({socketRef,currentProbId,tests,onCodeChange}) {
+export default function TextBox({socketRef,currentProbId,tests,onCodeChange,roomId}) {
     console.log('I am textbox and the current problem id is ' + currentProbId);
     const [language, setLanguage] = useState('cpp');
     const [textvalue, setTextvalue] = useState(defaultCpp);
@@ -80,20 +80,29 @@ export default function TextBox({socketRef,currentProbId,tests,onCodeChange}) {
     }, [socketRef.current]);
 
     useEffect(() => {
-        onCodeChange && onCodeChange(defaultCpp);
-    }, [onCodeChange]);
+        const saved = roomId ? localStorage.getItem(`code_${roomId}`) : null;
+        const initial = saved || defaultCpp;
+        setTextvalue(initial);
+        onCodeChange && onCodeChange(initial);
+        if (saved && socketRef.current) {
+            socketRef.current.emit('update-code', { code: saved });
+        }
+    }, [roomId, onCodeChange, socketRef]);
 
     useEffect(() => {
         if (!socketRef.current) return;
         const handleCodeUpdate = (payload) => {
             setTextvalue(payload.code);
+            if (roomId) {
+                localStorage.setItem(`code_${roomId}`, payload.code);
+            }
             onCodeChange && onCodeChange(payload.code);
         };
         socketRef.current.on('receive-code-update', handleCodeUpdate);
         return () => {
             socketRef.current.off('receive-code-update', handleCodeUpdate);
         };
-    }, [socketRef.current, onCodeChange]);
+    }, [socketRef.current, onCodeChange, roomId]);
 
     useEffect(() => {
         if (!socketRef.current) return;
@@ -113,13 +122,16 @@ export default function TextBox({socketRef,currentProbId,tests,onCodeChange}) {
             setLanguage(newLang);
             const template = newLang === 'cpp' ? defaultCpp : newLang === 'python' ? defaultPython : defaultJava;
             setTextvalue(template);
+            if (roomId) {
+                localStorage.setItem(`code_${roomId}`, template);
+            }
             onCodeChange && onCodeChange(template);
         };
         socketRef.current.on('receive-language-update', handleLanguageUpdate);
         return () => {
             socketRef.current.off('receive-language-update', handleLanguageUpdate);
         };
-    }, [socketRef.current, onCodeChange]);
+    }, [socketRef.current, onCodeChange, roomId]);
 
     useEffect(() => {
         if (!socketRef.current) return;
@@ -149,14 +161,20 @@ export default function TextBox({socketRef,currentProbId,tests,onCodeChange}) {
 
     const Handlechange = useCallback((val, viewUpdate) => {
         setTextvalue(val);
+        if (roomId) {
+            localStorage.setItem(`code_${roomId}`, val);
+        }
         SocketEmit('update-code',{code: val});
         onCodeChange && onCodeChange(val);
-    }, [SocketEmit,onCodeChange]);
+    }, [SocketEmit,onCodeChange,roomId]);
 
     function handleLanguageChange(newLang){
         setLanguage(newLang);
         const template = newLang === 'cpp' ? defaultCpp : newLang === 'python' ? defaultPython : defaultJava;
         setTextvalue(template);
+        if (roomId) {
+            localStorage.setItem(`code_${roomId}`, template);
+        }
         SocketEmit('update-code',{code: template});
         SocketEmit('update-language',{language: newLang});
         onCodeChange && onCodeChange(template);
