@@ -20,14 +20,18 @@ const schema = {
 
 function Code({ inline, className, children, ...props }) {
   const match = /language-(\w+)/.exec(className || '');
-  const code = String(children).replace(/\n$/, '');
+  const rawCode = String(children);
+  const code = rawCode.replace(/\n$/, '');
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
   };
-  if (inline) {
+  // Sometimes the AI returns fenced blocks wrapping single words like `n`.
+  // Such blocks have no newlines and no language class. Treat them as inline
+  // code so they render correctly within the sentence instead of as a block.
+  if (inline || (!rawCode.includes('\n') && !className)) {
     return (
       <code className={className} {...props}>
-        {children}
+        {code}
       </code>
     );
   }

@@ -34,5 +34,13 @@ describe('MarkdownMessage', () => {
     render(<MarkdownMessage content={md} />);
     expect(screen.queryByRole('img')).toBeNull();
   });
+
+  test('renders single-word fenced blocks as inline code', () => {
+    const md = 'Number of items:\n```n```';
+    render(<MarkdownMessage content={md} />);
+    // It should render `n` inside a code element but without copy button
+    expect(screen.getByText('n', { selector: 'code' })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/copy code/i)).toBeNull();
+  });
 });
 
