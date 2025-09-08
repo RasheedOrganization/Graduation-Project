@@ -12,6 +12,7 @@ import ResourcesPage from './pages/ResourcesPage';
 import SectionsPage from './pages/SectionsPage';
 import ContactPage from './pages/ContactPage';
 import ProfilePage from './pages/ProfilePage';
+import FriendProfilePage from './pages/FriendProfilePage';
 import AdminPage from './pages/AdminPage';
 import MarkdownTestPage from './pages/MarkdownTestPage';
 
@@ -30,6 +31,7 @@ function App(){
         <Route path="/rooms" element={<RoomsPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:id" element={<FriendProfilePage />} />
         <Route path="/room" element={<Room />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/markdown-test" element={<MarkdownTestPage />} />

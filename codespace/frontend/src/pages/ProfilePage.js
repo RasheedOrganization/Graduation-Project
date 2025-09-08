@@ -118,7 +118,13 @@ function ProfilePage() {
             <h3>Friends</h3>
             <ul>
               {(userInfo.friends || []).map((f) => (
-                <li key={f._id}>{f.displayName || f.username}</li>
+                <li
+                  key={f._id}
+                  onClick={() => navigate(`/profile/${f._id}`)}
+                  className="friend-item"
+                >
+                  {f.displayName || f.username}
+                </li>
               ))}
             </ul>
           </div>

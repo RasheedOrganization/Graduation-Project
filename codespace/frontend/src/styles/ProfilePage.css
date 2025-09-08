@@ -69,6 +69,10 @@
   margin-top: 20px;
 }
 
+.friend-item {
+  cursor: pointer;
+}
+
 .edit-form {
   margin-top: 20px;
 }
