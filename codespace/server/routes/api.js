@@ -166,7 +166,11 @@ router.get('/parse_problem/:param',async (req,res) => {
   }
   console.log(data);
   if(data!==null){
-    res.json(JSON.parse(data));
+    const parsed = JSON.parse(data);
+    if (!parsed.id) {
+      parsed.id = req_problem;
+    }
+    res.json(parsed);
   }
   else{
     // let the worker do it!!
@@ -174,6 +178,7 @@ router.get('/parse_problem/:param',async (req,res) => {
     console.log("added to queue");
     try{
       const result = await waitforJobCompletion(scrapingQueue,job);
+      result.id = req_problem;
       res.json(result);
     }
     catch(err){

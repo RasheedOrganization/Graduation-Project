@@ -36,6 +36,7 @@ async function scrapingWorker(job) {
             }
             try {
                 const parsedOutput = JSON.parse(stdout);
+                parsedOutput.id = req_problem;
                 if (redisClient.isOpen) {
                     redisClient.setEx(req_problem, 60000, JSON.stringify(parsedOutput));
                 }

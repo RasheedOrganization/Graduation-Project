@@ -6,6 +6,7 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 const codeRunner = require("./routes/codeRunner")
 const submit = require("./routes/submit")
+const codeforces = require("./routes/codeforces")
 const api1 = require("./routes/api")
 const auth = require("./routes/auth")
 const roomsRoute = require("./routes/rooms");
@@ -52,6 +53,7 @@ app.use('/api/problems', problemsRoute)
 app.use('/api/ai', aiRoute)
 app.use('/test',codeRunner)
 app.use('/submit',submit)
+app.use('/cf', codeforces)
 
 app.get('/', (req, res) => {
     res.send('omg hewwo fren!!');

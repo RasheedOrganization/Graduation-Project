@@ -12,7 +12,7 @@ import { RangeSetBuilder } from '@codemirror/state';
 
 // Replace with the URL you want to send the request to
 const apiUrl = `${BACKEND_URL}/test`; // compilation sandbox endpoint
-const submitUrl = `${BACKEND_URL}/submit`;
+const submitUrl = `${BACKEND_URL}/cf/submit`;
 
 const defaultCpp = "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n int t;\n cin >> t;\n while(t--){\n\n }\n}";
 const defaultPython = `import sys\n\n\ndef solve():\n    pass\n\n\ndef main():\n    t = int(sys.stdin.readline())\n    for _ in range(t):\n        solve()\n\n\nif __name__ == "__main__":\n    main()\n`;
