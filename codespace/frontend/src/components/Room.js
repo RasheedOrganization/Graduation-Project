@@ -294,17 +294,30 @@ export default function Room() {
                 />
               ) : (
                 <div className='problem-options'>
-                  <button className='view-problem-button' onClick={handleFetchClick}>
+                  <button
+                    className='view-problem-button'
+                    onClick={handleFetchClick}
+                    title='Fetch a problem from Codeforces'
+                  >
                     Fetch from Codeforces
                   </button>
-                  <button className='view-problem-button' onClick={handleWriteClick}>
+                  <button
+                    className='view-problem-button'
+                    onClick={handleWriteClick}
+                    title='Create and share your own problem'
+                  >
                     Write a Problem
                   </button>
                 </div>
               )}
             </div>
             <div className='editor-container'>
-              <TextBox socketRef={socketRef} currentProbId={currentProbId} onCodeChange={setCode} />
+              <TextBox
+                socketRef={socketRef}
+                currentProbId={currentProbId}
+                tests={tests}
+                onCodeChange={setCode}
+              />
             </div>
           </div>
         </div>
