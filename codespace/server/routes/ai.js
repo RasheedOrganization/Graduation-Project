@@ -65,7 +65,7 @@ router.post('/generate-tests', async (req, res) => {
   if (!apiKey) {
     return res.status(500).json({ error: 'Missing GEMINI_API_KEY' });
   }
-  const text = `Generate a JSON array of test cases for the following competitive programming problem. Each test should be an object with "input" and "output" fields. Only return the JSON.\n\n${statement}`;
+  const text = `Generate a JSON array of test cases for the following competitive programming problem. Each test should be an object with "input" and "output" fields. Avoid large inputs (no test should contain more than 1000 integers). Only return the JSON.\n\n${statement}`;
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
       method: 'POST',
