@@ -35,11 +35,12 @@ router.post('/', async (req, res) => {
   const TEST_DATA_DIR = process.env.TEST_DATA_DIR || path.join(__dirname, '..', 'test-data');
   await fs.mkdir(TEST_DATA_DIR, { recursive: true });
   const tmpBase = path.join(TEST_DATA_DIR, 'sandbox-');
-  let workDir;
+    let workDir;
 
-  try {
-    workDir = await fs.mkdtemp(tmpBase);
-    const sourceName = language === 'python' ? 'main.py' : language === 'java' ? 'Main.java' : 'main.cpp';
+    try {
+      workDir = await fs.mkdtemp(tmpBase);
+      const dockerWorkDir = path.resolve(workDir).replace(/\/g, '/');
+      const sourceName = language === 'python' ? 'main.py' : language === 'java' ? 'Main.java' : 'main.cpp';
     const sourcePath = path.join(workDir, sourceName);
     const inputPath = path.join(workDir, 'input.txt');
     const outputPath = path.join(workDir, 'output.txt');
@@ -67,7 +68,7 @@ router.post('/', async (req, res) => {
       const docker = spawn(DOCKER_CMD, [
         'run', '--rm',
         '--memory', '256m', '--network', 'none',
-        '-v', `${workDir}:/workspace`,
+        '-v', `${dockerWorkDir}:/workspace`,
         '-w', '/workspace',
         image,
         'bash', '-lc',
@@ -94,7 +95,7 @@ router.post('/', async (req, res) => {
       const docker = spawn(DOCKER_CMD, [
         'run', '--rm',
         '--memory', '256m', '--network', 'none',
-        '-v', `${workDir}:/workspace`,
+        '-v', `${dockerWorkDir}:/workspace`,
         '-w', '/workspace',
         image,
         'bash', '-lc',
