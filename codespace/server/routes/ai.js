@@ -80,9 +80,16 @@ router.post('/generate-tests', async (req, res) => {
       : '[]';
     let tests = [];
     try {
-      tests = JSON.parse(aiText);
+      // Some responses may include additional text or code fences around the
+      // JSON array. Extract the first JSON array substring and parse that.
+      const match = aiText.match(/\[[\s\S]*\]/);
+      if (match) {
+        tests = JSON.parse(match[0]);
+      } else {
+        console.error('No JSON array found in AI response');
+      }
     } catch (e) {
-      console.error('Failed to parse tests from AI');
+      console.error('Failed to parse tests from AI', e);
     }
     res.json({ tests });
   } catch (err) {
