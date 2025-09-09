@@ -23,7 +23,11 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
   };
 
   const handleGenerateSample = async () => {
-    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-average-tests`, { type: 'sample' });
+    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-tests`, {
+      statement,
+      count: 1,
+      maxArrayLength: maxLen,
+    });
     if (res.data.tests && res.data.tests[0]) {
       setSampleInput(res.data.tests[0].input);
       setSampleOutput(res.data.tests[0].output);
@@ -31,8 +35,8 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
   };
 
   const handleGenerateHidden = async () => {
-    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-average-tests`, {
-      type: 'hidden',
+    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-tests`, {
+      statement,
       count: hiddenCount,
       maxArrayLength: maxLen,
     });
@@ -119,26 +123,28 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
             Generate Hidden
           </AsyncButton>
         </Stack>
-        {tests.map((test, idx) => (
-          <Stack key={idx} direction="row" spacing={2} sx={{ mb: 1 }}>
-            <TextField
-              label={`Input ${idx + 1}`}
-              multiline
-              minRows={2}
-              value={test.input}
-              onChange={(e) => handleHiddenChange(idx, 'input', e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label={`Output ${idx + 1}`}
-              multiline
-              minRows={2}
-              value={test.output}
-              onChange={(e) => handleHiddenChange(idx, 'output', e.target.value)}
-              fullWidth
-            />
-          </Stack>
-        ))}
+        <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
+          {tests.map((test, idx) => (
+            <Stack key={idx} direction="row" spacing={2} sx={{ mb: 1 }}>
+              <TextField
+                label={`Input ${idx + 1}`}
+                multiline
+                minRows={2}
+                value={test.input}
+                onChange={(e) => handleHiddenChange(idx, 'input', e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label={`Output ${idx + 1}`}
+                multiline
+                minRows={2}
+                value={test.output}
+                onChange={(e) => handleHiddenChange(idx, 'output', e.target.value)}
+                fullWidth
+              />
+            </Stack>
+          ))}
+        </Box>
       </Box>
 
       <Stack direction="row" spacing={2} justifyContent="center">
