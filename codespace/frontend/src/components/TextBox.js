@@ -99,6 +99,7 @@ export default function TextBox({socketRef,currentProbId,tests,onCodeChange,room
             onCodeChange && onCodeChange(payload.code);
         };
         socketRef.current.on('receive-code-update', handleCodeUpdate);
+        socketRef.current.emit('request-code');
         return () => {
             socketRef.current.off('receive-code-update', handleCodeUpdate);
         };
