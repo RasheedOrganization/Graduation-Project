@@ -145,7 +145,14 @@ io.on('connection', (socket) => {
             socket.emit('ai-chat-history', state.aiChat);
         }
     })
-    
+
+    socket.on('request-code', () => {
+        const state = getRoomState(socket.roomid);
+        if (state.code) {
+            socket.emit('receive-code-update', { code: state.code });
+        }
+    });
+
     socket.on('update-code', async (payload) => {
         const state = getRoomState(socket.roomid);
         state.code = payload.code;
