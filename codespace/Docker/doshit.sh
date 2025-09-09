@@ -63,7 +63,7 @@ else
         touch $output_path
     fi
 
-    diff --brief $output_path $expected_output_path > $compare_path
+    diff -wB $output_path $expected_output_path > $compare_path
     cat $compare_path
     
     if [ -s $compare_path ]; then
