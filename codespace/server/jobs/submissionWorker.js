@@ -83,18 +83,16 @@ async function submissionWorker(job) {
             try {
                 // The request may have either a problem ID or direct tests
                 const { code, problemId, language = 'cpp', tests } = job.data;
-                let testPackage;
+                let testsToRun;
                 if (tests && Array.isArray(tests) && tests.length > 0) {
-                    testPackage = {
-                        main_tests: tests.map(t => t.input).join('\n'),
-                        expected_output: tests.map(t => t.output).join('\n')
-                    };
+                    testsToRun = tests;
                 } else if (problemId) {
-                    testPackage = await getTestPackageData(problemId);
+                    const pkg = await getTestPackageData(problemId);
+                    testsToRun = [{ input: pkg.main_tests, output: pkg.expected_output }];
                 } else {
                     throw new Error('No tests found');
                 }
-                console.log("test package is",testPackage);
+                console.log("tests to run", testsToRun);
                 // Define file paths
                 const sourceName =
                     language === 'python'
@@ -108,79 +106,82 @@ async function submissionWorker(job) {
                 const verdictfilepath = path.join(folderPath, 'verdict.txt');
                 const outputfilepath = path.join(folderPath, 'output.txt');
                 const test_path = path.join(folderPath);
-                const { expected_output, main_tests } = testPackage;
 
-                // Change files
-                await changeFile(inputfilepath, main_tests);
-                await changeFile(expectedoutputpath, expected_output);
-                await changeFile(sourcefilepath, code);
-                await changeFile(verdictfilepath, ''); // Create empty file
-                console.log('Files changed!');
+                let verdictData = 'Accepted';
+                for (const t of testsToRun) {
+                    await changeFile(inputfilepath, t.input);
+                    await changeFile(expectedoutputpath, t.output);
+                    await changeFile(sourcefilepath, code);
+                    await changeFile(verdictfilepath, '');
 
-                let verdictData;
-                if (language === 'python') {
-                    const containerOptions = {
-                        Image: 'python:3',
-                        Cmd: ['bash', '-lc', `timeout ${TIME_LIMIT}s python3 a.py < input.txt > output.txt`],
-                        HostConfig: {
-                            Memory: 256 * 1024 * 1024,
-                            PidsLimit: 100,
-                            Binds: [`${test_path}:/contest/`],
-                            NetworkMode: 'none',
+                    if (language === 'python') {
+                        const containerOptions = {
+                            Image: 'python:3',
+                            Cmd: ['bash', '-lc', `timeout ${TIME_LIMIT}s python3 a.py < input.txt > output.txt`],
+                            HostConfig: {
+                                Memory: 256 * 1024 * 1024,
+                                PidsLimit: 100,
+                                Binds: [`${test_path}:/contest/`],
+                                NetworkMode: 'none',
+                            }
+                        };
+
+                        const exitCode = await runContainer({ ...containerOptions, WorkingDir: '/contest' });
+
+                        if (exitCode === 124) {
+                            verdictData = 'Time Limit Exceeded';
+                        } else if (exitCode !== 0) {
+                            verdictData = 'Runtime Error';
+                        } else {
+                            const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                            const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                            verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
                         }
-                    };
+                        await changeFile(verdictfilepath, verdictData);
+                    } else if (language === 'java') {
+                        const containerOptions = {
+                            Image: 'openjdk:17',
+                            Cmd: ['bash', '-lc', `javac a.java && timeout ${TIME_LIMIT}s java a < input.txt > output.txt`],
+                            HostConfig: {
+                                Memory: 256 * 1024 * 1024,
+                                PidsLimit: 100,
+                                Binds: [`${test_path}:/contest/`],
+                                NetworkMode: 'none',
+                            }
+                        };
 
-                    const exitCode = await runContainer({ ...containerOptions, WorkingDir: '/contest' });
+                        const exitCode = await runContainer({ ...containerOptions, WorkingDir: '/contest' });
 
-                    if (exitCode === 124) {
-                        verdictData = 'Time Limit Exceeded';
-                    } else if (exitCode !== 0) {
-                        verdictData = 'Runtime Error';
+                        if (exitCode === 124) {
+                            verdictData = 'Time Limit Exceeded';
+                        } else if (exitCode !== 0) {
+                            verdictData = 'Runtime Error';
+                        } else {
+                            const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                            const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                            verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                        }
+                        await changeFile(verdictfilepath, verdictData);
                     } else {
-                        const userOutput = fs.readFileSync(outputfilepath, 'utf8');
-                        const expected = fs.readFileSync(expectedoutputpath, 'utf8');
-                        verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                        const containerOptions = {
+                            Image: 'nubskr/compiler:1',
+                            Cmd: ['/doshit.sh'],
+                            WorkingDir: '/',
+                            HostConfig: {
+                                Memory: 256 * 1024 * 1024, // 256MB
+                                PidsLimit: 100, // Limit number of processes
+                                Binds: [`${test_path}:/contest/`],
+                                NetworkMode: 'none',
+                            }
+                        };
+
+                        await runContainer(containerOptions);
+                        verdictData = fs.readFileSync(verdictfilepath, 'utf8');
                     }
-                    await changeFile(verdictfilepath, verdictData);
-                } else if (language === 'java') {
-                    const containerOptions = {
-                        Image: 'openjdk:17',
-                        Cmd: ['bash', '-lc', `javac a.java && timeout ${TIME_LIMIT}s java a < input.txt > output.txt`],
-                        HostConfig: {
-                            Memory: 256 * 1024 * 1024,
-                            PidsLimit: 100,
-                            Binds: [`${test_path}:/contest/`],
-                            NetworkMode: 'none',
-                        }
-                    };
 
-                    const exitCode = await runContainer({ ...containerOptions, WorkingDir: '/contest' });
-
-                    if (exitCode === 124) {
-                        verdictData = 'Time Limit Exceeded';
-                    } else if (exitCode !== 0) {
-                        verdictData = 'Runtime Error';
-                    } else {
-                        const userOutput = fs.readFileSync(outputfilepath, 'utf8');
-                        const expected = fs.readFileSync(expectedoutputpath, 'utf8');
-                        verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                    if (verdictData !== 'Accepted') {
+                        break;
                     }
-                    await changeFile(verdictfilepath, verdictData);
-                } else {
-                    const containerOptions = {
-                        Image: 'nubskr/compiler:1',
-                        Cmd: ['/doshit.sh'],
-                        WorkingDir: '/',
-                        HostConfig: {
-                            Memory: 256 * 1024 * 1024, // 256MB
-                            PidsLimit: 100, // Limit number of processes
-                            Binds: [`${test_path}:/contest/`],
-                            NetworkMode: 'none',
-                        }
-                    };
-
-                    await runContainer(containerOptions);
-                    verdictData = fs.readFileSync(verdictfilepath, 'utf8');
                 }
 
                 console.log(verdictData);
