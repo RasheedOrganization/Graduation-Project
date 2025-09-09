@@ -9,7 +9,11 @@ import BACKEND_URL from '../config';
 
 const CustomProblemPanel = ({ onAdd, onClose }) => {
   const [statement, setStatement] = useState('');
-  const [tests, setTests] = useState([{ input: '', output: '' }]);
+  const [sampleInput, setSampleInput] = useState('');
+  const [sampleOutput, setSampleOutput] = useState('');
+  const [tests, setTests] = useState([]); // hidden tests
+  const [hiddenCount, setHiddenCount] = useState(5);
+  const [maxLen, setMaxLen] = useState(10);
 
   const handleVerify = async () => {
     const res = await axios.post(`${BACKEND_URL}/api/ai/verify-problem`, { statement });
@@ -18,14 +22,26 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
     }
   };
 
-  const handleGenerate = async () => {
-    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-tests`, { statement });
+  const handleGenerateSample = async () => {
+    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-average-tests`, { type: 'sample' });
+    if (res.data.tests && res.data.tests[0]) {
+      setSampleInput(res.data.tests[0].input);
+      setSampleOutput(res.data.tests[0].output);
+    }
+  };
+
+  const handleGenerateHidden = async () => {
+    const res = await axios.post(`${BACKEND_URL}/api/ai/generate-average-tests`, {
+      type: 'hidden',
+      count: hiddenCount,
+      maxArrayLength: maxLen,
+    });
     if (res.data.tests) {
       setTests(res.data.tests);
     }
   };
 
-  const handleTestChange = (index, field, value) => {
+  const handleHiddenChange = (index, field, value) => {
     setTests(prev => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
@@ -34,7 +50,7 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
   };
 
   const handleAdd = async () => {
-    await onAdd(statement, tests);
+    await onAdd(statement, sampleInput, sampleOutput, tests);
   };
 
   return (
@@ -46,8 +62,63 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
         onChange={(e) => setStatement(e.target.value)}
         placeholder="Write your problem statement here"
       />
+
       <Box>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Sample Tests</Typography>
+        <Typography variant="subtitle1" sx={{ mb: 1 }}>Sample Test</Typography>
+        <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
+          <TextField
+            label="Sample Input"
+            multiline
+            minRows={2}
+            value={sampleInput}
+            onChange={(e) => setSampleInput(e.target.value)}
+            fullWidth
+          />
+          <TextField
+            label="Sample Output"
+            multiline
+            minRows={2}
+            value={sampleOutput}
+            onChange={(e) => setSampleOutput(e.target.value)}
+            fullWidth
+          />
+        </Stack>
+        <AsyncButton
+          size="small"
+          variant="outlined"
+          onClick={handleGenerateSample}
+          sx={{ minWidth: 160 }}
+        >
+          Generate Sample
+        </AsyncButton>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle1" sx={{ mb: 1, mt: 2 }}>Hidden Tests</Typography>
+        <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
+          <TextField
+            label="Number of Tests"
+            type="number"
+            value={hiddenCount}
+            onChange={(e) => setHiddenCount(Number(e.target.value))}
+            sx={{ width: 140 }}
+          />
+          <TextField
+            label="Max Array Length"
+            type="number"
+            value={maxLen}
+            onChange={(e) => setMaxLen(Number(e.target.value))}
+            sx={{ width: 160 }}
+          />
+          <AsyncButton
+            size="small"
+            variant="outlined"
+            onClick={handleGenerateHidden}
+            sx={{ minWidth: 160 }}
+          >
+            Generate Hidden
+          </AsyncButton>
+        </Stack>
         {tests.map((test, idx) => (
           <Stack key={idx} direction="row" spacing={2} sx={{ mb: 1 }}>
             <TextField
@@ -55,7 +126,7 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
               multiline
               minRows={2}
               value={test.input}
-              onChange={(e) => handleTestChange(idx, 'input', e.target.value)}
+              onChange={(e) => handleHiddenChange(idx, 'input', e.target.value)}
               fullWidth
             />
             <TextField
@@ -63,20 +134,13 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
               multiline
               minRows={2}
               value={test.output}
-              onChange={(e) => handleTestChange(idx, 'output', e.target.value)}
+              onChange={(e) => handleHiddenChange(idx, 'output', e.target.value)}
               fullWidth
             />
           </Stack>
         ))}
-        <AsyncButton
-          size="small"
-          variant="outlined"
-          onClick={handleGenerate}
-          sx={{ minWidth: 160 }}
-        >
-          AI Generate Tests
-        </AsyncButton>
       </Box>
+
       <Stack direction="row" spacing={2} justifyContent="center">
         <AsyncButton variant="contained" onClick={handleVerify}>Verify</AsyncButton>
         <AsyncButton variant="contained" onClick={handleAdd} onSuccess={onClose}>Add</AsyncButton>

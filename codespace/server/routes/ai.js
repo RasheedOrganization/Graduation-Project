@@ -98,4 +98,35 @@ router.post('/generate-tests', async (req, res) => {
   }
 });
 
+// Utility for formatting average with up to 4 decimal places without
+// unnecessary trailing zeros. For example, 3.4000 becomes "3.4".
+function formatAvg(num) {
+  let s = num.toFixed(4);
+  s = s.replace(/\.0+$/, '');
+  s = s.replace(/(\.\d*?[1-9])0+$/, '$1');
+  return s;
+}
+
+// Generates test cases for the array average problem. It supports two modes:
+// - sample: returns a single small test for the problem statement.
+// - hidden: returns multiple tests for system testing. The client may specify
+//   the number of tests (count) and the maximum array length.
+router.post('/generate-average-tests', (req, res) => {
+  const { type = 'sample', count = 1, maxArrayLength = 10 } = req.body;
+
+  const numTests = type === 'sample' ? 1 : Math.max(1, Math.floor(count));
+  const maxLen = Math.max(1, Math.floor(maxArrayLength));
+
+  const tests = [];
+  for (let i = 0; i < numTests; i++) {
+    const n = Math.floor(Math.random() * maxLen) + 1;
+    const arr = Array.from({ length: n }, () => Math.floor(Math.random() * 1e9) + 1);
+    const avg = arr.reduce((a, b) => a + b, 0) / n;
+    const output = formatAvg(avg);
+    tests.push({ input: `${n}\n${arr.join(' ')}`, output });
+  }
+
+  res.json({ tests });
+});
+
 module.exports = router;

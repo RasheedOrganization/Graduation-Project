@@ -373,13 +373,13 @@ export default function Room() {
         <Modal open={customOpen} onClose={() => setCustomOpen(false)}>
           <Box sx={modalStyle}>
             <CustomProblemPanel
-              onAdd={(stmt, genTests) => {
+              onAdd={(stmt, sIn, sOut, genTests) => {
                 setProblemStatement(stmt);
-                setSampleInput('');
-                setSampleOutput('');
+                setSampleInput(sIn);
+                setSampleOutput(sOut);
                 updateTests(genTests);
                 if (socketRef.current) {
-                  socketRef.current.emit('problem-fetched', { statement: stmt, sampleInput: '', sampleOutput: '', tests: genTests });
+                  socketRef.current.emit('problem-fetched', { statement: stmt, sampleInput: sIn, sampleOutput: sOut, tests: genTests });
                 }
                 setShowProblem(true);
               }}
