@@ -88,7 +88,17 @@ async function submissionWorker(job) {
                     testsToRun = tests;
                 } else if (problemId) {
                     const pkg = await getTestPackageData(problemId);
-                    testsToRun = [{ input: pkg.main_tests, output: pkg.expected_output }];
+                    // if multiple tests were stored as newline-separated values, split them
+                    const inputs = pkg.main_tests
+                        .split(/\r?\n/)
+                        .filter(line => line.trim() !== '');
+                    const outputs = pkg.expected_output
+                        .split(/\r?\n/)
+                        .filter(line => line.trim() !== '');
+                    testsToRun = inputs.map((input, idx) => ({
+                        input,
+                        output: outputs[idx] || ''
+                    }));
                 } else {
                     throw new Error('No tests found');
                 }
@@ -108,6 +118,13 @@ async function submissionWorker(job) {
                 const test_path = path.join(folderPath);
 
                 let verdictData = 'Accepted';
+                const normalize = s =>
+                    s
+                        .trim()
+                        .split(/\r?\n/)
+                        .map(line => line.trim())
+                        .join('\n');
+
                 for (const t of testsToRun) {
                     await changeFile(inputfilepath, t.input);
                     await changeFile(expectedoutputpath, t.output);
@@ -135,7 +152,7 @@ async function submissionWorker(job) {
                         } else {
                             const userOutput = fs.readFileSync(outputfilepath, 'utf8');
                             const expected = fs.readFileSync(expectedoutputpath, 'utf8');
-                            verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                            verdictData = normalize(userOutput) === normalize(expected) ? 'Accepted' : 'Wrong Answer';
                         }
                         await changeFile(verdictfilepath, verdictData);
                     } else if (language === 'java') {
@@ -159,7 +176,7 @@ async function submissionWorker(job) {
                         } else {
                             const userOutput = fs.readFileSync(outputfilepath, 'utf8');
                             const expected = fs.readFileSync(expectedoutputpath, 'utf8');
-                            verdictData = userOutput.trim() === expected.trim() ? 'Accepted' : 'Wrong Answer';
+                            verdictData = normalize(userOutput) === normalize(expected) ? 'Accepted' : 'Wrong Answer';
                         }
                         await changeFile(verdictfilepath, verdictData);
                     } else {
@@ -177,6 +194,15 @@ async function submissionWorker(job) {
 
                         await runContainer(containerOptions);
                         verdictData = fs.readFileSync(verdictfilepath, 'utf8');
+                        if (verdictData.trim() === 'Wrong Answer') {
+                            const userOutput = fs.readFileSync(outputfilepath, 'utf8');
+                            const expected = fs.readFileSync(expectedoutputpath, 'utf8');
+                            verdictData =
+                                normalize(userOutput) === normalize(expected)
+                                    ? 'Accepted'
+                                    : 'Wrong Answer';
+                            await changeFile(verdictfilepath, verdictData);
+                        }
                     }
 
                     if (verdictData !== 'Accepted') {
