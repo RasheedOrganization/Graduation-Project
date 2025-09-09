@@ -18,6 +18,7 @@ const topicsRoute = require("./routes/topics");
 const problemsRoute = require("./routes/problems");
 const rateLimit = require('express-rate-limit');
 const aiRoute = require("./routes/ai");
+const Room = require('./model/roomModel');
 
 const app = express();
 
@@ -117,7 +118,17 @@ io.on('connection', (socket) => {
             msg: m.message
         })));
 
+        const roomDoc = await Room.findOne({ roomid: payload.roomid });
         const state = getRoomState(payload.roomid);
+        if (roomDoc) {
+            state.code = roomDoc.code || '';
+            state.statement = roomDoc.statement || '';
+            state.sampleInput = roomDoc.sampleInput || '';
+            state.sampleOutput = roomDoc.sampleOutput || '';
+            state.tests = roomDoc.tests || [];
+            state.language = roomDoc.language || 'cpp';
+            state.input = roomDoc.input || '';
+        }
         if(state.code){
             socket.emit('receive-code-update',{code: state.code});
         }
@@ -135,22 +146,25 @@ io.on('connection', (socket) => {
         }
     })
     
-    socket.on('update-code', (payload) => {
+    socket.on('update-code', async (payload) => {
         const state = getRoomState(socket.roomid);
         state.code = payload.code;
+        await Room.findOneAndUpdate({ roomid: socket.roomid }, { code: payload.code });
         // Broadcast the latest code to everyone else in the room
         socket.to(socket.roomid).emit('receive-code-update', { code: payload.code });
     });
 
-    socket.on('update-input', (payload) => {
+    socket.on('update-input', async (payload) => {
         const state = getRoomState(socket.roomid);
         state.input = payload.input;
+        await Room.findOneAndUpdate({ roomid: socket.roomid }, { input: payload.input });
         socket.to(socket.roomid).emit('receive-input-update',{input: payload.input});
     });
 
-    socket.on('update-language', (payload) => {
+    socket.on('update-language', async (payload) => {
         const state = getRoomState(socket.roomid);
         state.language = payload.language;
+        await Room.findOneAndUpdate({ roomid: socket.roomid }, { language: payload.language });
         socket.to(socket.roomid).emit('receive-language-update',{language: payload.language});
     });
 
@@ -159,12 +173,21 @@ io.on('connection', (socket) => {
         socket.to(socket.roomid).emit('receive-cursor-update', payload);
     });
 
-    socket.on('problem-fetched', (payload) => {
+    socket.on('problem-fetched', async (payload) => {
         const state = getRoomState(socket.roomid);
         state.statement = payload.statement;
         state.sampleInput = payload.sampleInput;
         state.sampleOutput = payload.sampleOutput;
         state.tests = payload.tests || [];
+        await Room.findOneAndUpdate(
+            { roomid: socket.roomid },
+            {
+                statement: payload.statement,
+                sampleInput: payload.sampleInput,
+                sampleOutput: payload.sampleOutput,
+                tests: payload.tests || [],
+            }
+        );
         socket.to(socket.roomid).emit('problem-fetched', payload);
     });
 
@@ -233,12 +256,16 @@ io.on('connection', (socket) => {
         io.to(socket.roomid).emit('ai-chat-cleared');
     });
 
-    socket.on('clear-problem', () => {
+    socket.on('clear-problem', async () => {
         const state = getRoomState(socket.roomid);
         state.statement = '';
         state.sampleInput = '';
         state.sampleOutput = '';
         state.tests = [];
+        await Room.findOneAndUpdate(
+            { roomid: socket.roomid },
+            { statement: '', sampleInput: '', sampleOutput: '', tests: [] }
+        );
         io.to(socket.roomid).emit('problem-cleared');
     });
 
