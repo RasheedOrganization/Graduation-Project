@@ -146,3 +146,16 @@
   color: #a00;
   font-weight: bold;
 }
+
+.submission-row {
+  cursor: pointer;
+}
+
+.code-row td {
+  background: #f7f7f7;
+}
+
+.code-row pre {
+  margin: 0;
+  white-space: pre-wrap;
+}

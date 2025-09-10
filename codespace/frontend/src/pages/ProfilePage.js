@@ -13,6 +13,7 @@ function ProfilePage() {
   const [showEdit, setShowEdit] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
   const [form, setForm] = useState({ username: '', displayName: '', password: '', currentPassword: '' });
+  const [expanded, setExpanded] = useState(null);
   const userId = localStorage.getItem('userid');
   const navigate = useNavigate();
 
@@ -190,17 +191,30 @@ function ProfilePage() {
             </thead>
             <tbody>
               {submissions.map((sub) => (
-                <tr key={sub._id}>
-                  <td>{sub.problem}</td>
-                  <td className={`verdict ${sub.verdict
-                    .toLowerCase()
-                    .replace(/\s+/g, '-')}`}
+                <React.Fragment key={sub._id}>
+                  <tr
+                    className="submission-row"
+                    onClick={() => setExpanded(expanded === sub._id ? null : sub._id)}
                   >
-                    {sub.verdict}
-                  </td>
-                  <td>{sub.language}</td>
-                  <td>{new Date(sub.createdAt).toLocaleString()}</td>
-                </tr>
+                    <td>{sub.problem}</td>
+                    <td
+                      className={`verdict ${sub.verdict
+                        .toLowerCase()
+                        .replace(/\s+/g, '-')}`}
+                    >
+                      {sub.verdict}
+                    </td>
+                    <td>{sub.language}</td>
+                    <td>{new Date(sub.createdAt).toLocaleString()}</td>
+                  </tr>
+                  {expanded === sub._id && (
+                    <tr className="code-row">
+                      <td colSpan="4">
+                        <pre>{sub.code}</pre>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

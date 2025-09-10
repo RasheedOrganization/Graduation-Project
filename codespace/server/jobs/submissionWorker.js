@@ -125,7 +125,8 @@ async function submissionWorker(job) {
                         .map(line => line.trim())
                         .join('\n');
 
-                for (const t of testsToRun) {
+                for (let i = 0; i < testsToRun.length; i++) {
+                    const t = testsToRun[i];
                     await changeFile(inputfilepath, t.input);
                     await changeFile(expectedoutputpath, t.output);
                     await changeFile(sourcefilepath, code);
@@ -206,6 +207,7 @@ async function submissionWorker(job) {
                     }
 
                     if (verdictData !== 'Accepted') {
+                        verdictData = `${verdictData} on test ${i + 1}`;
                         break;
                     }
                 }
