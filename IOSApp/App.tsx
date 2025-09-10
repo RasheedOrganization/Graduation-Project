@@ -27,9 +27,20 @@ export default function App(): React.JSX.Element {
         animationType="slide"
         onRequestClose={toggleMenu}>
         <View style={styles.menuContainer}>
-          <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
-            <Text style={styles.menuText}>Close</Text>
-          </TouchableOpacity>
+          <View style={styles.menuContent}>
+            <TouchableOpacity onPress={toggleMenu} style={styles.menuItem}>
+              <Text style={styles.menuItemText}>Close</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemText}>Problems</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemText}>Sections</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemText}>Resources</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </View>
@@ -54,7 +65,22 @@ const styles = StyleSheet.create({
   webView: {flex: 1},
   menuContainer: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+  },
+  menuContent: {
+    width: 200,
     backgroundColor: '#fff',
+    height: '100%',
     paddingTop: 50,
+    paddingHorizontal: 16,
+  },
+  menuItem: {
+    paddingVertical: 10,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: '#000',
   },
 });
