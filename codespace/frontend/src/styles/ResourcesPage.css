@@ -118,7 +118,7 @@
   border-radius: 8px;
   position: relative;
   cursor: pointer;
-  min-height: 120px;
+  max-height: 120px;
 }
 
 .resource-header {
