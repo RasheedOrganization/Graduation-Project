@@ -71,7 +71,12 @@ function SectionsPage() {
   const updateProgress = async (value) => {
     if (!subtopicId) return;
     try {
-      await axios.patch(`${BACKEND_URL}/api/topics/${subtopicId}`, { progress: value });
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${BACKEND_URL}/api/topics/${subtopicId}`,
+        { progress: value },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setProgress(value);
     } catch (err) {
       console.error('Failed to update progress', err);
