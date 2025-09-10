@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Box, Typography, Button, List, ListItem, TextField, MenuItem } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, Modal } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
+import CustomProblemPanel from '../components/CustomProblemPanel';
+import { v4 as uuidv4 } from 'uuid';
 
 function ContestDetailPage() {
   const { id } = useParams();
@@ -10,7 +12,7 @@ function ContestDetailPage() {
   const [timeLeft, setTimeLeft] = useState('');
   const [registered, setRegistered] = useState(false);
   const [problemList, setProblemList] = useState([]);
-  const [selectedProblem, setSelectedProblem] = useState('');
+  const [customOpen, setCustomOpen] = useState(false);
   const isPastContest = contest && new Date(contest.startTime) <= Date.now();
   const role = localStorage.getItem('role');
   const token = localStorage.getItem('token');
@@ -114,27 +116,16 @@ function ContestDetailPage() {
     }
   };
 
-  const addProblem = async () => {
-    if (!isAdmin) return;
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/contests/${id}/problems`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ problem: selectedProblem })
-      });
-      if (res.ok) {
-        setContest((prev) => ({
-          ...prev,
-          problems: [...(prev.problems || []), selectedProblem]
-        }));
-        setSelectedProblem('');
-      }
-    } catch (err) {
-      console.error('Failed to add problem');
-    }
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'white',
+    padding: '20px',
+    maxWidth: '90vw',
+    maxHeight: '90vh',
+    overflowY: 'auto',
   };
 
   return (
@@ -177,26 +168,9 @@ function ContestDetailPage() {
                 )}
               </List>
               {!isPastContest && isAdmin && (
-                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                  <TextField
-                    select
-                    label="Add Problem"
-                    value={selectedProblem}
-                    onChange={(e) => setSelectedProblem(e.target.value)}
-                    sx={{ minWidth: 200 }}
-                  >
-                    {problemList.map((p) => (
-                      <MenuItem key={p.id} value={p.problem_name}>
-                        {p.problem_name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <Button
-                    variant="contained"
-                    onClick={addProblem}
-                    disabled={!selectedProblem}
-                  >
-                    Add
+                <Box sx={{ mt: 2 }}>
+                  <Button variant="contained" onClick={() => setCustomOpen(true)}>
+                    Add Problem
                   </Button>
                 </Box>
               )}
@@ -229,6 +203,51 @@ function ContestDetailPage() {
           <Typography>Loading...</Typography>
         )}
       </Box>
+      <Modal open={customOpen} onClose={() => setCustomOpen(false)}>
+        <Box sx={modalStyle}>
+          <CustomProblemPanel
+            onAdd={async (stmt, sIn, sOut, tests) => {
+              const problem_name = prompt('Enter problem name');
+              if (!problem_name) return;
+              const problemId = uuidv4();
+              try {
+                await fetch(`${BACKEND_URL}/api/new`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    id: problemId,
+                    problem_name,
+                    statement: stmt,
+                    sinput: sIn,
+                    soutput: sOut,
+                    main_tests: tests.map(t => t.input).join('\n'),
+                    expected_output: tests.map(t => t.output).join('\n'),
+                  }),
+                });
+                await fetch(`${BACKEND_URL}/api/contests/${id}/problems`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ problem: problem_name }),
+                });
+                setContest(prev => ({
+                  ...prev,
+                  problems: [...(prev.problems || []), problem_name],
+                }));
+                setProblemList(prev => ([
+                  ...prev,
+                  { id: problemId, problem_name, statement: stmt, sinput: sIn, soutput: sOut },
+                ]));
+              } catch (err) {
+                console.error('Failed to add problem', err);
+              }
+            }}
+            onClose={() => setCustomOpen(false)}
+          />
+        </Box>
+      </Modal>
     </>
   );
 }
