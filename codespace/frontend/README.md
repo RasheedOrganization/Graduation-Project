@@ -2,6 +2,16 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Image placeholders
+
+Place the following files under `public/images/` when providing real assets:
+
+- `feature_problems.jpg`
+- `feature_resources.jpg`
+- `feature_sections.jpg`
+- `feature_contests.jpg`
+- `feature_rooms.jpg`
+
 ## Markdown Rendering
 
 AI chat messages are rendered with [react-markdown](https://github.com/remarkjs/react-markdown) and GitHub Flavored Markdown via `remark-gfm`.
