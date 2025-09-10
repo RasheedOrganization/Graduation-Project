@@ -245,8 +245,9 @@ export default function TextBox({socketRef,currentProbId,tests,onCodeChange,room
             const response = await axios.post(submitUrl, requestData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setOutputvalue(response.data);
-            setColor(response.data.trim()==="Accepted" ? 'green' : 'red');
+            const verdict = response.data.trim();
+            setOutputvalue(verdict);
+            setColor(verdict.startsWith('Accepted') ? 'green' : 'red');
         }
         catch(error){
             if (error.response && error.response.status === 401) {

@@ -17,6 +17,13 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
   const [cfLink, setCfLink] = useState('');
   const [fetchError, setFetchError] = useState(null);
 
+  const formatIO = (val) =>
+    Array.isArray(val)
+      ? val.join(' ')
+      : typeof val === 'object'
+      ? JSON.stringify(val)
+      : String(val);
+
   function sanitize(statement) {
     let res = "";
     let buffer = "";
@@ -88,8 +95,8 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
       maxArrayLength: maxLen,
     });
     if (res.data.tests && res.data.tests[0]) {
-      setSampleInput(res.data.tests[0].input);
-      setSampleOutput(res.data.tests[0].output);
+      setSampleInput(formatIO(res.data.tests[0].input));
+      setSampleOutput(formatIO(res.data.tests[0].output));
     }
   };
 
@@ -100,7 +107,12 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
       maxArrayLength: maxLen,
     });
     if (res.data.tests) {
-      setTests(res.data.tests);
+      setTests(
+        res.data.tests.map((t) => ({
+          input: formatIO(t.input),
+          output: formatIO(t.output),
+        }))
+      );
     }
   };
 
