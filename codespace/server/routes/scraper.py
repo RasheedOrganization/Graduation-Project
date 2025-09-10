@@ -44,33 +44,29 @@ for statement in problem_statements:
     output_spec = statement.find(class_='output-specification').text.strip().replace('Output', '')
     # print("Output Specification:", output_spec)
     
+    legend = statement.find('div', class_='legend')
     problem = ""
-    for child in statement.children:
-        if child.name == 'div' and ('input-specification' in child.get('class', [])):
-            break
+    if legend:
+        problem = legend.get_text('\n', strip=True)
 
-        if child.name == 'div' and ('header' not in child.get('class', [])):
-            problem += child.text.strip()
+    examples = statement.find('div', class_='sample-tests')
+    inputs = []
+    outputs = []
+    if examples:
+        for sample in examples.find_all('div', class_='sample-test'):
+            input_div = sample.find('div', class_='input')
+            output_div = sample.find('div', class_='output')
+            if input_div:
+                pre = input_div.find('pre')
+                if pre:
+                    inputs.append(pre.get_text('\n', strip=True))
+            if output_div:
+                pre = output_div.find('pre')
+                if pre:
+                    outputs.append(pre.get_text('\n', strip=True))
 
-    # sample inputs
-    examples = statement.find(class_='sample-tests')
-    input_tests = examples.find_all(class_='test-example-line')
-
-    inputs = ""
-    for i in input_tests: 
-        input_example_lines = i.text.strip()
-        inputs += input_example_lines
-        inputs += '\n'
-    
-    # sample outputs
-    output_tests = examples.find_all(class_='output')    
-    outputs = ""
-
-    # print(output_tests.text.strip())
-    for i in output_tests:  
-        output_example_lines = i.text.strip().replace('Output\n', '')
-        outputs += output_example_lines
-        outputs += '\n'
+    sample_input = "\n\n".join(inputs)
+    sample_outputs = "\n\n".join(outputs)
     
     note = statement.find(class_='note')
     notes = ""
@@ -87,8 +83,8 @@ for statement in problem_statements:
         "input_format": input_spec,
         "output_format": output_spec,
         "statement": problem,
-        "sample_input": inputs,   
-        "sample_outputs": outputs,
+        "sample_input": sample_input,
+        "sample_outputs": sample_outputs,
         "note": notes
     }
 
