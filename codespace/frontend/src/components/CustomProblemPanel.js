@@ -134,9 +134,11 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
       <TextField
         multiline
         minRows={6}
+        maxRows={20}
         value={statement}
         onChange={(e) => setStatement(e.target.value)}
         placeholder="Write your problem statement here"
+        inputProps={{ style: { overflowY: 'auto' } }}
       />
 
       <Box>
