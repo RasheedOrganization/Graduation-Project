@@ -30,8 +30,8 @@ router.post('/', auth, permit('admin', 'superadmin'), async (req, res) => {
     const { stage, topic, subtopic } = req.body;
     await Topic.updateOne(
       { stage, topic, subtopic },
-      { stage, topic, subtopic },
-      { upsert: true }
+      { $set: { stage, topic, subtopic } },
+      { upsert: true, setDefaultsOnInsert: true }
     );
     res.status(201).json({ stage, topic, subtopic });
   } catch (err) {

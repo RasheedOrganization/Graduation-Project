@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { randomUUID } = require('crypto');
 
 const topicSchema = new mongoose.Schema({
-  id: { type: String, default: randomUUID, unique: true },
+  id: { type: String, default: () => randomUUID(), unique: true },
   stage: {
     type: String,
     enum: ['Bronze', 'Silver', 'Gold'],
