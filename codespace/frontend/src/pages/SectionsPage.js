@@ -80,7 +80,12 @@ function SectionsPage() {
 
   const updateResourceStatus = async (id, status) => {
     try {
-      await axios.patch(`${BACKEND_URL}/api/resources/${id}`, { status });
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${BACKEND_URL}/api/resources/${id}`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setResources((prev) =>
         prev.map((r) => (r._id === id ? { ...r, status } : r))
       );
@@ -91,7 +96,12 @@ function SectionsPage() {
 
   const updateProblemStatus = async (id, status) => {
     try {
-      await axios.patch(`${BACKEND_URL}/api/problems/${id}`, { status });
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `${BACKEND_URL}/api/problems/${id}`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setProblems((prev) =>
         prev.map((p) => (p._id === id ? { ...p, status } : p))
       );
