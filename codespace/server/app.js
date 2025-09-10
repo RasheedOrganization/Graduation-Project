@@ -3,7 +3,7 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { Server } = require("socket.io");
 const cors = require('cors');
-const fetch = require('node-fetch');
+const { callGemini, extractText } = require('./utils/gemini');
 const codeRunner = require("./routes/codeRunner")
 const submit = require("./routes/submit")
 const api1 = require("./routes/api")
@@ -227,16 +227,8 @@ io.on('connection', (socket) => {
             text = `${prompt}\n\nExplain the following code:\n${code}`;
         }
         try {
-            const apiKey = "AIzaSyCxEUSKz296qV7qCFgNvRe_7jYMe9Y8LyI";
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}` , {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text }] }] })
-            });
-            const data = await response.json();
-            const aiText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts
-                ? data.candidates[0].content.parts.map(p => p.text).join('')
-                : 'No response';
+            const data = await callGemini(text);
+            const aiText = extractText(data);
             io.to(socket.roomid).emit('ai-bot-message', { text: aiText });
             state.aiChat.push({ type: 'ai', username: 'AI', text: aiText });
         } catch (err) {
