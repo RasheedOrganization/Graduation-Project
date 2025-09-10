@@ -42,20 +42,37 @@ router.post('/', auth, permit('admin', 'superadmin'), async (req, res) => {
   }
 });
 
-router.patch('/:id', auth, permit('admin', 'superadmin'), async (req, res) => {
+router.patch('/:id', auth, async (req, res) => {
   try {
     const { status, name, link, stage, topic, subtopic } = req.body;
     const update = {};
+
+    const isAdmin =
+      req.user && (req.user.role === 'admin' || req.user.role === 'superadmin');
+
     if (status !== undefined) update.status = status;
-    if (name !== undefined) update.name = name;
-    if (link !== undefined) update.link = link;
-    if (stage !== undefined) update.stage = stage;
-    if (topic !== undefined) update.topic = topic;
-    if (subtopic !== undefined) update.subtopic = subtopic;
 
-    const resource = await Resource.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!isAdmin && (name || link || stage || topic || subtopic)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
 
-    if (resource && (update.stage !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
+    if (isAdmin) {
+      if (name !== undefined) update.name = name;
+      if (link !== undefined) update.link = link;
+      if (stage !== undefined) update.stage = stage;
+      if (topic !== undefined) update.topic = topic;
+      if (subtopic !== undefined) update.subtopic = subtopic;
+    }
+
+    const resource = await Resource.findByIdAndUpdate(req.params.id, update, {
+      new: true,
+    });
+
+    if (
+      isAdmin &&
+      resource &&
+      (update.stage !== undefined || update.topic !== undefined || update.subtopic !== undefined)
+    ) {
       await Topic.updateOne(
         { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic },
         { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic },

@@ -59,24 +59,44 @@ router.post('/', auth, permit('admin', 'superadmin'), async (req, res) => {
   }
 });
 
-router.patch('/:id', auth, permit('admin', 'superadmin'), async (req, res) => {
+router.patch('/:id', auth, async (req, res) => {
   try {
     const { name, link, stage, topic, subtopic, difficulty, status } = req.body;
     const update = {};
-    if (name !== undefined) update.name = name;
-    if (link !== undefined) {
-      update.link = link;
-      update.domain = getDomain(link);
-    }
-    if (stage !== undefined) update.stage = stage;
-    if (topic !== undefined) update.topic = topic;
-    if (subtopic !== undefined) update.subtopic = subtopic;
-    if (difficulty !== undefined) update.difficulty = difficulty;
+
+    const isAdmin =
+      req.user && (req.user.role === 'admin' || req.user.role === 'superadmin');
+
     if (status !== undefined) update.status = status;
 
-    const problem = await Problem.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (
+      !isAdmin &&
+      (name || link || stage || topic || subtopic || difficulty)
+    ) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
 
-    if (problem && (update.stage !== undefined || update.topic !== undefined || update.subtopic !== undefined)) {
+    if (isAdmin) {
+      if (name !== undefined) update.name = name;
+      if (link !== undefined) {
+        update.link = link;
+        update.domain = getDomain(link);
+      }
+      if (stage !== undefined) update.stage = stage;
+      if (topic !== undefined) update.topic = topic;
+      if (subtopic !== undefined) update.subtopic = subtopic;
+      if (difficulty !== undefined) update.difficulty = difficulty;
+    }
+
+    const problem = await Problem.findByIdAndUpdate(req.params.id, update, {
+      new: true,
+    });
+
+    if (
+      isAdmin &&
+      problem &&
+      (update.stage !== undefined || update.topic !== undefined || update.subtopic !== undefined)
+    ) {
       await Topic.updateOne(
         { stage: problem.stage, topic: problem.topic, subtopic: problem.subtopic },
         { stage: problem.stage, topic: problem.topic, subtopic: problem.subtopic },
