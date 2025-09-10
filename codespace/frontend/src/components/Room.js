@@ -17,7 +17,6 @@ import BACKEND_URL from '../config';
 import '../styles/RoomPage.css';
 import leave from '../assets/images/logout_1.png'
 import styled from "styled-components";
-import CFparser from './LHS/CFparser';
 import CustomProblemPanel from './CustomProblemPanel';
 
 
@@ -75,7 +74,6 @@ export default function Room() {
     const [problemStatement, setProblemStatement] = useState("");
     const [sampleInput, setSampleInput] = useState("");
     const [sampleOutput, setSampleOutput] = useState("");
-    const [fetchOpen, setFetchOpen] = useState(false);
     const [customOpen, setCustomOpen] = useState(false);
     const [tests, setTests] = useState(() => {
       const saved = roomid ? localStorage.getItem(`tests_${roomid}`) : null;
@@ -84,8 +82,7 @@ export default function Room() {
     const [activeTab, setActiveTab] = useState('general');
     const [code, setCode] = useState('');
 
-    const handleFetchClick = () => setFetchOpen(true);
-    const handleWriteClick = () => setCustomOpen(true);
+    const handleProblemClick = () => setCustomOpen(true);
     const updateTests = (newTests) => {
       setTests(newTests);
       if (roomid) {
@@ -331,17 +328,10 @@ export default function Room() {
                 <div className='problem-options'>
                   <button
                     className='view-problem-button'
-                    onClick={handleFetchClick}
-                    title='Fetch a problem from Codeforces'
+                    onClick={handleProblemClick}
+                    title='Create or fetch a problem'
                   >
-                    Fetch from Codeforces
-                  </button>
-                  <button
-                    className='view-problem-button'
-                    onClick={handleWriteClick}
-                    title='Create and share your own problem'
-                  >
-                    Write a Problem
+                    Add Problem
                   </button>
                 </div>
               )}
@@ -357,19 +347,6 @@ export default function Room() {
             </div>
           </div>
         </div>
-        <Modal open={fetchOpen} onClose={() => setFetchOpen(false)}>
-          <Box sx={modalStyle}>
-            <CFparser
-              socketRef={socketRef}
-              setStatement={(stmt) => { setProblemStatement(stmt); }}
-              setProblemName={() => {}}
-              setSampleInput={setSampleInput}
-              setSampleOutput={setSampleOutput}
-              setInput={(stmt) => { setProblemStatement(stmt); }}
-              onFetched={() => { setFetchOpen(false); setShowProblem(true); }}
-            />
-          </Box>
-        </Modal>
         <Modal open={customOpen} onClose={() => setCustomOpen(false)}>
           <Box sx={modalStyle}>
             <CustomProblemPanel
