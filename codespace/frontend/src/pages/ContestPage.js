@@ -9,7 +9,10 @@ import {
   CardActions,
   Button,
   Typography,
-  TextField
+  TextField,
+  MenuItem,
+  List,
+  ListItem
 } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
@@ -39,6 +42,9 @@ function ContestPage() {
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
   const [form, setForm] = useState({ name: '', startTime: '', duration: '' });
+  const [problemList, setProblemList] = useState([]);
+  const [selectedProblem, setSelectedProblem] = useState('');
+  const [contestProblems, setContestProblems] = useState([]);
   const userId = localStorage.getItem('userid');
   const role = localStorage.getItem('role');
   const token = localStorage.getItem('token');
@@ -83,6 +89,30 @@ function ContestPage() {
     fetchContests();
   }, []);
 
+  useEffect(() => {
+    async function fetchProblems() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/problem-list`);
+        if (res.ok) {
+          const data = await res.json();
+          setProblemList(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch problems');
+      }
+    }
+    if (isAdmin) {
+      fetchProblems();
+    }
+  }, [isAdmin]);
+
+  const addProblem = () => {
+    if (selectedProblem && !contestProblems.includes(selectedProblem)) {
+      setContestProblems((prev) => [...prev, selectedProblem]);
+      setSelectedProblem('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isAdmin) return;
@@ -96,12 +126,14 @@ function ContestPage() {
         body: JSON.stringify({
           name: form.name,
           startTime: new Date(form.startTime).toISOString(),
-          duration: Number(form.duration)
+          duration: Number(form.duration),
+          problems: contestProblems
         })
       });
       const data = await res.json();
       if (res.ok) {
         setForm({ name: '', startTime: '', duration: '' });
+        setContestProblems([]);
         fetchContests();
         alert('Contest scheduled');
       } else {
@@ -142,31 +174,58 @@ function ContestPage() {
       <NavBar />
       <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
         {isAdmin && (
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <TextField
-              label="Name"
-              name="name"
-              value={form.name}
-              onChange={handleInputChange}
-              required
-            />
-            <TextField
-              label="Start Time"
-              type="datetime-local"
-              name="startTime"
-              value={form.startTime}
-              onChange={handleInputChange}
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-            <TextField
-              label="Duration (min)"
-              type="number"
-              name="duration"
-              value={form.duration}
-              onChange={handleInputChange}
-              required
-            />
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Name"
+                name="name"
+                value={form.name}
+                onChange={handleInputChange}
+                required
+              />
+              <TextField
+                label="Start Time"
+                type="datetime-local"
+                name="startTime"
+                value={form.startTime}
+                onChange={handleInputChange}
+                InputLabelProps={{ shrink: true }}
+                required
+              />
+              <TextField
+                label="Duration (min)"
+                type="number"
+                name="duration"
+                value={form.duration}
+                onChange={handleInputChange}
+                required
+              />
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                select
+                label="Add Problem"
+                value={selectedProblem}
+                onChange={(e) => setSelectedProblem(e.target.value)}
+                sx={{ minWidth: 200 }}
+              >
+                {problemList.map((p) => (
+                  <MenuItem key={p.id} value={p.problem_name}>
+                    {p.problem_name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Button variant="outlined" onClick={addProblem} disabled={!selectedProblem}>
+                Add
+              </Button>
+            </Box>
+            {contestProblems.length > 0 && (
+              <List sx={{ maxHeight: 150, overflow: 'auto' }}>
+                {contestProblems.map((p, idx) => (
+                  <ListItem key={idx}>{p}</ListItem>
+                ))}
+              </List>
+            )}
             <Button type="submit" variant="contained">Schedule</Button>
           </Box>
         )}
