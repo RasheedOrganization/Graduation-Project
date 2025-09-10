@@ -5,6 +5,7 @@ const router = express.Router();
 
 const { submissionQueue, waitforJobCompletion } = require('../jobs/submissionWorker');
 const Submission = require('../model/submissionModel');
+const PracticeProblem = require('../model/practiceProblemModel');
 
 const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/graduation_project';
 mongoose.connect(url);
@@ -49,9 +50,14 @@ router.post('/', authenticate, async (req, res) => {
   }
 
   try {
+    let problemName = 'Custom Problem';
+    if (problem_id) {
+      const problem = await PracticeProblem.findOne({ id: problem_id }).select('name');
+      problemName = problem ? problem.name : problem_id;
+    }
     const submission = new Submission({
       user: req.user.id,
-      problem: problem_id || 'custom',
+      problem: problemName,
       code,
       verdict: verdictData,
       language,
