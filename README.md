@@ -140,6 +140,20 @@ npx react-native run-android
 
 The app shares configuration via `src/config.ts` and includes an `AsyncButton` component adapted from the web frontend. Ensure an Android emulator or device and the Android SDK are available before running.
 
+## IOS App
+
+A TypeScript React Native project lives under `IOSApp/` and mirrors the Android client while targeting iOS.
+
+### Running on iOS
+
+```bash
+cd IOSApp
+npm install
+npx react-native run-ios
+```
+
+The app reuses shared business logic and components from the Android project.
+
 ### Code execution sandbox
 
 The `/test` endpoint compiles and runs user-submitted C++ code inside a
