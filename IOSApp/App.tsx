@@ -31,14 +31,12 @@ export default function App(): React.JSX.Element {
             <TouchableOpacity onPress={toggleMenu} style={styles.menuItem}>
               <Text style={styles.menuItemText}>Close</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Text style={styles.menuItemText}>Problems</Text>
+            <Text style={styles.sectionHeader}>Sections</Text>
+            <TouchableOpacity style={styles.subItem}>
+              <Text style={styles.subItemText}>Problems</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Text style={styles.menuItemText}>Sections</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Text style={styles.menuItemText}>Resources</Text>
+            <TouchableOpacity style={styles.subItem}>
+              <Text style={styles.subItemText}>Resources</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -52,7 +50,9 @@ const styles = StyleSheet.create({
   topBar: {
     height: '10%',
     backgroundColor: '#000',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 16,
   },
   menuButton: {
@@ -60,14 +60,14 @@ const styles = StyleSheet.create({
   },
   menuText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
   },
   webView: {flex: 1},
   menuContainer: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'flex-start',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   menuContent: {
     width: 200,
@@ -80,7 +80,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   menuItemText: {
-    fontSize: 16,
+    fontSize: 14,
+    color: '#000',
+  },
+  sectionHeader: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+  subItem: {
+    paddingVertical: 8,
+    paddingLeft: 10,
+  },
+  subItemText: {
+    fontSize: 12,
     color: '#000',
   },
 });
