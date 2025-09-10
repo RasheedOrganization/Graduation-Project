@@ -9,10 +9,7 @@ import {
   CardActions,
   Button,
   Typography,
-  TextField,
-  MenuItem,
-  List,
-  ListItem
+  TextField
 } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
@@ -42,9 +39,6 @@ function ContestPage() {
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
   const [form, setForm] = useState({ name: '', startTime: '', duration: '' });
-  const [problemList, setProblemList] = useState([]);
-  const [selectedProblem, setSelectedProblem] = useState('');
-  const [contestProblems, setContestProblems] = useState([]);
   const userId = localStorage.getItem('userid');
   const role = localStorage.getItem('role');
   const token = localStorage.getItem('token');
@@ -89,29 +83,6 @@ function ContestPage() {
     fetchContests();
   }, []);
 
-  useEffect(() => {
-    async function fetchProblems() {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/problem-list`);
-        if (res.ok) {
-          const data = await res.json();
-          setProblemList(data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch problems');
-      }
-    }
-    if (isAdmin) {
-      fetchProblems();
-    }
-  }, [isAdmin]);
-
-  const addProblem = () => {
-    if (selectedProblem && !contestProblems.includes(selectedProblem)) {
-      setContestProblems((prev) => [...prev, selectedProblem]);
-      setSelectedProblem('');
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,14 +97,12 @@ function ContestPage() {
         body: JSON.stringify({
           name: form.name,
           startTime: new Date(form.startTime).toISOString(),
-          duration: Number(form.duration),
-          problems: contestProblems
+          duration: Number(form.duration)
         })
       });
       const data = await res.json();
       if (res.ok) {
         setForm({ name: '', startTime: '', duration: '' });
-        setContestProblems([]);
         fetchContests();
         alert('Contest scheduled');
       } else {
@@ -201,31 +170,6 @@ function ContestPage() {
                 required
               />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                select
-                label="Add Problem"
-                value={selectedProblem}
-                onChange={(e) => setSelectedProblem(e.target.value)}
-                sx={{ minWidth: 200 }}
-              >
-                {problemList.map((p) => (
-                  <MenuItem key={p.id} value={p.problem_name}>
-                    {p.problem_name}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Button variant="outlined" onClick={addProblem} disabled={!selectedProblem}>
-                Add
-              </Button>
-            </Box>
-            {contestProblems.length > 0 && (
-              <List sx={{ maxHeight: 150, overflow: 'auto' }}>
-                {contestProblems.map((p, idx) => (
-                  <ListItem key={idx}>{p}</ListItem>
-                ))}
-              </List>
-            )}
             <Button type="submit" variant="contained">Schedule</Button>
           </Box>
         )}
