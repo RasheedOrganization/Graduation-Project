@@ -126,20 +126,6 @@ npm start
 Adjust any variables in the `.env` files if your local services run on different
 hosts or ports.
 
-## Android App
-
-A React Native project lives under `AndroidApp/` and provides a basic mobile client.
-
-### Running on Android
-
-```bash
-cd AndroidApp
-npm install
-npx react-native run-android
-```
-
-The app shares configuration via `src/config.ts` and includes an `AsyncButton` component adapted from the web frontend. Ensure an Android emulator or device and the Android SDK are available before running.
-
 ## IOS App
 
 A TypeScript React Native project lives under `IOSApp/` and mirrors the Android client while targeting iOS.
@@ -149,7 +135,7 @@ A TypeScript React Native project lives under `IOSApp/` and mirrors the Android 
 ```bash
 cd IOSApp
 npm install
-npx react-native run-ios
+npx react-native run-ios --simulator "iPhone 16"
 ```
 
 The app reuses shared business logic and components from the Android project.
