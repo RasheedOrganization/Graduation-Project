@@ -18,6 +18,7 @@ function NavBar() {
   const [searchResults, setSearchResults] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [usOpen, setUsOpen] = useState(false);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
@@ -108,6 +109,12 @@ function NavBar() {
 
   const handleLinkClick = () => {
     setMenuOpen(false);
+    setUsOpen(false);
+  };
+
+  const toggleUS = (e) => {
+    e.stopPropagation();
+    setUsOpen((prev) => !prev);
   };
 
   return (
@@ -158,8 +165,17 @@ function NavBar() {
         ☰
       </button>
       <ul className={`navbar-links ${menuOpen ? 'open' : ''}`} onClick={handleLinkClick}>
-        <li><Link to="/problems">Problems</Link></li>
-        <li><Link to="/resources">Resources</Link></li>
+        <li className="dropdown">
+          <button className="dropdown-toggle" onClick={toggleUS}>
+            US {usOpen ? '-' : '+'}
+          </button>
+          {usOpen && (
+            <ul className="dropdown-menu">
+              <li><Link to="/problems">Problems</Link></li>
+              <li><Link to="/resources">Resources</Link></li>
+            </ul>
+          )}
+        </li>
         <li><Link to="/sections">Sections</Link></li>
         <li><Link to="/contests">Contests</Link></li>
         <li><Link to="/rooms">Rooms</Link></li>

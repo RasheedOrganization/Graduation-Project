@@ -25,6 +25,7 @@ function SectionsPage() {
   const [resources, setResources] = useState([]);
   const [problems, setProblems] = useState([]);
   const [progress, setProgress] = useState('not started');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -126,14 +127,18 @@ function SectionsPage() {
   return (
     <div>
       <NavBar />
+      <button className="sidebar-toggle" onClick={() => setSidebarOpen((prev) => !prev)}>
+        Sections {sidebarOpen ? '-' : '+'}
+      </button>
       <div className="sections-page">
-        <div className="sections-sidebar">
-          <FormControl fullWidth className="stage-select">
-            <InputLabel id="stage-select-label">Stage</InputLabel>
-            <Select
-              labelId="stage-select-label"
-              value={stageFilter}
-              label="Stage"
+        {sidebarOpen && (
+          <div className="sections-sidebar">
+            <FormControl fullWidth className="stage-select">
+              <InputLabel id="stage-select-label">Stage</InputLabel>
+              <Select
+                labelId="stage-select-label"
+                value={stageFilter}
+                label="Stage"
               onChange={(e) => {
                 setStageFilter(e.target.value);
                 setSelectedTopic(null);
@@ -147,31 +152,32 @@ function SectionsPage() {
               ))}
             </Select>
           </FormControl>
-          <div className="topics-list">
-            {Object.keys(topics[stageFilter] || {}).map((t) => (
-              <div key={t} className="topic-item">
-                <div className="topic-name">{t}</div>
-                <ul>
-                  {topics[stageFilter][t].map((sub) => (
-                    <li
-                      key={sub._id}
-                      className={
-                        selectedStage === stageFilter &&
-                        selectedTopic === t &&
-                        selectedSubtopic === sub.subtopic
-                          ? 'selected'
-                          : ''
-                      }
-                      onClick={() => loadContent(stageFilter, t, sub)}
-                    >
-                      {sub.subtopic}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <div className="topics-list">
+              {Object.keys(topics[stageFilter] || {}).map((t) => (
+                <div key={t} className="topic-item">
+                  <div className="topic-name">{t}</div>
+                  <ul>
+                    {topics[stageFilter][t].map((sub) => (
+                      <li
+                        key={sub._id}
+                        className={
+                          selectedStage === stageFilter &&
+                          selectedTopic === t &&
+                          selectedSubtopic === sub.subtopic
+                            ? 'selected'
+                            : ''
+                        }
+                        onClick={() => loadContent(stageFilter, t, sub)}
+                      >
+                        {sub.subtopic}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div className="sections-content">
           {selectedSubtopic ? (
             <div>
