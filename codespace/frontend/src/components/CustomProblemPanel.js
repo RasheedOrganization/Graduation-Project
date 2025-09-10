@@ -14,6 +14,65 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
   const [tests, setTests] = useState([]); // hidden tests
   const [hiddenCount, setHiddenCount] = useState(5);
   const [maxLen, setMaxLen] = useState(10);
+  const [cfLink, setCfLink] = useState('');
+  const [fetchError, setFetchError] = useState(null);
+
+  function sanitize(statement) {
+    let res = "";
+    let buffer = "";
+    let count = 0;
+    for (let i = 0; i < statement.length; i++) {
+      const char = statement.charAt(i);
+      if (/\w/.test(char)) {
+        buffer += char;
+      } else {
+        if (buffer !== "") {
+          res += buffer;
+          buffer = "";
+          count++;
+        }
+        if (char === "$" && statement.charAt(i + 1) === "$" && statement.charAt(i + 2) === "$") {
+          res += "$$";
+          i += 2;
+        } else {
+          res += char;
+        }
+      }
+      if (char === '.' && count > 5) {
+        res += "\n";
+        count = 0;
+      }
+    }
+    if (buffer !== "") {
+      res += buffer;
+    }
+    return res;
+  }
+
+  const handleFetchCF = async () => {
+    setFetchError(null);
+    if (!cfLink) return;
+    try {
+      const encodedURL = encodeURIComponent(cfLink);
+      const res = await axios.get(`${BACKEND_URL}/api/parse_problem/${encodedURL}`);
+      const data = res.data;
+      if (data.error) {
+        setFetchError(data.error);
+        return;
+      }
+      let newStatement = `<h2><strong>${data.title}</strong></h2>\n`;
+      newStatement += sanitize(data.statement);
+      newStatement += `<h3><strong>Input format</strong></h3>\n`;
+      newStatement += sanitize(data.input_format);
+      newStatement += `<h3><strong>Output format</strong></h3>\n`;
+      newStatement += sanitize(data.output_format);
+      setStatement(newStatement);
+      setSampleInput(data.sample_input);
+      setSampleOutput(data.sample_outputs);
+    } catch (err) {
+      setFetchError(err.message);
+    }
+  };
 
   const handleVerify = async () => {
     const res = await axios.post(`${BACKEND_URL}/api/ai/verify-problem`, { statement });
@@ -59,6 +118,19 @@ const CustomProblemPanel = ({ onAdd, onClose }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 600 }}>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <TextField
+          label="Codeforces Link"
+          value={cfLink}
+          onChange={(e) => setCfLink(e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <AsyncButton size="small" variant="outlined" onClick={handleFetchCF} sx={{ minWidth: 100 }}>
+          Fetch
+        </AsyncButton>
+      </Stack>
+      {fetchError && <Typography color="error">{fetchError}</Typography>}
       <TextField
         multiline
         minRows={6}
