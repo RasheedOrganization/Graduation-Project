@@ -5,7 +5,9 @@ import {WEB_URL} from './src/config';
 
 export default function App(): React.JSX.Element {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [usExpanded, setUsExpanded] = useState(false);
   const toggleMenu = () => setMenuVisible(prev => !prev);
+  const toggleUs = () => setUsExpanded(prev => !prev);
 
   return (
     <View style={styles.container}>
@@ -32,12 +34,21 @@ export default function App(): React.JSX.Element {
               <Text style={styles.menuItemText}>Close</Text>
             </TouchableOpacity>
             <Text style={styles.sectionHeader}>Sections</Text>
-            <TouchableOpacity style={styles.subItem}>
-              <Text style={styles.subItemText}>Problems</Text>
+            <TouchableOpacity onPress={toggleUs} style={styles.menuItem}>
+              <Text style={styles.menuItemText}>
+                {usExpanded ? '▼' : '▶'} US
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.subItem}>
-              <Text style={styles.subItemText}>Resources</Text>
-            </TouchableOpacity>
+            {usExpanded && (
+              <>
+                <TouchableOpacity style={styles.subItem}>
+                  <Text style={styles.subItemText}>Problems</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.subItem}>
+                  <Text style={styles.subItemText}>Resources</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
       </Modal>
