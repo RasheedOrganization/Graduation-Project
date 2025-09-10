@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, Text, ActivityIndicator, StyleSheet, ViewStyle} from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  ViewStyle,
+} from 'react-native';
 
 interface AsyncButtonProps {
   onPress: () => Promise<void>;
@@ -8,7 +14,12 @@ interface AsyncButtonProps {
   style?: ViewStyle;
 }
 
-const AsyncButton: React.FC<AsyncButtonProps> = ({onPress, onSuccess, children, style}) => {
+const AsyncButton: React.FC<AsyncButtonProps> = ({
+  onPress,
+  onSuccess,
+  children,
+  style,
+}) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -29,7 +40,10 @@ const AsyncButton: React.FC<AsyncButtonProps> = ({onPress, onSuccess, children, 
   };
 
   return (
-    <TouchableOpacity style={[styles.button, style]} onPress={handlePress} disabled={loading}>
+    <TouchableOpacity
+      style={[styles.button, style]}
+      onPress={handlePress}
+      disabled={loading}>
       {loading ? (
         <ActivityIndicator color="#fff" />
       ) : success ? (
