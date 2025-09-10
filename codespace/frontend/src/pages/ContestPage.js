@@ -41,6 +41,7 @@ function ContestPage() {
   const [form, setForm] = useState({ name: '', startTime: '', duration: '' });
   const userId = localStorage.getItem('userid');
   const role = localStorage.getItem('role');
+  const token = localStorage.getItem('token');
   const isAdmin = role === 'admin' || role === 'superadmin';
 
   const handleInputChange = (e) => {
@@ -88,7 +89,10 @@ function ContestPage() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/contests`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({
           name: form.name,
           startTime: new Date(form.startTime).toISOString(),

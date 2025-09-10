@@ -13,6 +13,7 @@ function ContestDetailPage() {
   const [selectedProblem, setSelectedProblem] = useState('');
   const isPastContest = contest && new Date(contest.startTime) <= Date.now();
   const role = localStorage.getItem('role');
+  const token = localStorage.getItem('token');
   const isAdmin = role === 'admin' || role === 'superadmin';
 
   useEffect(() => {
@@ -118,7 +119,10 @@ function ContestDetailPage() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/contests/${id}/problems`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({ problem: selectedProblem })
       });
       if (res.ok) {
