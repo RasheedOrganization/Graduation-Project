@@ -114,8 +114,8 @@ function NavBar() {
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/" className="brand-link">
-          <img src={logo} alt="Code Hub logo" className="brand-logo" />
-          <span className="brand-name">Code Hub</span>
+          <img src={logo} alt="CodeSpace logo" className="brand-logo" />
+          <span className="brand-name">CodeSpace</span>
         </Link>
       </div>
       <div className="navbar-search">
