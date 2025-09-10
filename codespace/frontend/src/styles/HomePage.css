@@ -16,6 +16,7 @@
   background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a1c4fd);
   background-size: 400% 400%;
   padding: 0 1rem 3rem;
+  min-height: 500px;
 }
 
 .home-title {
