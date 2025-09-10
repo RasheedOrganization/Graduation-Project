@@ -32,8 +32,8 @@ router.post('/', auth, permit('admin', 'superadmin'), async (req, res) => {
 
     await Topic.updateOne(
       { stage, topic, subtopic },
-      { stage, topic, subtopic },
-      { upsert: true }
+      { $set: { stage, topic, subtopic } },
+      { upsert: true, setDefaultsOnInsert: true }
     );
 
     res.status(201).json(resource);
@@ -75,8 +75,8 @@ router.patch('/:id', auth, async (req, res) => {
     ) {
       await Topic.updateOne(
         { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic },
-        { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic },
-        { upsert: true }
+        { $set: { stage: resource.stage, topic: resource.topic, subtopic: resource.subtopic } },
+        { upsert: true, setDefaultsOnInsert: true }
       );
     }
 
