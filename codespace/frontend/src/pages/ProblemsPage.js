@@ -89,7 +89,12 @@ function ProblemsPage() {
     const { stage, name } = newTopic;
     if (!stage || !name) return;
     try {
-      await axios.post(`${BACKEND_URL}/api/topics`, { stage, topic: name });
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${BACKEND_URL}/api/topics`,
+        { stage, topic: name },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setTopics((prev) => ({
         ...prev,
         [stage]: { ...(prev[stage] || {}), [name]: [] },
@@ -107,7 +112,12 @@ function ProblemsPage() {
     const { stage, topic, name } = newSubtopic;
     if (!stage || !topic || !name) return;
     try {
-      await axios.post(`${BACKEND_URL}/api/topics`, { stage, topic, subtopic: name });
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${BACKEND_URL}/api/topics`,
+        { stage, topic, subtopic: name },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setTopics((prev) => ({
         ...prev,
         [stage]: {
@@ -126,7 +136,12 @@ function ProblemsPage() {
     e.preventDefault();
     if (!isAdmin) return;
     try {
-      const res = await axios.post(`${BACKEND_URL}/api/problems`, formData);
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        `${BACKEND_URL}/api/problems`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setProblems((prev) => [...prev, res.data]);
       setFormData({ name: '', link: '', stage: '', topic: '', subtopic: '', difficulty: '' });
       setShowForm(false);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 function ResourcesSidebar({
   showForm,
@@ -52,67 +53,81 @@ function ResourcesSidebar({
                 onChange={handleFormChange}
                 required
               />
-              <select
-                name="stage"
-                value={formData.stage}
-                onChange={handleFormChange}
-                required
-              >
-                <option value="">Select Stage</option>
-                {['Bronze', 'Silver', 'Gold'].map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="topic"
-                value={formData.topic}
-                onChange={handleFormChange}
-                disabled={!formData.stage}
-                required
-              >
-                <option value="">Select Topic</option>
-                {formData.stage &&
-                  Object.keys(topics[formData.stage] || {}).map((topic) => (
-                    <option key={topic} value={topic}>
-                      {topic}
-                    </option>
+              <FormControl fullWidth size="small">
+                <InputLabel id="resource-stage-label">Stage</InputLabel>
+                <Select
+                  labelId="resource-stage-label"
+                  name="stage"
+                  value={formData.stage}
+                  label="Stage"
+                  onChange={handleFormChange}
+                  required
+                >
+                  {['Bronze', 'Silver', 'Gold'].map((s) => (
+                    <MenuItem key={s} value={s}>
+                      {s}
+                    </MenuItem>
                   ))}
-              </select>
-              <select
-                name="subtopic"
-                value={formData.subtopic}
-                onChange={handleFormChange}
-                disabled={!formData.topic}
-                required
-              >
-                <option value="">Select Subtopic</option>
-                {formData.stage &&
-                  formData.topic &&
-                  topics[formData.stage][formData.topic].map((sub) => (
-                    <option key={sub} value={sub}>
-                      {sub}
-                    </option>
-                  ))}
-              </select>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small" disabled={!formData.stage}>
+                <InputLabel id="resource-topic-label">Topic</InputLabel>
+                <Select
+                  labelId="resource-topic-label"
+                  name="topic"
+                  value={formData.topic}
+                  label="Topic"
+                  onChange={handleFormChange}
+                  required
+                >
+                  {formData.stage &&
+                    Object.keys(topics[formData.stage] || {}).map((topic) => (
+                      <MenuItem key={topic} value={topic}>
+                        {topic}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small" disabled={!formData.topic}>
+                <InputLabel id="resource-subtopic-label">Subtopic</InputLabel>
+                <Select
+                  labelId="resource-subtopic-label"
+                  name="subtopic"
+                  value={formData.subtopic}
+                  label="Subtopic"
+                  onChange={handleFormChange}
+                  required
+                >
+                  {formData.stage &&
+                    formData.topic &&
+                    topics[formData.stage][formData.topic].map((sub) => (
+                      <MenuItem key={sub} value={sub}>
+                        {sub}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
               <button type="submit">Add</button>
             </form>
           )}
           {showTopicForm && (
             <form className="add-topic-form" onSubmit={addTopic}>
-              <select
-                value={newTopic.stage}
-                onChange={(e) => setNewTopic((prev) => ({ ...prev, stage: e.target.value }))}
-                required
-              >
-                <option value="">Select Stage</option>
-                {['Bronze', 'Silver', 'Gold'].map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+              <FormControl fullWidth size="small">
+                <InputLabel id="topic-stage-label">Stage</InputLabel>
+                <Select
+                  labelId="topic-stage-label"
+                  value={newTopic.stage}
+                  label="Stage"
+                  onChange={(e) => setNewTopic((prev) => ({ ...prev, stage: e.target.value }))}
+                  required
+                >
+                  {['Bronze', 'Silver', 'Gold'].map((s) => (
+                    <MenuItem key={s} value={s}>
+                      {s}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <input
                 type="text"
                 value={newTopic.name}
@@ -125,32 +140,43 @@ function ResourcesSidebar({
           )}
           {showSubtopicForm && (
             <form className="add-subtopic-form" onSubmit={addSubtopic}>
-              <select
-                value={newSubtopic.stage}
-                onChange={(e) => setNewSubtopic((prev) => ({ ...prev, stage: e.target.value, topic: '' }))}
-                required
-              >
-                <option value="">Select Stage</option>
-                {['Bronze', 'Silver', 'Gold'].map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={newSubtopic.topic}
-                onChange={(e) => setNewSubtopic((prev) => ({ ...prev, topic: e.target.value }))}
-                disabled={!newSubtopic.stage}
-                required
-              >
-                <option value="">Select Topic</option>
-                {newSubtopic.stage &&
-                  Object.keys(topics[newSubtopic.stage] || {}).map((topic) => (
-                    <option key={topic} value={topic}>
-                      {topic}
-                    </option>
+              <FormControl fullWidth size="small">
+                <InputLabel id="subtopic-stage-label">Stage</InputLabel>
+                <Select
+                  labelId="subtopic-stage-label"
+                  value={newSubtopic.stage}
+                  label="Stage"
+                  onChange={(e) =>
+                    setNewSubtopic((prev) => ({ ...prev, stage: e.target.value, topic: '' }))
+                  }
+                  required
+                >
+                  {['Bronze', 'Silver', 'Gold'].map((s) => (
+                    <MenuItem key={s} value={s}>
+                      {s}
+                    </MenuItem>
                   ))}
-              </select>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small" disabled={!newSubtopic.stage}>
+                <InputLabel id="subtopic-topic-label">Topic</InputLabel>
+                <Select
+                  labelId="subtopic-topic-label"
+                  value={newSubtopic.topic}
+                  label="Topic"
+                  onChange={(e) =>
+                    setNewSubtopic((prev) => ({ ...prev, topic: e.target.value }))
+                  }
+                  required
+                >
+                  {newSubtopic.stage &&
+                    Object.keys(topics[newSubtopic.stage] || {}).map((topic) => (
+                      <MenuItem key={topic} value={topic}>
+                        {topic}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
               <input
                 type="text"
                 value={newSubtopic.name}
@@ -163,37 +189,59 @@ function ResourcesSidebar({
           )}
         </>
       )}
-      <select value={selectedStage} onChange={handleStageChange}>
-        <option value="">All Stages</option>
-        {['Bronze', 'Silver', 'Gold'].map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
-      <select value={selectedTopic} onChange={handleTopicChange} disabled={!selectedStage}>
-        <option value="">All Topics</option>
-        {selectedStage &&
-          Object.keys(topics[selectedStage] || {}).map((topic) => (
-            <option key={topic} value={topic}>
-              {topic}
-            </option>
+      <FormControl fullWidth size="small">
+        <InputLabel id="filter-stage-label">Stage</InputLabel>
+        <Select
+          labelId="filter-stage-label"
+          value={selectedStage}
+          label="Stage"
+          onChange={handleStageChange}
+        >
+          <MenuItem value="">All Stages</MenuItem>
+          {['Bronze', 'Silver', 'Gold'].map((s) => (
+            <MenuItem key={s} value={s}>
+              {s}
+            </MenuItem>
           ))}
-      </select>
-      <select
-        value={selectedSubtopic}
-        onChange={(e) => setSelectedSubtopic(e.target.value)}
-        disabled={!selectedTopic}
-      >
-        <option value="">All Subtopics</option>
-        {selectedStage &&
-          selectedTopic &&
-          topics[selectedStage][selectedTopic].map((sub) => (
-            <option key={sub} value={sub}>
-              {sub}
-            </option>
-          ))}
-      </select>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small" disabled={!selectedStage}>
+        <InputLabel id="filter-topic-label">Topic</InputLabel>
+        <Select
+          labelId="filter-topic-label"
+          value={selectedTopic}
+          label="Topic"
+          onChange={handleTopicChange}
+          disabled={!selectedStage}
+        >
+          <MenuItem value="">All Topics</MenuItem>
+          {selectedStage &&
+            Object.keys(topics[selectedStage] || {}).map((topic) => (
+              <MenuItem key={topic} value={topic}>
+                {topic}
+              </MenuItem>
+            ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small" disabled={!selectedTopic}>
+        <InputLabel id="filter-subtopic-label">Subtopic</InputLabel>
+        <Select
+          labelId="filter-subtopic-label"
+          value={selectedSubtopic}
+          label="Subtopic"
+          onChange={(e) => setSelectedSubtopic(e.target.value)}
+          disabled={!selectedTopic}
+        >
+          <MenuItem value="">All Subtopics</MenuItem>
+          {selectedStage &&
+            selectedTopic &&
+            topics[selectedStage][selectedTopic].map((sub) => (
+              <MenuItem key={sub} value={sub}>
+                {sub}
+              </MenuItem>
+            ))}
+        </Select>
+      </FormControl>
     </div>
   );
 }

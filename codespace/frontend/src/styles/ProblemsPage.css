@@ -30,12 +30,9 @@
   height: 100%;
 }
 
-.left-menu select {
+.left-menu .MuiFormControl-root {
   width: 100%;
-  padding: 8px;
   margin-bottom: 15px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
 }
 
 .left-menu button {
@@ -62,7 +59,7 @@
 }
 
 .add-resource-form input,
-.add-resource-form select,
+.add-resource-form .MuiFormControl-root,
 .add-resource-form button {
   width: 100%;
   padding: 8px;
@@ -77,8 +74,9 @@
 }
 
 .add-topic-form input,
+.add-topic-form .MuiFormControl-root,
 .add-topic-form button,
-.add-subtopic-form select,
+.add-subtopic-form .MuiFormControl-root,
 .add-subtopic-form input,
 .add-subtopic-form button {
   width: 100%;
