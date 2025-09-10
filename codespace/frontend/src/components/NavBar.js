@@ -17,6 +17,7 @@ function NavBar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
@@ -101,6 +102,14 @@ function NavBar() {
     navigate('/login');
   };
 
+  const toggleMenu = () => {
+    setMenuOpen((prev) => !prev);
+  };
+
+  const handleLinkClick = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -141,7 +150,14 @@ function NavBar() {
           </div>
         )}
       </div>
-      <ul className="navbar-links">
+      <button
+        className="navbar-toggle"
+        aria-expanded={menuOpen}
+        onClick={toggleMenu}
+      >
+        ☰
+      </button>
+      <ul className={`navbar-links ${menuOpen ? 'open' : ''}`} onClick={handleLinkClick}>
         <li><Link to="/problems">Problems</Link></li>
         <li><Link to="/resources">Resources</Link></li>
         <li><Link to="/sections">Sections</Link></li>

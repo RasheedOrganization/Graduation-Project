@@ -64,6 +64,15 @@
   font-weight: bold;
 }
 
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
 .navbar-links {
   list-style: none;
   display: flex;
@@ -123,4 +132,31 @@
 
 .profile-button:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+  }
+
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+
+  .navbar-links.open {
+    display: flex;
+  }
+
+  .navbar-toggle {
+    display: block;
+  }
+
+  .navbar-search {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
 }
