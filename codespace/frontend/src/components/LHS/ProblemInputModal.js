@@ -16,12 +16,14 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 1000,
-  height: 500,
+  width: '90vw',
+  maxWidth: 1000,
+  maxHeight: '90vh',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
+  overflowY: 'auto',
 };
 
 export default function ProblemInputModal({text,setText,input,setInput}) {

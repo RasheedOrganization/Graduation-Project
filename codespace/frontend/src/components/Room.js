@@ -58,6 +58,9 @@ const modalStyle = {
   transform: 'translate(-50%, -50%)',
   backgroundColor: 'white',
   padding: '20px',
+  maxWidth: '90vw',
+  maxHeight: '90vh',
+  overflowY: 'auto',
 };
 
 export default function Room() {
