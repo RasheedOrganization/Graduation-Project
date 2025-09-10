@@ -44,7 +44,7 @@ router.post('/verify-problem', async (req, res) => {
   if (!apiKey) {
     return res.status(500).json({ error: 'Missing GEMINI_API_KEY' });
   }
-  const text = `You are a competitive programming problem validator. If the following statement is missing information or is unclear, rewrite it to be complete and unambiguous. Otherwise reply with the original statement.\n\n${statement}`;
+  const text = `You are a competitive programming problem validator. If the following statement is missing information or is unclear, rewrite it to be complete and unambiguous. Otherwise reply with the original statement. Respond ONLY with valid JSON of the form {"statement":"<final statement>"} and nothing else.\n\n${statement}`;
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
@@ -62,7 +62,25 @@ router.post('/verify-problem', async (req, res) => {
       data.candidates[0].content.parts
         ? data.candidates[0].content.parts.map((p) => p.text).join('')
         : statement;
-    res.json({ statement: aiText });
+
+    let verifiedStatement = statement;
+    try {
+      const match = aiText.match(/\{[\s\S]*\}/);
+      if (match) {
+        const obj = JSON.parse(match[0]);
+        if (obj.statement) {
+          verifiedStatement = obj.statement.trim();
+        } else {
+          console.error('No statement field in AI response JSON');
+        }
+      } else {
+        console.error('No JSON object found in AI response');
+      }
+    } catch (e) {
+      console.error('Failed to parse statement from AI', e);
+    }
+
+    res.json({ statement: verifiedStatement });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to verify problem statement' });
