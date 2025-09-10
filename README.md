@@ -126,6 +126,20 @@ npm start
 Adjust any variables in the `.env` files if your local services run on different
 hosts or ports.
 
+## Android App
+
+A React Native project lives under `AndroidApp/` and provides a basic mobile client.
+
+### Running on Android
+
+```bash
+cd AndroidApp
+npm install
+npx react-native run-android
+```
+
+The app shares configuration via `src/config.ts` and includes an `AsyncButton` component adapted from the web frontend. Ensure an Android emulator or device and the Android SDK are available before running.
+
 ### Code execution sandbox
 
 The `/test` endpoint compiles and runs user-submitted C++ code inside a
