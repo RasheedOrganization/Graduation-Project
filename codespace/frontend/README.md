@@ -75,3 +75,13 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Image placeholders
+
+The Home page references the following placeholder images. Add them later under `frontend/public/images/`:
+
+- `feature_problems.jpg`
+- `feature_resources.jpg`
+- `feature_sections.jpg`
+- `feature_contests.jpg`
+- `feature_rooms.jpg`
