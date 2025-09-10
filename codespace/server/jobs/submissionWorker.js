@@ -206,6 +206,7 @@ async function submissionWorker(job) {
                         }
                     }
 
+                    verdictData = verdictData.trim();
                     if (verdictData !== 'Accepted') {
                         verdictData = `${verdictData} on test ${i + 1}`;
                         break;
