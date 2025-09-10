@@ -10,7 +10,8 @@
 
 textarea {
   font-size: 16px; /* Set the font size to 16 pixels (adjust as needed) */
-  width:max-content;
+  /* Ensure the textarea scales to the available width on small screens */
+  width: 100%;
   /* Add other styles as needed */
 }
 
@@ -139,7 +140,25 @@ button {
 
 .LHS-container, .RHS-container {
   /* overflow: auto; */
-  width: max-content;
+  /* Allow containers to shrink on smaller viewports */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Stack layout and shrink elements for mobile screens */
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .LHS-container, .RHS-container {
+    width: 100%;
+  }
 }
 
 .gutter {
