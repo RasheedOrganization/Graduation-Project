@@ -61,7 +61,7 @@ class CursorWidget extends WidgetType {
         return span;
     }
 }
-export default function TextBox({socketRef,currentProbId,tests,onCodeChange,roomId}) {
+export default function TextBox({socketRef,currentProbId,tests,onCodeChange,roomId,contestId}) {
     console.log('I am textbox and the current problem id is ' + currentProbId);
     const [language, setLanguage] = useState('cpp');
     const [textvalue, setTextvalue] = useState(defaultCpp);
@@ -232,6 +232,9 @@ export default function TextBox({socketRef,currentProbId,tests,onCodeChange,room
                 code: textvalue,
                 language: language
             };
+            if (contestId) {
+                requestData.contestId = contestId;
+            }
             if (currentProbId) {
                 requestData.problem_id = currentProbId;
             } else if (tests && tests.length > 0) {

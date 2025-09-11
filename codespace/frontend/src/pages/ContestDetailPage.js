@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Box, Typography, Button, List, ListItem, Modal } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, Modal, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 import CustomProblemPanel from '../components/CustomProblemPanel';
@@ -13,6 +13,7 @@ function ContestDetailPage() {
   const [registered, setRegistered] = useState(false);
   const [problemList, setProblemList] = useState([]);
   const [customOpen, setCustomOpen] = useState(false);
+  const [scoreboard, setScoreboard] = useState([]);
   const isPastContest = contest && new Date(contest.startTime) <= Date.now();
   const role = localStorage.getItem('role');
   const token = localStorage.getItem('token');
@@ -84,6 +85,23 @@ function ContestDetailPage() {
     return () => clearInterval(interval);
   }, [contest]);
 
+  useEffect(() => {
+    async function fetchScoreboard() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/contests/${id}/scoreboard`);
+        if (res.ok) {
+          const data = await res.json();
+          setScoreboard(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch scoreboard');
+      }
+    }
+    if (contest) {
+      fetchScoreboard();
+    }
+  }, [contest, id]);
+
   const register = async () => {
     const userId = localStorage.getItem('userid');
     try {
@@ -154,7 +172,7 @@ function ContestDetailPage() {
                       <ListItem
                         key={idx}
                         component={Link}
-                        to={`/problems/${prob.id}`}
+                        to={`/problems/${prob.id}?contest=${id}`}
                         sx={{ cursor: 'pointer' }}
                       >
                         {p}
@@ -179,7 +197,30 @@ function ContestDetailPage() {
             <Box sx={{ mt: 4 }}>
               <Typography variant="h6">Scoreboard</Typography>
               <Box sx={{ bgcolor: '#f5f5f5', p: 2 }}>
-                <Typography variant="body2">Scoreboard will appear here.</Typography>
+                {scoreboard.length > 0 ? (
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>User</TableCell>
+                        {contest.problems.map((p) => (
+                          <TableCell key={p}>{p}</TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {scoreboard.map((row) => (
+                        <TableRow key={row.userId}>
+                          <TableCell>{row.username}</TableCell>
+                          {contest.problems.map((p) => (
+                            <TableCell key={p}>{row.results[p] || '-'}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Typography variant="body2">No submissions yet.</Typography>
+                )}
               </Box>
             </Box>
 

@@ -26,7 +26,7 @@ function authenticate(req, res, next) {
 }
 
 router.post('/', authenticate, async (req, res) => {
-  const { code, problem_id, language = 'cpp', tests } = req.body;
+  const { code, problem_id, language = 'cpp', tests, contestId } = req.body;
   if (!code) {
     return res.status(400).send('Code is required.');
   }
@@ -61,6 +61,7 @@ router.post('/', authenticate, async (req, res) => {
       code,
       verdict: verdictData,
       language,
+      contest: contestId && mongoose.Types.ObjectId.isValid(contestId) ? new mongoose.Types.ObjectId(contestId) : undefined,
     });
     await submission.save();
   } catch (err) {
