@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Contest = require('../model/contestModel');
+const Submission = require('../model/submissionModel');
+const User = require('../model/userModel');
 const auth = require('../middleware/authMiddleware');
 const permit = require('../middleware/roleMiddleware');
 
@@ -118,6 +120,41 @@ router.post('/:id/problems', auth, permit('admin', 'superadmin'), async (req, re
       await contest.save();
     }
     res.json({ message: 'Problem added' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get scoreboard for a contest
+router.get('/:id/scoreboard', async (req, res) => {
+  try {
+    const contest = await Contest.findById(req.params.id).lean();
+    if (!contest) {
+      return res.status(404).json({ message: 'Contest not found' });
+    }
+
+    const users = await User.find({ _id: { $in: contest.participants } })
+      .select('username')
+      .lean();
+    const submissions = await Submission.find({ contest: contest._id }).lean();
+
+    const scoreboard = users.map((u) => {
+      const results = {};
+      contest.problems.forEach((p) => {
+        const subs = submissions.filter(
+          (s) => s.user.toString() === u._id.toString() && s.problem === p
+        );
+        if (subs.length > 0) {
+          const last = subs.reduce((a, b) => (a.createdAt > b.createdAt ? a : b));
+          results[p] = last.verdict;
+        } else {
+          results[p] = null;
+        }
+      });
+      return { userId: u._id, username: u.username, results };
+    });
+
+    res.json(scoreboard);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

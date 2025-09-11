@@ -5,7 +5,8 @@ const submissionSchema = new mongoose.Schema({
   problem: { type: String, required: true },
   code: { type: String, required: true },
   verdict: { type: String, required: true },
-  language: { type: String, required: true }
+  language: { type: String, required: true },
+  contest: { type: mongoose.Schema.Types.ObjectId, ref: 'Contest' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Submission', submissionSchema);
