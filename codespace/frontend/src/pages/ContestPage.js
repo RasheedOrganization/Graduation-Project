@@ -7,22 +7,45 @@ import {
   Card,
   CardContent,
   CardActions,
+  CardActionArea,
   Button,
   Typography,
-  TextField
+  TextField,
+  Stack
 } from '@mui/material';
+import EventIcon from '@mui/icons-material/Event';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import NavBar from '../components/NavBar';
 import BACKEND_URL from '../config';
 
 function ContestCard({ contest, onRegister, userId }) {
   const isRegistered = userId && contest.participants && contest.participants.includes(userId);
+  const formattedStart = new Date(contest.startTime).toLocaleString();
+
   return (
-    <Card sx={{ mb: 2 }}>
-      <CardContent component={Link} to={`/contests/${contest._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <Typography variant="h6">{contest.name}</Typography>
-        <Typography variant="body2">Start: {new Date(contest.startTime).toLocaleString()}</Typography>
-        <Typography variant="body2">Duration: {contest.duration} minutes</Typography>
-      </CardContent>
+    <Card
+      sx={{
+        mb: 2,
+        borderRadius: 2,
+        boxShadow: 3,
+        '&:hover': { boxShadow: 6 }
+      }}
+    >
+      <CardActionArea component={Link} to={`/contests/${contest._id}`} sx={{ textDecoration: 'none', color: 'inherit' }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            {contest.name}
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+            <EventIcon fontSize="small" />
+            <Typography variant="body2">{formattedStart}</Typography>
+          </Stack>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <AccessTimeIcon fontSize="small" />
+            <Typography variant="body2">{contest.duration} minutes</Typography>
+          </Stack>
+        </CardContent>
+      </CardActionArea>
       {onRegister && (
         <CardActions>
           <Button size="small" onClick={() => onRegister(contest._id)} disabled={isRegistered}>
